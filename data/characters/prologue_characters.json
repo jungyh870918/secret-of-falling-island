@@ -1,0 +1,56 @@
+{
+	"_comment": "캐릭터 외형. 명세서 §6.2 크기 / §6.7 디자인. 스프라이트시트가 들어오면 assets/sprites/characters/<id>.png 가 자동으로 우선한다.",
+
+	"entries": [
+		{
+			"character_id": "han_gaemi",
+			"_note": "§6.7 한개미 — 갈색 정장 바지, 소매 걷은 와이셔츠, 낡은 가방, 약간 헝클어진 머리",
+			"height": 46,
+			"walk_speed": 64,
+			"hair_style": "messy",
+			"has_bag": true,
+			"frame_size": [32, 48],
+			"colors": {
+				"skin": "#d8a888",
+				"hair": "#241c22",
+				"shirt": "#e8d9b8",
+				"pants": "#5a4632",
+				"accent": "#8c3327",
+				"shoes": "#241f2b"
+			}
+		},
+		{
+			"character_id": "boss",
+			"_note": "부장. 프롤로그 한정. 반짝이지 않는 정장, 벗겨진 머리, 표정 변화 없음.",
+			"height": 48,
+			"walk_speed": 44,
+			"hair_style": "bald",
+			"frame_size": [32, 48],
+			"colors": {
+				"skin": "#d0a084",
+				"hair": "#3a3238",
+				"shirt": "#c9c6b4",
+				"pants": "#3d3a44",
+				"accent": "#4a4a4c",
+				"shoes": "#1b1820"
+			}
+		},
+		{
+			"character_id": "sera",
+			"_note": "§6.7 윤세라 — 적갈색 단발, 검은 터틀넥, 긴 코트, 각진 실루엣. 챕터1부터 등장하지만 정의는 미리 둔다.",
+			"height": 47,
+			"walk_speed": 60,
+			"hair_style": "bob",
+			"has_coat": true,
+			"frame_size": [32, 48],
+			"colors": {
+				"skin": "#dcae90",
+				"hair": "#6b3226",
+				"shirt": "#1b1820",
+				"pants": "#241f2b",
+				"accent": "#2c2634",
+				"shoes": "#0d0b10"
+			}
+		}
+	]
+}

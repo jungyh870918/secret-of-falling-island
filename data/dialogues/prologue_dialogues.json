@@ -1,0 +1,132 @@
+{
+	"_comment": "명세서 §16.2 대화 데이터 스키마. §8.1 프롤로그 시작 대본을 그대로 옮겼다. §0-7 원칙에 따라 어떤 선택지도 게임 오버나 영구 잠김으로 이어지지 않는다 — 모든 분기는 같은 지점으로 합류한다.",
+
+	"entries": [
+		{
+			"dialogue_id": "prologue_open",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "narrator", "text_key": "dlg.open.n001", "next": "n002" },
+				"n002": { "speaker": "player", "text_key": "dlg.open.n002", "next": "n003" },
+				"n003": { "speaker": "player", "text_key": "dlg.open.n003", "next": "n004" },
+				"n004": {
+					"result": { "flags": { "prologue_started": true } },
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "boss_first_talk",
+			"_note": "§8.1 '프롤로그 시작 대본'. 선택지 4개는 명세서 원문 그대로이며, 어느 것을 골라도 부장의 결론('자네는 참 안정적이야')으로 합류한다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "boss", "text_key": "dlg.boss1.n001", "next": "n002" },
+
+				"n002": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.boss1.c001", "next": "n010" },
+						{ "text_key": "dlg.boss1.c002", "next": "n020" },
+						{ "text_key": "dlg.boss1.c003", "next": "n030" },
+						{ "text_key": "dlg.boss1.c004", "next": "n040" }
+					]
+				},
+
+				"n010": { "speaker": "boss", "text_key": "dlg.boss1.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.boss1.n011", "next": "n012" },
+				"n012": { "speaker": "boss", "text_key": "dlg.boss1.n012", "next": "n050" },
+
+				"n020": { "speaker": "boss", "text_key": "dlg.boss1.n020", "next": "n021" },
+				"n021": { "speaker": "player", "text_key": "dlg.boss1.n021", "next": "n022" },
+				"n022": { "speaker": "boss", "text_key": "dlg.boss1.n022", "next": "n050" },
+
+				"n030": { "speaker": "boss", "text_key": "dlg.boss1.n030", "next": "n031" },
+				"n031": { "speaker": "player", "text_key": "dlg.boss1.n031", "next": "n032" },
+				"n032": { "speaker": "narrator", "text_key": "dlg.boss1.n032", "next": "n050" },
+
+				"n040": { "speaker": "boss", "text_key": "dlg.boss1.n040", "next": "n041" },
+				"n041": { "speaker": "boss", "text_key": "dlg.boss1.n041", "next": "n042" },
+				"n042": { "speaker": "player", "text_key": "dlg.boss1.n042", "next": "n050" },
+
+				"n050": { "speaker": "boss", "text_key": "dlg.boss1.n050", "next": "n051" },
+				"n051": { "speaker": "narrator", "text_key": "dlg.boss1.n051", "next": "n052" },
+				"n052": { "speaker": "narrator", "text_key": "dlg.boss1.n052", "next": "n060" },
+
+				"n060": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.boss1.c010", "next": "n061" },
+						{ "text_key": "dlg.boss1.c011", "next": "n070" }
+					]
+				},
+				"n061": { "speaker": "boss", "text_key": "dlg.boss1.n061", "next": "n062" },
+				"n062": { "speaker": "player", "text_key": "dlg.boss1.n062", "next": "n070" },
+
+				"n070": { "speaker": "boss", "text_key": "dlg.boss1.n070", "next": "n071" },
+				"n071": { "speaker": "player", "text_key": "dlg.boss1.n071", "next": "n072" },
+				"n072": { "speaker": "boss", "text_key": "dlg.boss1.n072", "next": "n080" },
+
+				"n080": {
+					"result": {
+						"flags": { "talked_to_boss": true },
+						"autosave": true
+					},
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "boss_idle",
+			"_note": "반복 대화. §13.1 '한 장면에서 같은 밈 반복 금지' — 선택지가 소진되면 대화가 짧게 끝난다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "boss", "text_key": "dlg.bossidle.n001", "next": "n002" },
+				"n002": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.bossidle.c001", "next": "n010", "once": true },
+						{ "text_key": "dlg.bossidle.c002", "next": "n020", "once": true },
+						{
+							"text_key": "dlg.bossidle.c003",
+							"next": "n030",
+							"once": true,
+							"requires": { "flags": ["knows_boss_caffeine"] }
+						},
+						{ "text_key": "dlg.bossidle.c004", "next": "end" }
+					]
+				},
+				"n010": { "speaker": "boss", "text_key": "dlg.bossidle.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.bossidle.n011", "next": "n012" },
+				"n012": { "speaker": "boss", "text_key": "dlg.bossidle.n012", "next": "end" },
+
+				"n020": { "speaker": "boss", "text_key": "dlg.bossidle.n020", "next": "end" },
+
+				"n030": { "speaker": "boss", "text_key": "dlg.bossidle.n030", "next": "n031" },
+				"n031": { "speaker": "player", "text_key": "dlg.bossidle.n031", "next": "end" }
+			}
+		},
+
+		{
+			"dialogue_id": "boss_leaving",
+			"_note": "§8.1 4단계 — 부장이 '오늘은 일찍 자야겠다'며 퇴근한다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "boss", "text_key": "dlg.bossleave.n001", "next": "n002" },
+				"n002": { "speaker": "narrator", "text_key": "dlg.bossleave.n002", "next": "n003" },
+				"n003": { "speaker": "boss", "text_key": "dlg.bossleave.n003", "next": "n004" },
+				"n004": { "speaker": "boss", "text_key": "dlg.bossleave.n004", "next": "n005" },
+				"n005": { "speaker": "boss", "text_key": "dlg.bossleave.n005", "next": "n006" },
+				"n006": {
+					"result": { "sfx": "door" },
+					"speaker": "narrator",
+					"text_key": "dlg.bossleave.n006",
+					"next": "n007"
+				},
+				"n007": { "speaker": "player", "text_key": "dlg.bossleave.n007", "next": "n008" },
+				"n008": { "speaker": "player", "text_key": "dlg.bossleave.n008", "next": "end" }
+			}
+		}
+	]
+}

@@ -1,0 +1,198 @@
+{
+	"_comment": "명세서 §8.1 '야근 중인 회의실'. 좌표계는 320x135 게임 영역 기준(하단 45px 은 명령 패널). blocks 는 임시 도트이며 background 에 PNG 를 넣으면 자동으로 대체된다.",
+
+	"scene_id": "office_meeting_room",
+	"name_key": "scene.office_meeting_room",
+	"background": "res://assets/backgrounds/office_meeting_room.png",
+	"palette": "institution",
+	"music": "office_night",
+	"active_puzzles": ["decaf_swap"],
+
+	"walkbox": [16, 100, 288, 28],
+
+	"spawn_points": {
+		"default": [64, 118],
+		"from_corridor": [258, 116]
+	},
+
+	"blocks": [
+		{ "rect": [0, 0, 320, 96], "color": "#39424e" },
+		{ "rect": [0, 78, 320, 18], "color": "#2f3742", "dither": "2x2", "color2": "#39424e" },
+		{ "rect": [0, 94, 320, 2], "color": "#1c222b" },
+		{ "rect": [0, 96, 320, 39], "color": "#43413f", "dither": "4x4", "color2": "#38363a" },
+
+		{ "_": "창문 — 밤의 도시. §6.4 디더링으로 하늘 처리", "rect": [26, 18, 68, 50], "color": "#2a2f3a" },
+		{ "rect": [29, 21, 62, 44], "color": "#141c2e", "dither": "4x4", "color2": "#1b2430" },
+		{ "rect": [34, 52, 4, 10], "color": "#3d5670" },
+		{ "rect": [42, 46, 5, 16], "color": "#3d5670" },
+		{ "rect": [52, 55, 3, 7], "color": "#245a5e" },
+		{ "rect": [60, 42, 6, 20], "color": "#3d5670" },
+		{ "rect": [72, 50, 4, 12], "color": "#245a5e" },
+		{ "rect": [44, 48, 1, 1], "color": "#e0b23a", "anim": "flicker" },
+		{ "rect": [62, 45, 1, 1], "color": "#e0b23a", "anim": "flicker" },
+		{ "rect": [26, 18, 68, 50], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "책상과 모니터 — §6.6 'HTS 화면에서 작은 캔들이 오르내림'", "rect": [96, 70, 176, 6], "color": "#6b5a44" },
+		{ "rect": [100, 76, 4, 20], "color": "#4a3d2e" },
+		{ "rect": [264, 76, 4, 20], "color": "#4a3d2e" },
+
+		{ "hotspot": "monitors", "rect": [106, 46, 32, 24], "color": "#2c2634" },
+		{ "hotspot": "monitors", "rect": [108, 48, 28, 18], "color": "#1b2430" },
+		{ "hotspot": "monitors", "rect": [112, 58, 3, 6], "color": "#8fd48a", "anim": "ticker" },
+		{ "hotspot": "monitors", "rect": [118, 55, 3, 9], "color": "#c8352e", "anim": "ticker" },
+		{ "hotspot": "monitors", "rect": [124, 57, 3, 7], "color": "#8fd48a", "anim": "ticker" },
+		{ "hotspot": "monitors", "rect": [130, 53, 3, 11], "color": "#c8352e", "anim": "ticker" },
+
+		{ "hotspot": "monitors", "rect": [148, 46, 32, 24], "color": "#2c2634" },
+		{ "hotspot": "monitors", "rect": [150, 48, 28, 18], "color": "#1b2430" },
+		{ "hotspot": "monitors", "rect": [154, 51, 20, 2], "color": "#8f9a8c", "anim": "flicker" },
+		{ "hotspot": "monitors", "rect": [154, 55, 20, 2], "color": "#8f9a8c" },
+		{ "hotspot": "monitors", "rect": [154, 59, 20, 2], "color": "#8f9a8c" },
+		{ "hotspot": "monitors", "rect": [154, 63, 14, 2], "color": "#8f9a8c" },
+
+		{ "hotspot": "monitors", "rect": [190, 46, 32, 24], "color": "#2c2634" },
+		{ "hotspot": "monitors", "rect": [192, 48, 28, 18], "color": "#1b2430" },
+		{ "hotspot": "monitors", "rect": [196, 51, 20, 2], "color": "#8f9a8c" },
+		{ "hotspot": "monitors", "rect": [196, 55, 20, 2], "color": "#8f9a8c", "anim": "flicker" },
+		{ "hotspot": "monitors", "rect": [196, 59, 20, 2], "color": "#8f9a8c" },
+
+		{ "_": "부장의 머그컵 + '더 스트롱' 봉지 — 관찰 대상", "hotspot": "boss_mug", "rect": [226, 60, 11, 10], "color": "#c9c6b4" },
+		{ "hotspot": "boss_mug", "rect": [226, 60, 11, 3], "color": "#8f9a8c" },
+		{ "hotspot": "boss_mug", "rect": [237, 63, 3, 5], "color": "#c9c6b4" },
+		{ "hotspot": "boss_mug", "rect": [226, 60, 11, 10], "outline": "#1b1820", "color": "#00000000" },
+		{ "hotspot": "boss_mug", "rect": [240, 61, 9, 9], "color": "#c8352e" },
+		{ "hotspot": "boss_mug", "rect": [241, 63, 7, 2], "color": "#e0b23a" },
+
+		{ "_": "지난달 보고서 더미", "hotspot": "report_stack", "rect": [252, 62, 20, 8], "color": "#c9c6b4" },
+		{ "hotspot": "report_stack", "rect": [252, 62, 20, 2], "color": "#e8d9b8" },
+		{ "hotspot": "report_stack", "rect": [254, 66, 16, 1], "color": "#8f9a8c" },
+		{ "hotspot": "report_stack", "rect": [252, 62, 20, 8], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "시계 — 11시", "hotspot": "wall_clock", "rect": [256, 16, 16, 16], "color": "#c9c6b4" },
+		{ "hotspot": "wall_clock", "rect": [256, 16, 16, 16], "outline": "#1b1820", "color": "#00000000" },
+		{ "hotspot": "wall_clock", "rect": [263, 20, 1, 5], "color": "#1b1820" },
+		{ "hotspot": "wall_clock", "rect": [259, 23, 5, 1], "color": "#1b1820" },
+
+		{ "_": "복도로 나가는 문", "hotspot": "door_corridor", "rect": [276, 38, 34, 60], "color": "#4a3d2e" },
+		{ "hotspot": "door_corridor", "rect": [279, 41, 28, 57], "color": "#6b5a44" },
+		{ "hotspot": "door_corridor", "rect": [282, 66, 4, 4], "color": "#b98a3c" },
+		{ "hotspot": "door_corridor", "rect": [276, 38, 34, 60], "outline": "#1b1820", "color": "#00000000" }
+	],
+
+	"hotspots": [
+		{
+			"id": "boss",
+			"name_key": "hotspot.boss",
+			"default_verb": "talk",
+			"character": "boss",
+			"stand_at": [162, 118],
+			"facing": "down",
+			"rect": [146, 70, 32, 50],
+			"walk_to": [128, 120],
+			"actions": ["look", "talk", "use"],
+			"defaults": {
+				"pickup": "fail.boss.pickup",
+				"push": "fail.boss.push",
+				"pull": "fail.boss.pull",
+				"open": "fail.boss.open",
+				"close": "fail.boss.close"
+			}
+		},
+		{
+			"id": "boss_mug",
+			"name_key": "hotspot.boss_mug",
+			"default_verb": "look",
+			"rect": [222, 56, 28, 16],
+			"walk_to": [236, 104],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.mug.talk",
+				"push": "fail.mug.push",
+				"pull": "fail.mug.push",
+				"open": "fail.mug.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "monitors",
+			"name_key": "hotspot.monitors",
+			"default_verb": "look",
+			"rect": [102, 44, 122, 28],
+			"walk_to": [150, 104],
+			"actions": ["look", "use"],
+			"defaults": {
+				"talk": "fail.monitors.talk",
+				"pickup": "fail.monitors.pickup",
+				"push": "fail.monitors.push",
+				"pull": "fail.monitors.push",
+				"open": "fail.monitors.open",
+				"close": "fail.monitors.close"
+			}
+		},
+		{
+			"id": "report_stack",
+			"name_key": "hotspot.report_stack",
+			"default_verb": "pickup",
+			"rect": [250, 58, 24, 14],
+			"walk_to": [262, 104],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.report.talk",
+				"push": "fail.report.push",
+				"pull": "fail.report.push",
+				"open": "fail.report.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "window",
+			"name_key": "hotspot.window",
+			"default_verb": "look",
+			"rect": [26, 18, 68, 50],
+			"walk_to": [58, 104],
+			"actions": ["look", "open", "close"],
+			"defaults": {
+				"talk": "fail.window.talk",
+				"pickup": "fail.window.pickup",
+				"use": "fail.window.use",
+				"push": "fail.window.push",
+				"pull": "fail.window.push"
+			}
+		},
+		{
+			"id": "wall_clock",
+			"name_key": "hotspot.wall_clock",
+			"default_verb": "look",
+			"rect": [254, 14, 20, 20],
+			"walk_to": [256, 104],
+			"actions": ["look"],
+			"defaults": {
+				"talk": "fail.clock.talk",
+				"pickup": "fail.clock.pickup",
+				"use": "fail.clock.use",
+				"push": "fail.clock.push",
+				"pull": "fail.clock.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"id": "door_corridor",
+			"name_key": "hotspot.door_corridor",
+			"default_verb": "walk",
+			"rect": [276, 38, 34, 60],
+			"walk_to": [272, 116],
+			"target": "office_corridor",
+			"entry": "from_meeting",
+			"actions": ["look", "open", "use"],
+			"defaults": {
+				"talk": "fail.door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close"
+			}
+		}
+	]
+}

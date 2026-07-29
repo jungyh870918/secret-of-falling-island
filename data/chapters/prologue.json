@@ -1,0 +1,20 @@
+{
+	"_comment": "명세서 §8.1 프롤로그: 월급의 끝. Phase 1 프로토타입은 회의실/복도/탕비실 구간만 다룬다.",
+
+	"entries": [
+		{
+			"chapter_id": "prologue",
+			"name_key": "chapter.prologue.name",
+			"start_scene": "office_meeting_room",
+			"start_entry": "default",
+			"intro_image": "prologue",
+			"intro_card": [
+				"card.prologue_intro.1",
+				"card.prologue_intro.2",
+				"card.prologue_intro.3"
+			],
+			"opening_dialogue": "prologue_open",
+			"starting_items": ["id_card", "phone"]
+		}
+	]
+}

@@ -1,0 +1,201 @@
+{
+	"_comment": "명세서 §8.1 '탕비실의 디카페인 커피 획득'. 퍼즐 재료가 전부 여기 있다. 필수 아이템은 버릴 수 없고(§11.2), 소모되는 경우 반드시 결과물로 대체된다.",
+
+	"scene_id": "office_pantry",
+	"name_key": "scene.office_pantry",
+	"background": "res://assets/backgrounds/office_pantry.png",
+	"palette": "institution",
+	"music": "office_night",
+	"active_puzzles": ["decaf_swap"],
+
+	"walkbox": [20, 98, 284, 30],
+
+	"spawn_points": {
+		"default": [60, 116],
+		"from_corridor": [46, 116]
+	},
+
+	"blocks": [
+		{ "rect": [0, 0, 320, 90], "color": "#6f7a6a" },
+		{ "rect": [0, 56, 320, 34], "color": "#8f9a8c", "dither": "2x2", "color2": "#6f7a6a" },
+		{ "rect": [0, 88, 320, 2], "color": "#3a3f38" },
+		{ "rect": [0, 90, 320, 45], "color": "#4a4a4c", "dither": "4x4", "color2": "#3f3f42" },
+
+		{ "_": "복도 문", "hotspot": "door_corridor", "rect": [14, 34, 34, 62], "color": "#4a3d2e" },
+		{ "hotspot": "door_corridor", "rect": [17, 37, 28, 59], "color": "#6b5a44" },
+		{ "hotspot": "door_corridor", "rect": [39, 64, 4, 4], "color": "#b98a3c" },
+		{ "hotspot": "door_corridor", "rect": [14, 34, 34, 62], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "사내 공지 게시판", "hotspot": "notice_board", "rect": [58, 22, 42, 32], "color": "#5a4632" },
+		{ "hotspot": "notice_board", "rect": [61, 25, 36, 26], "color": "#e8d9b8" },
+		{ "hotspot": "notice_board", "rect": [64, 29, 30, 2], "color": "#4a4a4c" },
+		{ "hotspot": "notice_board", "rect": [64, 34, 30, 2], "color": "#4a4a4c" },
+		{ "hotspot": "notice_board", "rect": [64, 39, 18, 2], "color": "#c8352e" },
+		{ "hotspot": "notice_board", "rect": [58, 22, 42, 32], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "조리대", "rect": [86, 78, 212, 6], "color": "#8f9a8c" },
+		{ "rect": [86, 84, 212, 12], "color": "#5f6d78" },
+		{ "rect": [86, 78, 212, 2], "color": "#c9c6b4" },
+
+		{ "_": "커피 머신", "hotspot": "coffee_machine", "rect": [104, 40, 32, 38], "color": "#3f3f42" },
+		{ "hotspot": "coffee_machine", "rect": [107, 43, 26, 16], "color": "#1b2430" },
+		{ "hotspot": "coffee_machine", "rect": [109, 46, 10, 2], "color": "#8fd48a", "anim": "flicker" },
+		{ "hotspot": "coffee_machine", "rect": [112, 62, 16, 12], "color": "#2c2634" },
+		{ "hotspot": "coffee_machine", "rect": [118, 60, 4, 3], "color": "#8f9a8c" },
+		{ "hotspot": "coffee_machine", "rect": [104, 40, 32, 38], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "선반", "rect": [146, 46, 98, 5], "color": "#6b5a44" },
+
+		{
+			"_": "디카페인 봉지 — 집으면 사라진다",
+			"hotspot": "decaf_shelf", "rect": [152, 52, 20, 26], "color": "#6f9a63",
+			"visible_if": { "not_flags": ["took_decaf"] }
+		},
+		{ "hotspot": "decaf_shelf", "rect": [152, 52, 20, 8], "color": "#4f7a48",
+			"visible_if": { "not_flags": ["took_decaf"] } },
+		{ "hotspot": "decaf_shelf", "rect": [155, 63, 14, 2], "color": "#e8d9b8",
+			"visible_if": { "not_flags": ["took_decaf"] } },
+		{ "hotspot": "decaf_shelf", "rect": [155, 68, 10, 2], "color": "#e8d9b8",
+			"visible_if": { "not_flags": ["took_decaf"] } },
+		{ "hotspot": "decaf_shelf", "rect": [152, 52, 20, 26], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "not_flags": ["took_decaf"] } },
+
+		{
+			"_": "'더 스트롱' 빈 봉지 — 라벨을 떼면 형태가 바뀐다",
+			"hotspot": "strong_shelf", "rect": [186, 52, 20, 26], "color": "#8c3327",
+			"visible_if": { "not_flags": ["took_label"] }
+		},
+		{ "hotspot": "strong_shelf", "rect": [186, 52, 20, 8], "color": "#5c1f18",
+			"visible_if": { "not_flags": ["took_label"] } },
+		{ "hotspot": "strong_shelf", "rect": [189, 63, 14, 6], "color": "#e0b23a",
+			"visible_if": { "not_flags": ["took_label"] } },
+		{ "hotspot": "strong_shelf", "rect": [186, 52, 20, 26], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "not_flags": ["took_label"] } },
+		{
+			"_": "라벨을 뗀 뒤 남은 봉지",
+			"hotspot": "strong_shelf", "rect": [186, 56, 20, 22], "color": "#5c1f18",
+			"visible_if": { "flags": ["took_label"] }
+		},
+		{ "hotspot": "strong_shelf", "rect": [186, 56, 20, 22], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "flags": ["took_label"] } },
+
+		{ "_": "싱크대", "hotspot": "sink", "rect": [248, 66, 44, 12], "color": "#5f6d78" },
+		{ "hotspot": "sink", "rect": [251, 68, 38, 8], "color": "#3d4c58" },
+		{ "hotspot": "sink", "rect": [266, 56, 3, 12], "color": "#8f9a8c" },
+		{ "hotspot": "sink", "rect": [266, 56, 10, 3], "color": "#8f9a8c" },
+		{ "hotspot": "sink", "rect": [248, 66, 44, 12], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "종이컵 더미", "hotspot": "paper_cups", "rect": [220, 62, 14, 16], "color": "#e8d9b8" },
+		{ "hotspot": "paper_cups", "rect": [220, 62, 14, 3], "color": "#c9c6b4" },
+		{ "hotspot": "paper_cups", "rect": [220, 62, 14, 16], "outline": "#1b1820", "color": "#00000000" }
+	],
+
+	"hotspots": [
+		{
+			"id": "coffee_machine",
+			"name_key": "hotspot.coffee_machine",
+			"default_verb": "use",
+			"rect": [102, 38, 36, 42],
+			"walk_to": [120, 106],
+			"actions": ["look", "use", "open", "close", "push"],
+			"defaults": {
+				"talk": "fail.machine.talk",
+				"pickup": "fail.machine.pickup",
+				"pull": "fail.machine.pull"
+			}
+		},
+		{
+			"id": "decaf_shelf",
+			"name_key": "hotspot.decaf_shelf",
+			"default_verb": "pickup",
+			"rect": [148, 48, 28, 32],
+			"walk_to": [162, 106],
+			"visible_if": { "not_flags": ["took_decaf"] },
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.pack.talk",
+				"push": "fail.pack.push",
+				"pull": "fail.pack.push",
+				"open": "fail.pack.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "strong_shelf",
+			"name_key": "hotspot.strong_shelf",
+			"default_verb": "pickup",
+			"rect": [182, 48, 28, 32],
+			"walk_to": [196, 106],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.pack.talk",
+				"push": "fail.pack.push",
+				"pull": "fail.pack.push",
+				"open": "fail.pack.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "paper_cups",
+			"name_key": "hotspot.paper_cups",
+			"default_verb": "look",
+			"rect": [216, 58, 22, 22],
+			"walk_to": [226, 106],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.cups.talk",
+				"push": "fail.cups.push",
+				"pull": "fail.cups.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "sink",
+			"name_key": "hotspot.sink",
+			"default_verb": "look",
+			"rect": [246, 54, 48, 26],
+			"walk_to": [268, 106],
+			"actions": ["look", "use", "open", "close"],
+			"defaults": {
+				"talk": "fail.sink.talk",
+				"pickup": "fail.sink.pickup",
+				"push": "fail.sink.push",
+				"pull": "fail.sink.push"
+			}
+		},
+		{
+			"id": "notice_board",
+			"name_key": "hotspot.notice_board",
+			"default_verb": "look",
+			"rect": [58, 22, 42, 32],
+			"walk_to": [78, 104],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.notice.talk",
+				"push": "fail.notice.push",
+				"pull": "fail.notice.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"id": "door_corridor",
+			"name_key": "hotspot.door_corridor",
+			"default_verb": "walk",
+			"rect": [14, 34, 34, 62],
+			"walk_to": [42, 114],
+			"target": "office_corridor",
+			"entry": "from_pantry",
+			"actions": ["look", "open", "use"],
+			"defaults": {
+				"talk": "fail.door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close"
+			}
+		}
+	]
+}

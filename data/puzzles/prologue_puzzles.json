@@ -1,0 +1,48 @@
+{
+	"_comment": "명세서 §16.4 퍼즐 상태 / §11.3 3단계 힌트. states 는 단조 증가만 하며 GameState.advance_puzzle 가 역행을 막는다. 관찰(부장 컵)은 순서를 강제하지 않도록 상태가 아니라 플래그로 둔다 — 어떤 순서로 진행해도 막히지 않는다.",
+
+	"entries": [
+		{
+			"puzzle_id": "decaf_swap",
+			"name_key": "puzzle.decaf_swap.name",
+			"states": [
+				"not_started",
+				"has_decaf",
+				"cup_brewed",
+				"disguised",
+				"completed"
+			],
+			"fail_safe": {
+				"resettable": true,
+				"lost_items_restored": true
+			},
+			"hints": {
+				"not_started": [
+					{ "speaker": "player", "key": "hint.decaf.0.1" },
+					{ "speaker": "narrator", "key": "hint.decaf.0.2" },
+					{ "speaker": "hint", "key": "hint.decaf.0.3" }
+				],
+				"has_decaf": [
+					{ "speaker": "player", "key": "hint.decaf.1.1" },
+					{ "speaker": "narrator", "key": "hint.decaf.1.2" },
+					{ "speaker": "hint", "key": "hint.decaf.1.3" }
+				],
+				"cup_brewed": [
+					{ "speaker": "player", "key": "hint.decaf.2.1" },
+					{ "speaker": "narrator", "key": "hint.decaf.2.2" },
+					{ "speaker": "hint", "key": "hint.decaf.2.3" }
+				],
+				"disguised": [
+					{ "speaker": "player", "key": "hint.decaf.3.1" },
+					{ "speaker": "narrator", "key": "hint.decaf.3.2" },
+					{ "speaker": "hint", "key": "hint.decaf.3.3" }
+				],
+				"completed": [
+					{ "speaker": "player", "key": "hint.decaf.4.1" },
+					{ "speaker": "narrator", "key": "hint.decaf.4.2" },
+					{ "speaker": "hint", "key": "hint.decaf.4.3" }
+				]
+			}
+		}
+	]
+}

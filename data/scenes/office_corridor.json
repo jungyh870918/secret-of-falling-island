@@ -1,0 +1,143 @@
+{
+	"_comment": "회의실과 탕비실을 잇는 복도. 엘리베이터가 §23 '퍼즐 해결 후 새로운 출구 활성화' 를 담당한다. 잠금은 hotspot 을 숨기는 대신 룰 + on_fail 로 처리해, 플레이어가 '왜 못 가는지' 를 항상 알 수 있게 한다.",
+
+	"scene_id": "office_corridor",
+	"name_key": "scene.office_corridor",
+	"background": "res://assets/backgrounds/office_corridor.png",
+	"palette": "institution",
+	"music": "office_night",
+	"active_puzzles": ["decaf_swap"],
+
+	"walkbox": [12, 100, 296, 28],
+
+	"spawn_points": {
+		"default": [160, 116],
+		"from_meeting": [46, 116],
+		"from_pantry": [168, 116],
+		"from_elevator": [268, 116]
+	},
+
+	"blocks": [
+		{ "rect": [0, 0, 320, 92], "color": "#4a4a4c" },
+		{ "rect": [0, 66, 320, 26], "color": "#3f3f42", "dither": "2x2", "color2": "#4a4a4c" },
+		{ "rect": [0, 90, 320, 2], "color": "#26262a" },
+		{ "rect": [0, 92, 320, 43], "color": "#38363a", "dither": "4x4", "color2": "#2f2d32" },
+		{ "_": "천장 형광등 — §6.6 깜빡임", "rect": [60, 4, 40, 4], "color": "#c9c6b4", "anim": "blink" },
+		{ "rect": [180, 4, 40, 4], "color": "#c9c6b4" },
+
+		{ "_": "회의실 문", "hotspot": "door_meeting", "rect": [22, 36, 34, 60], "color": "#4a3d2e" },
+		{ "hotspot": "door_meeting", "rect": [25, 39, 28, 57], "color": "#6b5a44" },
+		{ "hotspot": "door_meeting", "rect": [47, 64, 4, 4], "color": "#b98a3c" },
+		{ "hotspot": "door_meeting", "rect": [22, 36, 34, 60], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "사훈 액자", "hotspot": "motto_frame", "rect": [82, 26, 52, 30], "color": "#b98a3c" },
+		{ "hotspot": "motto_frame", "rect": [85, 29, 46, 24], "color": "#e8d9b8" },
+		{ "hotspot": "motto_frame", "rect": [89, 35, 38, 2], "color": "#4a4a4c" },
+		{ "hotspot": "motto_frame", "rect": [89, 40, 38, 2], "color": "#4a4a4c" },
+		{ "hotspot": "motto_frame", "rect": [89, 45, 24, 2], "color": "#4a4a4c" },
+		{ "hotspot": "motto_frame", "rect": [82, 26, 52, 30], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "탕비실 문", "hotspot": "door_pantry", "rect": [150, 36, 34, 60], "color": "#4a3d2e" },
+		{ "hotspot": "door_pantry", "rect": [153, 39, 28, 57], "color": "#6b5a44" },
+		{ "hotspot": "door_pantry", "rect": [175, 64, 4, 4], "color": "#b98a3c" },
+		{ "hotspot": "door_pantry", "rect": [155, 44, 24, 10], "color": "#c9c6b4" },
+		{ "hotspot": "door_pantry", "rect": [150, 36, 34, 60], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "정수기", "hotspot": "water_cooler", "rect": [200, 58, 16, 38], "color": "#8f9a8c" },
+		{ "hotspot": "water_cooler", "rect": [202, 44, 12, 16], "color": "#c8d8e4" },
+		{ "hotspot": "water_cooler", "rect": [202, 44, 12, 6], "color": "#245a5e", "dither": "2x2", "color2": "#c8d8e4" },
+		{ "hotspot": "water_cooler", "rect": [200, 58, 16, 38], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "엘리베이터", "hotspot": "elevator", "rect": [246, 32, 48, 64], "color": "#5f6d78" },
+		{ "hotspot": "elevator", "rect": [249, 35, 42, 61], "color": "#8f9a8c" },
+		{ "hotspot": "elevator", "rect": [269, 35, 2, 61], "color": "#4a4a4c" },
+		{ "hotspot": "elevator", "rect": [296, 48, 6, 10], "color": "#2c2634" },
+		{ "hotspot": "elevator", "rect": [297, 50, 4, 3], "color": "#c8352e", "anim": "blink" },
+		{ "hotspot": "elevator", "rect": [246, 24, 48, 6], "color": "#2c2634" },
+		{ "hotspot": "elevator", "rect": [266, 25, 8, 4], "color": "#e0b23a", "anim": "flicker" },
+		{ "hotspot": "elevator", "rect": [246, 32, 48, 64], "outline": "#1b1820", "color": "#00000000" }
+	],
+
+	"hotspots": [
+		{
+			"id": "motto_frame",
+			"name_key": "hotspot.motto_frame",
+			"default_verb": "look",
+			"rect": [82, 26, 52, 30],
+			"walk_to": [106, 106],
+			"actions": ["look", "use"],
+			"defaults": {
+				"talk": "fail.motto.talk",
+				"pickup": "fail.motto.pickup",
+				"push": "fail.motto.push",
+				"pull": "fail.motto.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "water_cooler",
+			"name_key": "hotspot.water_cooler",
+			"default_verb": "use",
+			"rect": [198, 42, 20, 54],
+			"walk_to": [206, 108],
+			"actions": ["look", "use", "push", "pull"],
+			"defaults": {
+				"talk": "fail.cooler.talk",
+				"pickup": "fail.cooler.pickup",
+				"open": "fail.cooler.open",
+				"close": "fail.generic.close"
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"id": "door_meeting",
+			"name_key": "hotspot.door_meeting",
+			"default_verb": "walk",
+			"rect": [22, 36, 34, 60],
+			"walk_to": [42, 114],
+			"target": "office_meeting_room",
+			"entry": "from_corridor",
+			"actions": ["look", "open", "use"],
+			"defaults": {
+				"talk": "fail.door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close"
+			}
+		},
+		{
+			"id": "door_pantry",
+			"name_key": "hotspot.door_pantry",
+			"default_verb": "walk",
+			"rect": [150, 36, 34, 60],
+			"walk_to": [166, 114],
+			"target": "office_pantry",
+			"entry": "from_corridor",
+			"actions": ["look", "open", "use"],
+			"defaults": {
+				"talk": "fail.door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close"
+			}
+		},
+		{
+			"id": "elevator",
+			"name_key": "hotspot.elevator",
+			"default_verb": "walk",
+			"rect": [246, 24, 48, 72],
+			"walk_to": [268, 112],
+			"target": "office_corridor",
+			"entry": "from_elevator",
+			"_note": "실제 이동은 룰 elevator_leave 의 event 로 처리한다. target 은 폴백일 뿐이며 룰이 항상 먼저 걸린다.",
+			"actions": ["look", "open", "use", "push"],
+			"defaults": {
+				"talk": "fail.elevator.talk",
+				"pickup": "fail.elevator.pickup",
+				"close": "fail.elevator.close",
+				"pull": "fail.elevator.pull"
+			}
+		}
+	]
+}

@@ -1,0 +1,601 @@
+{
+	"_comment": "명세서 §21 상호작용 분해: actor / action / target / optional item / preconditions / result / fallback dialogue. 코드에는 이 파일을 해석하는 로직만 있고 장면별 if 문은 없다.",
+
+	"_convention": [
+		"같은 (action,target) 에 룰이 여러 개면 preconditions 가 많은 쪽이 먼저 검사된다.",
+		"그래서 '이미 본 뒤의 짧은 반복 대사' 룰에 flags 전제조건을 달아 두면 자동으로 우선한다.",
+		"on_fail 은 전제조건이 안 맞을 때 나오는 그 룰 고유의 실패 대사다. (§21)",
+		"once:true 인 룰은 한 번만 실행되고, 이후에는 다음 순위 룰로 넘어간다."
+	],
+
+	"rules": [
+
+		{
+			"id": "look_boss_mug_repeat",
+			"_note": "이미 관찰한 뒤의 짧은 확인 대사",
+			"action": "look",
+			"target": "boss_mug",
+			"preconditions": { "flags": ["knows_boss_caffeine"] },
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.mug.repeat.1" }
+				]
+			}
+		},
+		{
+			"id": "look_boss_mug_first",
+			"_note": "§8.1 '부장의 컵을 조사해 밤에는 카페인을 마시면 잠을 못 잔다는 대사 확인'. 퍼즐 상태가 아니라 플래그로 두어 진행 순서를 강제하지 않는다.",
+			"action": "look",
+			"target": "boss_mug",
+			"result": {
+				"sfx": "news",
+				"lines": [
+					{ "speaker": "player", "key": "line.mug.first.1" },
+					{ "speaker": "boss", "key": "line.mug.first.2" },
+					{ "speaker": "boss", "key": "line.mug.first.3" },
+					{ "speaker": "player", "key": "line.mug.first.4" },
+					{ "speaker": "boss", "key": "line.mug.first.5" },
+					{ "speaker": "player", "key": "line.mug.first.6" }
+				],
+				"flags": { "knows_boss_caffeine": true, "knows_boss_brand": true },
+				"autosave": true
+			}
+		},
+		{
+			"id": "pickup_boss_mug",
+			"action": "pickup",
+			"target": "boss_mug",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.mug.pickup.1" },
+					{ "speaker": "boss", "key": "line.mug.pickup.2" }
+				]
+			}
+		},
+
+		{
+			"id": "talk_boss_idle",
+			"action": "talk",
+			"target": "boss",
+			"preconditions": { "flags": ["talked_to_boss"] },
+			"result": { "dialogue": "boss_idle" }
+		},
+		{
+			"id": "talk_boss_first",
+			"_note": "§8.1 프롤로그 시작 대본",
+			"action": "talk",
+			"target": "boss",
+			"result": { "dialogue": "boss_first_talk" }
+		},
+		{
+			"id": "look_boss",
+			"action": "look",
+			"target": "boss",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.boss.look.1" },
+					{ "speaker": "player", "key": "line.boss.look.2", "if": { "flags": ["knows_boss_caffeine"] } }
+				]
+			}
+		},
+
+		{
+			"id": "pickup_decaf",
+			"_note": "§8.1 1단계 — 탕비실의 디카페인 커피 획득",
+			"action": ["pickup", "use"],
+			"target": "decaf_shelf",
+			"result": {
+				"sfx": "pickup",
+				"lines": [
+					{ "speaker": "player", "key": "line.decaf.pickup.1" },
+					{ "speaker": "player", "key": "line.decaf.pickup.2" }
+				],
+				"give": ["decaf_pack"],
+				"flags": { "took_decaf": true },
+				"puzzle": { "decaf_swap": "has_decaf" },
+				"autosave": true
+			}
+		},
+		{
+			"id": "look_decaf_shelf",
+			"action": "look",
+			"target": "decaf_shelf",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.decaf.look.1" },
+					{ "speaker": "player", "key": "line.decaf.look.2" }
+				]
+			}
+		},
+
+		{
+			"id": "pickup_strong_label",
+			"_note": "라벨을 떼면 빈 봉지는 그대로 남는다. 필수 아이템을 잃을 수 없게 하는 원칙(§11.2)의 작은 표현.",
+			"action": ["pickup", "use"],
+			"target": "strong_shelf",
+			"preconditions": { "not_flags": ["took_label"] },
+			"result": {
+				"sfx": "pickup",
+				"lines": [
+					{ "speaker": "player", "key": "line.strong.pickup.1" },
+					{ "speaker": "player", "key": "line.strong.pickup.2" }
+				],
+				"give": ["strong_label"],
+				"flags": { "took_label": true },
+				"autosave": true
+			},
+			"on_fail": {
+				"lines": [ { "speaker": "player", "key": "line.strong.pickup.again" } ]
+			}
+		},
+		{
+			"id": "look_strong_shelf_after",
+			"action": "look",
+			"target": "strong_shelf",
+			"preconditions": { "flags": ["took_label"] },
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.strong.look.after" } ]
+			}
+		},
+		{
+			"id": "look_strong_shelf",
+			"action": "look",
+			"target": "strong_shelf",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.strong.look.1" },
+					{ "speaker": "player", "key": "line.strong.look.2" }
+				]
+			}
+		},
+
+		{
+			"id": "use_decaf_on_machine",
+			"_note": "§8.1 3단계 준비 — 커피를 내린다",
+			"action": "use",
+			"target": "coffee_machine",
+			"item": "decaf_pack",
+			"result": {
+				"sfx": "pickup",
+				"lines": [
+					{ "speaker": "player", "key": "line.brew.1" },
+					{ "speaker": "player", "key": "line.brew.2" }
+				],
+				"take": ["decaf_pack"],
+				"give": ["decaf_cup"],
+				"puzzle": { "decaf_swap": "cup_brewed" },
+				"autosave": true
+			}
+		},
+		{
+			"id": "use_machine_empty",
+			"action": ["use", "push"],
+			"target": "coffee_machine",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.machine.empty.1" },
+					{ "speaker": "player", "key": "line.machine.empty.2" }
+				]
+			}
+		},
+		{
+			"id": "look_coffee_machine",
+			"action": "look",
+			"target": "coffee_machine",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.machine.look.1" },
+					{ "speaker": "player", "key": "line.machine.look.2" }
+				]
+			}
+		},
+
+		{
+			"id": "use_label_on_cup",
+			"_note": "§8.1 3단계 — '디카페인 커피를 일반 커피처럼 보이게'. 대칭 조합이므로 컵에 라벨을 써도, 라벨에 컵을 써도 같은 룰이 걸린다.",
+			"action": "use",
+			"target": "decaf_cup",
+			"item": "strong_label",
+			"result": {
+				"sfx": "pickup",
+				"lines": [
+					{ "speaker": "player", "key": "line.disguise.1" },
+					{ "speaker": "player", "key": "line.disguise.2" }
+				],
+				"take": ["decaf_cup", "strong_label"],
+				"give": ["disguised_cup"],
+				"puzzle": { "decaf_swap": "disguised" },
+				"autosave": true
+			}
+		},
+
+		{
+			"id": "use_disguised_on_boss",
+			"_note": "§8.1 4단계 — 부장이 퇴근한다. 전제조건은 '컵을 관찰했는가'. 못 맞췄을 때의 on_fail 이 곧 힌트가 된다.",
+			"action": "use",
+			"target": "boss",
+			"item": "disguised_cup",
+			"preconditions": { "flags": ["knows_boss_caffeine"] },
+			"result": {
+				"take": ["disguised_cup"],
+				"dialogue": "boss_leaving",
+				"flags": { "boss_left": true },
+				"hotspots": { "boss": false },
+				"puzzle": { "decaf_swap": "completed" },
+				"autosave": true
+			},
+			"on_fail": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "boss", "key": "fail.boss.no_reason.1" },
+					{ "speaker": "player", "key": "fail.boss.no_reason.2" }
+				]
+			}
+		},
+		{
+			"id": "use_plain_cup_on_boss",
+			"_note": "위장하지 않은 컵 — 고유 실패 대사 (§21)",
+			"action": "use",
+			"target": "boss",
+			"item": "decaf_cup",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "boss", "key": "fail.boss.plain_cup.1" },
+					{ "speaker": "player", "key": "fail.boss.plain_cup.2" }
+				]
+			}
+		},
+		{
+			"id": "use_decaf_pack_on_boss",
+			"action": "use",
+			"target": "boss",
+			"item": "decaf_pack",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.boss.pack.1" },
+					{ "speaker": "boss", "key": "fail.boss.pack.2" }
+				]
+			}
+		},
+		{
+			"id": "use_label_on_boss",
+			"action": "use",
+			"target": "boss",
+			"item": "strong_label",
+			"result": {
+				"sfx": "fail",
+				"lines": [ { "speaker": "player", "key": "fail.boss.label.1" } ]
+			}
+		},
+		{
+			"id": "use_report_on_boss",
+			"action": "use",
+			"target": "boss",
+			"item": "stale_report",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.boss.report.1" },
+					{ "speaker": "boss", "key": "fail.boss.report.2" },
+					{ "speaker": "player", "key": "fail.boss.report.3" }
+				]
+			}
+		},
+		{
+			"id": "use_id_card_on_boss",
+			"action": "use",
+			"target": "boss",
+			"item": "id_card",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.boss.id_card.1" },
+					{ "speaker": "boss", "key": "fail.boss.id_card.2" }
+				]
+			}
+		},
+		{
+			"id": "use_phone_on_boss",
+			"action": "use",
+			"target": "boss",
+			"item": "phone",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.boss.phone.1" },
+					{ "speaker": "boss", "key": "fail.boss.phone.2" }
+				]
+			}
+		},
+
+		{
+			"id": "elevator_leave",
+			"_note": "§23 '퍼즐 해결 후 새로운 출구 활성화'. 잠금을 숨김이 아니라 룰로 표현해 이유를 항상 알 수 있게 한다.",
+			"action": ["walk", "open", "use", "push"],
+			"target": "elevator",
+			"preconditions": { "flags": ["boss_left"] },
+			"result": {
+				"sfx": "door",
+				"lines": [
+					{ "speaker": "player", "key": "line.elevator.leave.1" },
+					{ "speaker": "player", "key": "line.elevator.leave.2" }
+				],
+				"autosave": true,
+				"event": "prologue_end"
+			},
+			"on_fail": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.elevator.locked.1" },
+					{ "speaker": "player", "key": "fail.elevator.locked.2" }
+				]
+			}
+		},
+		{
+			"id": "look_elevator",
+			"action": "look",
+			"target": "elevator",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.elevator.look.1" },
+					{ "speaker": "player", "key": "line.elevator.look.2" }
+				]
+			}
+		},
+		{
+			"id": "use_id_card_on_elevator",
+			"action": "use",
+			"target": "elevator",
+			"item": "id_card",
+			"result": {
+				"sfx": "fail",
+				"lines": [ { "speaker": "player", "key": "fail.elevator.id_card.1" } ]
+			}
+		},
+
+		{
+			"id": "look_monitors",
+			"action": "look",
+			"target": "monitors",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.monitors.look.1" },
+					{ "speaker": "player", "key": "line.monitors.look.2" }
+				]
+			}
+		},
+		{
+			"id": "use_monitors",
+			"action": "use",
+			"target": "monitors",
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.monitors.use.1" } ]
+			}
+		},
+		{
+			"id": "use_phone_on_monitors",
+			"action": "use",
+			"target": "monitors",
+			"item": "phone",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.monitors.phone.1" },
+					{ "speaker": "player", "key": "line.monitors.phone.2" }
+				]
+			}
+		},
+
+		{
+			"id": "pickup_report_again",
+			"action": ["pickup", "use"],
+			"target": "report_stack",
+			"preconditions": { "items": ["stale_report"] },
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.report.again" } ]
+			}
+		},
+		{
+			"id": "pickup_report",
+			"action": ["pickup", "use"],
+			"target": "report_stack",
+			"result": {
+				"sfx": "pickup",
+				"lines": [
+					{ "speaker": "player", "key": "line.report.pickup.1" },
+					{ "speaker": "player", "key": "line.report.pickup.2" }
+				],
+				"give": ["stale_report"]
+			}
+		},
+		{
+			"id": "look_report",
+			"action": "look",
+			"target": "report_stack",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.report.look.1" },
+					{ "speaker": "player", "key": "line.report.look.2" }
+				]
+			}
+		},
+
+		{
+			"id": "look_window",
+			"action": "look",
+			"target": "window",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.window.look.1" },
+					{ "speaker": "player", "key": "line.window.look.2" }
+				]
+			}
+		},
+		{
+			"id": "open_window",
+			"action": ["open", "close"],
+			"target": "window",
+			"result": {
+				"sfx": "fail",
+				"lines": [ { "speaker": "player", "key": "line.window.open.1" } ]
+			}
+		},
+
+		{
+			"id": "look_wall_clock",
+			"action": "look",
+			"target": "wall_clock",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.clock.look.1" },
+					{ "speaker": "player", "key": "line.clock.look.2" }
+				]
+			}
+		},
+
+		{
+			"id": "look_motto_frame",
+			"action": "look",
+			"target": "motto_frame",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.motto.look.1" },
+					{ "speaker": "player", "key": "line.motto.look.2" },
+					{ "speaker": "player", "key": "line.motto.look.3" }
+				]
+			}
+		},
+		{
+			"id": "use_motto_frame",
+			"action": "use",
+			"target": "motto_frame",
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.motto.use.1" } ]
+			}
+		},
+
+		{
+			"id": "look_water_cooler",
+			"action": "look",
+			"target": "water_cooler",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.cooler.look.1" },
+					{ "speaker": "player", "key": "line.cooler.look.2" }
+				]
+			}
+		},
+		{
+			"id": "use_water_cooler",
+			"action": ["use", "push", "pull"],
+			"target": "water_cooler",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.cooler.use.1" },
+					{ "speaker": "player", "key": "line.cooler.use.2" }
+				]
+			}
+		},
+
+		{
+			"id": "look_paper_cups",
+			"action": "look",
+			"target": "paper_cups",
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.cups.look.1" } ]
+			}
+		},
+		{
+			"id": "pickup_paper_cups",
+			"action": ["pickup", "use"],
+			"target": "paper_cups",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.cups.pickup.1" },
+					{ "speaker": "player", "key": "line.cups.pickup.2" }
+				]
+			}
+		},
+
+		{
+			"id": "look_sink",
+			"action": "look",
+			"target": "sink",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sink.look.1" },
+					{ "speaker": "player", "key": "line.sink.look.2" }
+				]
+			}
+		},
+		{
+			"id": "use_sink",
+			"action": ["use", "open", "close"],
+			"target": "sink",
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.sink.use.1" } ]
+			}
+		},
+		{
+			"id": "use_cup_on_sink",
+			"_note": "필수 아이템을 버리려는 시도를 막는다. §11.2 / §21 '필수 아이템 삭제 기능은 구현하지 않는다'",
+			"action": "use",
+			"target": "sink",
+			"item": ["decaf_cup", "disguised_cup"],
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.sink.pour.1" },
+					{ "speaker": "player", "key": "line.sink.pour.2" }
+				]
+			}
+		},
+
+		{
+			"id": "look_notice_board",
+			"action": "look",
+			"target": "notice_board",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.notice.look.1" },
+					{ "speaker": "player", "key": "line.notice.look.2" },
+					{ "speaker": "player", "key": "line.notice.look.3" }
+				]
+			}
+		},
+		{
+			"id": "pickup_notice_board",
+			"action": ["pickup", "use"],
+			"target": "notice_board",
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.notice.pickup.1" } ]
+			}
+		},
+
+		{
+			"id": "look_doors",
+			"action": "look",
+			"target": ["door_corridor", "door_meeting", "door_pantry"],
+			"result": {
+				"lines": [ { "speaker": "player", "key": "line.door.look.1" } ]
+			}
+		},
+
+		{
+			"id": "use_id_card_on_machine",
+			"action": "use",
+			"target": "coffee_machine",
+			"item": "id_card",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "fail.id_card.machine.1" },
+					{ "speaker": "player", "key": "fail.id_card.machine.2" }
+				]
+			}
+		}
+	]
+}

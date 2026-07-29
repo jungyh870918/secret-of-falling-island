@@ -1,0 +1,68 @@
+{
+	"_comment": "명세서 §10.1 — 아이템은 단순한 열쇠가 아니다. 각 아이템은 최소 한 번 이상 농담, 캐릭터 묘사, 세계관 설명에 쓰인다. fail_key 는 §21 '잘못된 조합에는 고유한 실패 대사' 의 최후 폴백.",
+
+	"entries": [
+		{
+			"item_id": "id_card",
+			"name_key": "item.id_card.name",
+			"description_key": "item.id_card.desc",
+			"fail_key": "fail.id_card.generic",
+			"icon": "res://assets/ui/items/id_card.png",
+			"icon_color": "#8f9a8c"
+		},
+		{
+			"item_id": "phone",
+			"name_key": "item.phone.name",
+			"description_key": "item.phone.desc",
+			"fail_key": "fail.phone.generic",
+			"icon": "res://assets/ui/items/phone.png",
+			"icon_color": "#3d5670"
+		},
+		{
+			"item_id": "stale_report",
+			"name_key": "item.stale_report.name",
+			"description_key": "item.stale_report.desc",
+			"fail_key": "fail.stale_report.generic",
+			"icon": "res://assets/ui/items/stale_report.png",
+			"icon_color": "#c9c6b4"
+		},
+		{
+			"item_id": "decaf_pack",
+			"name_key": "item.decaf_pack.name",
+			"description_key": "item.decaf_pack.desc",
+			"fail_key": "fail.decaf_pack.generic",
+			"icon": "res://assets/ui/items/decaf_pack.png",
+			"icon_color": "#6f9a63",
+			"combinations": [
+				{ "with": "coffee_machine", "result_event": "brew_decaf" }
+			]
+		},
+		{
+			"item_id": "strong_label",
+			"name_key": "item.strong_label.name",
+			"description_key": "item.strong_label.desc",
+			"fail_key": "fail.strong_label.generic",
+			"icon": "res://assets/ui/items/strong_label.png",
+			"icon_color": "#c8352e",
+			"combinations": [
+				{ "with": "decaf_cup", "result_event": "disguise_cup" }
+			]
+		},
+		{
+			"item_id": "decaf_cup",
+			"name_key": "item.decaf_cup.name",
+			"description_key": "item.decaf_cup.desc",
+			"fail_key": "fail.decaf_cup.generic",
+			"icon": "res://assets/ui/items/decaf_cup.png",
+			"icon_color": "#8a6a4a"
+		},
+		{
+			"item_id": "disguised_cup",
+			"name_key": "item.disguised_cup.name",
+			"description_key": "item.disguised_cup.desc",
+			"fail_key": "fail.disguised_cup.generic",
+			"icon": "res://assets/ui/items/disguised_cup.png",
+			"icon_color": "#c8352e"
+		}
+	]
+}

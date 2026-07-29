@@ -1,0 +1,30 @@
+{
+	"_comment": "GameData 가 읽는 데이터 파일 목록. 익스포트 시 폴더 스캔이 불안정하므로 명시적으로 적는다. 새 파일을 추가하면 여기에도 한 줄 추가한다.",
+
+	"localization": [
+		"res://data/localization/ko.json"
+	],
+	"characters": [
+		"res://data/characters/prologue_characters.json"
+	],
+	"items": [
+		"res://data/items/prologue_items.json"
+	],
+	"scenes": [
+		"res://data/scenes/office_meeting_room.json",
+		"res://data/scenes/office_corridor.json",
+		"res://data/scenes/office_pantry.json"
+	],
+	"dialogues": [
+		"res://data/dialogues/prologue_dialogues.json"
+	],
+	"puzzles": [
+		"res://data/puzzles/prologue_puzzles.json"
+	],
+	"chapters": [
+		"res://data/chapters/prologue.json"
+	],
+	"interactions": [
+		"res://data/interactions/prologue.json"
+	]
+}
