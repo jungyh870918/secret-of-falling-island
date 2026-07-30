@@ -224,7 +224,9 @@ func default_settings() -> Dictionary:
 		"font_size_index": 1,        ## §18 3단계
 		"text_speed": 1,             ## 0 느림 / 1 보통 / 2 빠름 / 3 즉시
 		"fullscreen": false,
-		"high_contrast_hotspots": false,  ## §18 고대비 핫스폿
+		"high_contrast_hotspots": true,   ## §18 고대비 핫스폿.
+		## 프로토타입 기본 ON — 임시 색 블록으로는 무엇이 상호작용 가능한지 알 수 없다.
+		## 실제 배경 도트가 들어오면 false 로 되돌린다.
 		"show_exit_markers": false,       ## §18 출구 표시
 		"reduce_shake": false,
 		"reduce_flashing": false,

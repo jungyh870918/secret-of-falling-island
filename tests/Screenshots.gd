@@ -94,22 +94,29 @@ func _ready() -> void:
 	await auto_advance()
 	await capture("room_corridor", "복도 — 사훈 액자 · 정수기 · 엘리베이터")
 
+	# 강조를 끈 상태 — 임시 아트만으로 뭐가 상호작용 가능한지 알 수 있나?
+	SaveManager.set_setting("high_contrast_hotspots", false)
+	SaveManager.set_setting("show_exit_markers", false)
+	await settle(8)
+	await capture("highlight_off", "핫스폿 강조 OFF — 대비용. 뭐가 클릭 가능한지 알 수 없다")
+
 	SaveManager.set_setting("high_contrast_hotspots", true)
 	SaveManager.set_setting("show_exit_markers", true)
 	await settle(8)
-	await capture("accessibility", "§18 고대비 핫스폿 + 출구 삼각 마커")
-	SaveManager.set_setting("high_contrast_hotspots", false)
+	await capture("highlight_on", "§18 강조 ON (프로토타입 기본값) + 출구 삼각 마커")
 	SaveManager.set_setting("show_exit_markers", false)
 	await settle(4)
 
 	# --- 탕비실 + 인벤토리 ---
 	main.call("_interact", "door_pantry", Actions.Verb.WALK)
 	await auto_advance()
+	await capture("room_pantry_before", "탕비실 (집기 전) — 커피 봉지 두 개가 강조되는지")
+
 	main.call("_interact", "decaf_shelf", Actions.Verb.PICKUP)
 	await auto_advance()
 	main.call("_interact", "strong_shelf", Actions.Verb.PICKUP)
 	await auto_advance()
-	await capture("room_pantry", "탕비실 — 인벤토리 4칸")
+	await capture("room_pantry", "탕비실 (집은 뒤) — 인벤토리 4칸, 봉지 핫스폿 소멸")
 
 	# 실패 대사 한 장 (§21)
 	main.held_item = "id_card"

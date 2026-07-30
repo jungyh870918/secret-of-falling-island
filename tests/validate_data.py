@@ -437,6 +437,9 @@ for did, dlg in dialogues.items():
             stack.append(n)
 
     for nid in nodes:
+        # "_" 로 시작하는 키는 주석이다 (GameData 와 같은 규약)
+        if nid.startswith("_"):
+            continue
         if nid not in reachable:
             warn(f"[dialogue {did}] 도달할 수 없는 노드: {nid}")
 

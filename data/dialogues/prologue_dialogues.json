@@ -9,7 +9,10 @@
 				"n001": { "speaker": "narrator", "text_key": "dlg.open.n001", "next": "n002" },
 				"n002": { "speaker": "player", "text_key": "dlg.open.n002", "next": "n003" },
 				"n003": { "speaker": "player", "text_key": "dlg.open.n003", "next": "n004" },
-				"n004": {
+				"_note_n004": "조작 안내. 최초 1회만. hint 화자색(연두)으로 '게임이 하는 말' 임을 구분한다.",
+				"n004": { "speaker": "hint", "text_key": "dlg.open.tutorial.1", "next": "n005" },
+				"n005": { "speaker": "hint", "text_key": "dlg.open.tutorial.2", "next": "n006" },
+				"n006": {
 					"result": { "flags": { "prologue_started": true } },
 					"next": "end"
 				}

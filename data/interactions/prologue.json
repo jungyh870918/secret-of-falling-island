@@ -104,7 +104,8 @@
 			"result": {
 				"lines": [
 					{ "speaker": "player", "key": "line.decaf.look.1" },
-					{ "speaker": "player", "key": "line.decaf.look.2" }
+					{ "speaker": "player", "key": "line.decaf.look.2" },
+					{ "speaker": "player", "key": "line.decaf.look.3" }
 				]
 			}
 		},
@@ -145,7 +146,8 @@
 			"result": {
 				"lines": [
 					{ "speaker": "player", "key": "line.strong.look.1" },
-					{ "speaker": "player", "key": "line.strong.look.2" }
+					{ "speaker": "player", "key": "line.strong.look.2" },
+					{ "speaker": "player", "key": "line.strong.look.3" }
 				]
 			}
 		},
@@ -418,7 +420,8 @@
 			"result": {
 				"lines": [
 					{ "speaker": "player", "key": "line.report.look.1" },
-					{ "speaker": "player", "key": "line.report.look.2" }
+					{ "speaker": "player", "key": "line.report.look.2" },
+					{ "speaker": "player", "key": "line.report.look.3" }
 				]
 			}
 		},
