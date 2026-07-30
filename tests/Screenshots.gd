@@ -51,16 +51,23 @@ func _ready() -> void:
 
 	await capture("room_meeting", "§8.1 회의실 — 하단 25% 명령 패널")
 
-	# §5.3 문장 라인
+	# 마우스오버 포커스 — 실제 커서를 핫스폿 위로 옮겨서 확인한다.
+	# (수동으로 set_hover 만 하면 _update_hover 가 매 프레임 덮어쓴다)
+	await hover_over("boss_mug")
+	await capture("hover_focus", "마우스오버 포커스 + §5.3 문장 라인 (보다 → 부장의 머그컵)")
+
+	# 아이템을 든 상태의 3단 문장 라인
 	main.held_item = "id_card"
 	main.panel.set_held_item("id_card")
-	main.panel.set_sentence(Actions.sentence(
-		Actions.Verb.USE, false, Loc.t("hotspot.boss"), Loc.t("item.id_card.name")))
-	await settle(4)
-	await capture("sentence_line", "§5.3 사용하다 → 사원증 → 부장")
+	main.current_verb = Actions.Verb.USE
+	main.panel.set_verb(Actions.Verb.USE)
+	await hover_over("boss")
+	await capture("sentence_use_item", "§5.3 사용하다 → 사원증 → 부장")
 	main.held_item = ""
 	main.panel.set_held_item("")
-	await settle(2)
+	main.current_verb = Actions.Verb.LOOK
+	main.panel.set_verb(Actions.Verb.LOOK)
+	await unhover()
 
 	# --- 부장 대화: 대사 한 장, 선택지 한 장 ---
 	main.call("_interact", "boss", Actions.Verb.TALK)
@@ -199,6 +206,24 @@ func auto_advance(max_frames: int = 4000) -> void:
 		else:
 			settled = 0
 
+
+## 창 좌표로 실제 커서를 옮긴다. 내부 해상도 320x180 → 창 1280x720 이므로 4배.
+func hover_over(hotspot_id: String) -> void:
+	var view: LocationView = SceneDirector.current_view
+	var h := GameData.hotspot_def(GameState.scene_id, hotspot_id)
+	if view == null or h.is_empty():
+		push_warning("호버 대상 없음: %s" % hotspot_id)
+		return
+	var c := LocationView._rect_of(h).get_center()
+	var scale := float(DisplayServer.window_get_size().x) / float(Layout.SCREEN.x)
+	Input.warp_mouse(c * scale)
+	await settle(8)
+
+
+func unhover() -> void:
+	var scale := float(DisplayServer.window_get_size().x) / float(Layout.SCREEN.x)
+	Input.warp_mouse(Vector2(6, 6) * scale)
+	await settle(6)
 
 func capture(shot_name: String, note: String) -> void:
 	await RenderingServer.frame_post_draw

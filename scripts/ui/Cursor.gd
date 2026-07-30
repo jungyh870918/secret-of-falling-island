@@ -10,6 +10,7 @@ var over_hotspot := false
 var held_item := ""
 
 var _time := 0.0
+var _drew_hot := false
 
 
 func _ready() -> void:
@@ -26,23 +27,24 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	var p := get_viewport().get_mouse_position().round()
-	if p != pos:
+	if p != pos or over_hotspot != _drew_hot:
 		pos = p
-		queue_redraw()
-	elif over_hotspot:
 		queue_redraw()
 
 
 func _draw() -> void:
-	var c := Palette.ui("text")
-	if over_hotspot:
-		c = Palette.ui("text_hot") if fposmod(_time, 0.5) < 0.25 else Palette.ui("text")
+	# 점멸 없음. 핫스폿 위에서는 색이 바뀌고 십자가 조여든다 — 즉각적으로 읽힌다.
+	_drew_hot = over_hotspot
+	var c := Palette.ui("text_hot") if over_hotspot else Palette.ui("text")
+	var gap := 1 if over_hotspot else 2
 
-	# 십자 — 가운데 1px 은 비워서 대상이 가려지지 않게 한다.
-	draw_rect(Rect2(pos.x - 4, pos.y, 3, 1), c, true)
-	draw_rect(Rect2(pos.x + 2, pos.y, 3, 1), c, true)
-	draw_rect(Rect2(pos.x, pos.y - 4, 1, 3), c, true)
-	draw_rect(Rect2(pos.x, pos.y + 2, 1, 3), c, true)
+	# 십자 — 가운데는 비워서 대상이 가려지지 않게 한다.
+	draw_rect(Rect2(pos.x - gap - 3, pos.y, 3, 1), c, true)
+	draw_rect(Rect2(pos.x + gap, pos.y, 3, 1), c, true)
+	draw_rect(Rect2(pos.x, pos.y - gap - 3, 1, 3), c, true)
+	draw_rect(Rect2(pos.x, pos.y + gap, 1, 3), c, true)
+	if over_hotspot:
+		draw_rect(Rect2(pos.x - 1, pos.y - 1, 3, 3), Palette.ui("outline"), false, 1.0)
 
 	# 아이템을 들고 있으면 커서 옆에 색 블록을 붙인다.
 	if not held_item.is_empty():

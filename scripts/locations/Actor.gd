@@ -23,7 +23,7 @@ signal arrived()
 
 var character_id := ""
 var display_height := 46
-var walk_speed := 62.0
+var walk_speed := 90.0
 var facing: Facing = Facing.DOWN
 var is_walking := false
 var is_talking := false
@@ -53,7 +53,7 @@ var _walk_clamp: Callable = Callable()
 func setup(def: Dictionary) -> void:
 	character_id = str(def.get("character_id", def.get("id", "")))
 	display_height = int(def.get("height", 46))
-	walk_speed = float(def.get("walk_speed", 62.0))
+	walk_speed = float(def.get("walk_speed", 90.0))
 	hair_style = str(def.get("hair_style", "messy"))
 	has_bag = bool(def.get("has_bag", false))
 	has_coat = bool(def.get("has_coat", false))

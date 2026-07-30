@@ -7,8 +7,8 @@ extends Node
 signal scene_will_change(from_id: String, to_id: String)
 signal scene_changed(scene_id: String)
 
-const FADE_STEPS := 6
-const FADE_STEP_SEC := 0.022
+const FADE_STEPS := 4
+const FADE_STEP_SEC := 0.015
 
 ## Main 이 주입한다. LocationView 가 붙을 부모 노드.
 var world_root: Node2D = null

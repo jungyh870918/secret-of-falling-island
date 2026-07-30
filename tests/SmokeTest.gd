@@ -270,7 +270,7 @@ func _t_unique_failures() -> void:
 
 	DialogueLog.clear()
 	await act("strong_shelf", Actions.Verb.PICKUP)
-	check(log_contains("두 번 뗄 수는 없다"), "라벨 재수령 시도 → 고유 대사")
+	check(log_contains("두 번 뗄 수 있으면"), "라벨 재수령 시도 → 고유 대사")
 
 	# 복도로 나가 엘리베이터 잠김 확인
 	await act("door_corridor", Actions.Verb.WALK)
@@ -283,7 +283,7 @@ func _t_unique_failures() -> void:
 
 	DialogueLog.clear()
 	await act("elevator", Actions.Verb.USE, "id_card")
-	check(log_contains("인증해 주지 않는다"), "사원증 → 엘리베이터 고유 실패 대사")
+	check(log_contains("되면 그게 더 이상하지"), "사원증 → 엘리베이터 고유 실패 대사")
 
 
 func _t_observation_and_solve() -> void:
@@ -313,7 +313,7 @@ func _t_observation_and_solve() -> void:
 	# 재조사는 짧은 대사로
 	DialogueLog.clear()
 	await act("boss_mug", Actions.Verb.LOOK)
-	check(log_contains("이 브랜드만 드신다"), "재조사 시 짧은 반복 대사 (룰 우선순위)")
+	check(log_contains("이십 년째 같은 거"), "재조사 시 짧은 반복 대사 (룰 우선순위)")
 
 	# 해결
 	DialogueLog.clear()

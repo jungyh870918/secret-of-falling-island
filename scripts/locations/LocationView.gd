@@ -302,18 +302,19 @@ func _draw_exit_markers() -> void:
 			Palette.ui("text_hot"))
 
 
-## §6.5 "선택 시 테두리 발광 대신 1px 점멸 또는 색 반전 사용"
+## 마우스오버 포커스. §6.5 "발광 대신 1px 테두리".
+## 점멸시키지 않는다 — 커서를 올린 순간 바로, 계속 보여야 한다.
+## (점멸은 눈이 아프고 '지금 반응이 없는 건가' 하는 착각을 준다)
 func _draw_hover_outline() -> void:
 	if _hover_id.is_empty():
 		return
 	var h := GameData.hotspot_def(scene_id, _hover_id)
 	if h.is_empty():
 		return
-	if bool(SaveManager.get_setting("reduce_flashing", false)):
-		draw_rect(_rect_of(h), Palette.ui("text_hot"), false, 1.0)
-		return
-	if fposmod(_time, 0.6) < 0.3:
-		draw_rect(_rect_of(h), Palette.ui("text_hot"), false, 1.0)
+	var r := _rect_of(h)
+	# 어두운 배경에도, 밝은 배경에도 읽히도록 안쪽에 어두운 선을 한 겹 깐다.
+	draw_rect(r.grow(1), Palette.ui("outline"), false, 1.0)
+	draw_rect(r, Palette.ui("text_hot"), false, 1.0)
 
 
 # ---------------------------------------------------------------- 유틸

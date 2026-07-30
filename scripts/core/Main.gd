@@ -13,7 +13,7 @@ enum Mode { TITLE, PLAY, PAUSE, SETTINGS, SAVE, LOAD, LOG }
 const START_SCENE := "office_meeting_room"
 const START_CHAPTER := "prologue"
 const ENABLE_DEBUG := true
-const KEYBOARD_WALK_SPEED := 62.0
+const KEYBOARD_WALK_SPEED := 90.0
 const THUMBNAIL_INTERVAL := 1.5
 
 var mode: int = Mode.TITLE
@@ -41,6 +41,10 @@ var dialogue_runner: DialogueRunner
 
 var _hover_id := ""
 var _thumb_timer := 0.0
+
+## 대상까지 걸어가는 중인지. 이 상태에서는 클릭이 새 목표로 즉시 전환된다.
+var walking_to_target := false
+var _action_token := 0
 
 
 func _ready() -> void:
@@ -390,6 +394,17 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## 대사/선택지/컷신이 진행 중일 때.
 func _input_busy(event: InputEvent) -> void:
+	# 대상까지 걸어가는 중이라면 클릭을 씹지 않고 새 목표로 갈아탄다.
+	if walking_to_target and event is InputEventMouseButton \
+			and (event as InputEventMouseButton).pressed:
+		var mb := event as InputEventMouseButton
+		if mb.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+			_action_token += 1        # 진행 중인 걷기를 무효화
+			walking_to_target = false
+			busy = false
+			_on_click(mb.position, mb.button_index == MOUSE_BUTTON_RIGHT)
+			return
+
 	if choice_box.is_active():
 		if event is InputEventMouseMotion:
 			choice_box.hover_at((event as InputEventMouseMotion).position)
@@ -531,7 +546,8 @@ func _on_click(p: Vector2, right: bool) -> void:
 
 	var h := view.hotspot_at(p)
 	if h.is_empty():
-		# 빈 바닥 — 걸어간다.
+		# 빈 바닥 — 걸어간다. 진행 중이던 목표는 버린다.
+		_action_token += 1
 		view.player.walk_to(view.clamp_to_walkbox(p))
 		if not held_item.is_empty():
 			_release_item()
@@ -545,21 +561,44 @@ func _on_click(p: Vector2, right: bool) -> void:
 	await _walk_then_interact(view, h, verb)
 
 
+## 눈으로 하는 동작은 걸어갈 필요가 없다. 멀리서도 볼 수 있고,
+## 무엇보다 클릭에 즉시 반응해야 답답하지 않다.
+const INSTANT_VERBS := [Actions.Verb.LOOK]
+
+
 func _walk_then_interact(view: LocationView, h: Dictionary, verb: int) -> void:
-	busy = true
-	var goal: Vector2 = view.walk_to_of(h)
 	var player: Actor = view.player
-	if player != null and player.position.distance_to(goal) > 2.0:
+
+	# 조사(보다)는 걷지 않는다 — 고개만 돌리고 바로 대사가 나온다.
+	if INSTANT_VERBS.has(verb):
+		if player != null:
+			player.stop()
+			player.face_towards(LocationView._rect_of(h).get_center())
+		await _interact(str(h.get("id", "")), verb)
+		return
+
+	var goal: Vector2 = view.walk_to_of(h)
+	if player != null and player.position.distance_to(goal) > 3.0:
+		_action_token += 1
+		var token := _action_token
+		walking_to_target = true
+		busy = true
 		player.walk_to(goal)
 		var waited := 0.0
-		while player.is_walking and waited < 4.0:
+		while player.is_walking and waited < 2.0:
 			await get_tree().process_frame
 			waited += get_process_delta_time()
+			# 걷는 도중 다른 곳을 클릭하면 이 행동은 취소된다.
+			if token != _action_token:
+				walking_to_target = false
+				busy = false
+				return
 		player.stop()
+		walking_to_target = false
+		busy = false
+
 	if player != null:
-		var r := LocationView._rect_of(h)
-		player.face_towards(r.get_center())
-	busy = false
+		player.face_towards(LocationView._rect_of(h).get_center())
 
 	await _interact(str(h.get("id", "")), verb)
 

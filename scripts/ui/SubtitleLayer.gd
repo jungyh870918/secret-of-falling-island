@@ -10,10 +10,10 @@ const LINE_GAP := 1
 const MARGIN := 4
 
 ## §18 텍스트 속도. 초당 글자 수. 마지막 값은 '즉시'.
-const SPEED_CPS := [14.0, 26.0, 45.0, 0.0]
+const SPEED_CPS := [22.0, 42.0, 75.0, 0.0]
 ## 다 표시된 뒤 자동으로 넘어가기까지의 여유 시간
-const HOLD_BASE := 0.9
-const HOLD_PER_CHAR := 0.045
+const HOLD_BASE := 0.40
+const HOLD_PER_CHAR := 0.024
 
 var _speaker := ""
 var _full_text := ""
