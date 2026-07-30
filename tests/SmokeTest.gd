@@ -190,6 +190,8 @@ func _t_new_game() -> void:
 		"시작 소지품 2개 지급 (%s)" % ", ".join(GameState.inventory))
 	check(log_contains("월급의 끝") or log_contains("목요일 밤"), "인트로 컷신이 재생됨")
 	check(log_contains("부장님이 안 가면"), "오프닝 내레이션이 재생됨")
+	check(log_contains("동작을 고르고"), "조작 안내 1이 출력됨")
+	check(log_contains("힌트에 벌점"), "조작 안내 2가 출력됨")
 
 
 func _t_boss_dialogue() -> void:
@@ -231,6 +233,14 @@ func _t_navigation() -> void:
 func _t_puzzle_chain() -> void:
 	section("§23-6~7 퍼즐 재료 수집")
 	check(GameState.puzzle_state("decaf_swap") == "not_started", "퍼즐 초기 상태")
+
+	# 좌클릭 기본 동사가 '보다' 인 플레이어가 집기를 발견할 수 있어야 한다
+	DialogueLog.clear()
+	await act("decaf_shelf", Actions.Verb.LOOK)
+	check(log_contains("일단 챙겨 둘까"), "초록 봉지 조사 시 집기를 유도한다")
+	DialogueLog.clear()
+	await act("strong_shelf", Actions.Verb.LOOK)
+	check(log_contains("떼어 갈 수 있을 것 같은데"), "빨간 봉지 조사 시 집기를 유도한다")
 
 	await act("decaf_shelf", Actions.Verb.PICKUP)
 	check(GameState.has_item("decaf_pack"), "디카페인 원두 획득")
