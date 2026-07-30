@@ -48,7 +48,6 @@
 	"ui.pause.footer": "ESC 로 돌아갑니다",
 
 	"ui.settings.title": "설정",
-	"ui.settings.footer": "← → 로 값 변경 · ESC 로 나가기",
 	"ui.settings.back": "돌아가기",
 	"ui.settings.on": "켜짐",
 	"ui.settings.off": "꺼짐",

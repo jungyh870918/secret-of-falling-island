@@ -64,7 +64,7 @@ func _draw() -> void:
 		2: _page_data(lines)
 		3: _page_scene(lines)
 
-	var font := Theming.base_font
+	var font := Theming.small_font
 	var size := Theming.small_font_size()
 	for i in lines.size():
 		var y := BOX.position.y + 4 + LINE_H * i + font.get_ascent(size)

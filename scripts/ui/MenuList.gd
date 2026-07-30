@@ -13,6 +13,9 @@ const PAD := 5
 
 ## 항목이 많은 화면(설정)에서는 낮춘다.
 var row_h := 12
+## 항목이 많아 행 높이가 빡빡할 때 한 단계 작은 폰트를 쓴다.
+## (도트 폰트는 크기를 줄이면 뭉개지므로 '작은 폰트' 로 갈아탄다)
+var dense := false
 var title_key := ""
 var rows: Array = []      ## [{label:String, value:String, enabled:bool}]
 var selected := 0
@@ -119,8 +122,8 @@ func _row_rect(i: int) -> Rect2:
 func _draw() -> void:
 	if not visible:
 		return
-	var font := Theming.base_font
-	var size := Theming.font_size()
+	var font := Theming.small_font if dense else Theming.base_font
+	var size := Theming.small_font_size() if dense else Theming.font_size()
 
 	# 화면 전체를 살짝 덮어 뒤가 읽히지 않게 한다.
 	draw_rect(Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), Color(0, 0, 0, 0.55), true)
@@ -130,11 +133,13 @@ func _draw() -> void:
 	draw_rect(Rect2(box).grow(-1), Palette.ui("panel_light"), false, 1.0)
 
 	if not title_key.is_empty():
+		var tf := Theming.base_font
+		var ts := Theming.font_size()
 		var t := Loc.t(title_key)
-		var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
-		draw_string(font, Vector2(roundf(box.position.x + (box.size.x - tw) / 2.0),
-			box.position.y + 3 + font.get_ascent(size)),
-			t, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Palette.ui("text_hot"))
+		var tw := tf.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, ts).x
+		draw_string(tf, Vector2(roundf(box.position.x + (box.size.x - tw) / 2.0),
+			box.position.y + 3 + tf.get_ascent(ts)),
+			t, HORIZONTAL_ALIGNMENT_LEFT, -1, ts, Palette.ui("text_hot"))
 		draw_line(Vector2(box.position.x + 3, box.position.y + 14),
 			Vector2(box.position.x + box.size.x - 3, box.position.y + 14),
 			Palette.ui("panel_light"), 1.0)
@@ -166,6 +171,6 @@ func _draw() -> void:
 
 	if not footer_key.is_empty():
 		var f := Loc.t(footer_key)
-		draw_string(font, Vector2(box.position.x + PAD, box.position.y + box.size.y - 4),
+		draw_string(Theming.small_font, Vector2(box.position.x + PAD, box.position.y + box.size.y - 4),
 			f, HORIZONTAL_ALIGNMENT_LEFT, box.size.x - PAD * 2,
 			Theming.small_font_size(), Palette.ui("text_dim"))

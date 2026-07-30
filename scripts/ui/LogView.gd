@@ -97,7 +97,7 @@ func _draw() -> void:
 			draw_string(font, Vector2(BOX.position.x + 6, BOX.position.y + 18 + line_h * i + font.get_ascent(size)),
 				str(w["text"]), HORIZONTAL_ALIGNMENT_LEFT, BOX.size.x - 12, size, w["color"])
 
-	draw_string(font, Vector2(BOX.position.x + 5, BOX.position.y + BOX.size.y - 4),
+	draw_string(Theming.small_font, Vector2(BOX.position.x + 5, BOX.position.y + BOX.size.y - 4),
 		Loc.t("ui.log.footer"), HORIZONTAL_ALIGNMENT_LEFT, BOX.size.x - 10,
 		Theming.small_font_size(), Palette.ui("text_dim"))
 

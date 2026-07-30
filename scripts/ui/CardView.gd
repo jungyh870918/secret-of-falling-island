@@ -88,6 +88,8 @@ func _draw() -> void:
 
 	if _elapsed >= MIN_HOLD and fposmod(_elapsed, 1.2) < 0.6:
 		var hint := Loc.t("ui.card.continue")
-		var hw := font.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size()).x
-		draw_string(font, Vector2(roundf((Layout.SCREEN.x - hw) / 2.0), Layout.SCREEN.y - 12),
-			hint, HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size(), Palette.ui("text_dim"))
+		var sf := Theming.small_font
+		var ss := Theming.small_font_size()
+		var hw := sf.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, ss).x
+		draw_string(sf, Vector2(roundf((Layout.SCREEN.x - hw) / 2.0), Layout.SCREEN.y - 12),
+			hint, HORIZONTAL_ALIGNMENT_LEFT, -1, ss, Palette.ui("text_dim"))

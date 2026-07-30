@@ -8,7 +8,9 @@ enum Mode { SAVE, LOAD }
 
 signal slot_chosen(slot: String, mode: int)
 
-const THUMB_BOX := Rect2i(218, 42, 64, 27)
+const THUMB_BOX := Rect2i(214, 40, 64, 27)
+## 썸네일 아래 정보(장면 이름·저장 시각)를 적을 폭
+const INFO_WIDTH := 100
 
 var mode: int = Mode.SAVE
 var _slots: Array[String] = []
@@ -17,8 +19,10 @@ var _thumb_cache: Dictionary = {}
 
 func open_for(p_mode: int) -> void:
 	mode = p_mode
-	box = Rect2i(12, 4, 192, 174)
+	# 13개 슬롯이 들어가야 하므로 작은 도트 폰트 + 낮은 행 높이
+	box = Rect2i(10, 2, 196, 176)
 	row_h = 11
+	dense = true
 	_thumb_cache.clear()
 	_slots.clear()
 	var rows: Array = []
@@ -70,7 +74,7 @@ func _draw() -> void:
 		return
 	super._draw()
 
-	var font := Theming.base_font
+	var font := Theming.small_font
 	var size := Theming.small_font_size()
 	var slot := selected_slot()
 
@@ -95,9 +99,9 @@ func _draw() -> void:
 	var scene_key := str(s.get("scene_name_key", ""))
 	if not scene_key.is_empty():
 		draw_string(font, Vector2(THUMB_BOX.position.x, y), Loc.t(scene_key),
-			HORIZONTAL_ALIGNMENT_LEFT, THUMB_BOX.size.x + 4, size, Palette.ui("text"))
-	draw_string(font, Vector2(THUMB_BOX.position.x, y + 10), str(s.get("saved_at_text", "")),
-		HORIZONTAL_ALIGNMENT_LEFT, THUMB_BOX.size.x + 4, size, Palette.ui("text_dim"))
+			HORIZONTAL_ALIGNMENT_LEFT, INFO_WIDTH, size, Palette.ui("text"))
+	draw_string(font, Vector2(THUMB_BOX.position.x, y + 11), str(s.get("saved_at_text", "")),
+		HORIZONTAL_ALIGNMENT_LEFT, INFO_WIDTH, size, Palette.ui("text_dim"))
 
 
 func _thumb(slot: String) -> Texture2D:

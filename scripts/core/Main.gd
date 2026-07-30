@@ -114,8 +114,9 @@ func _build_tree() -> void:
 
 	settings_menu = MenuList.new()
 	settings_menu.name = "SettingsMenu"
-	settings_menu.box = Rect2i(18, 2, 284, 176)
-	settings_menu.row_h = 11
+	settings_menu.box = Rect2i(16, 2, 288, 176)
+	settings_menu.row_h = 12
+	settings_menu.dense = true
 	ui_layer.add_child(settings_menu)
 	settings_menu.activated.connect(_on_settings_activated)
 	settings_menu.adjusted.connect(_on_settings_adjusted)
@@ -816,7 +817,8 @@ func _open_settings() -> void:
 	pause_menu.close()
 	title_screen.close()
 	mode = Mode.SETTINGS
-	settings_menu.open("ui.settings.title", _settings_rows(), "ui.settings.footer")
+	# 하단 안내문 없이 — 13개 항목이 들어가야 하고, 마지막 행이 곧 '돌아가기' 다.
+	settings_menu.open("ui.settings.title", _settings_rows())
 
 
 func _settings_rows() -> Array:

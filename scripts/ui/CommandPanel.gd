@@ -203,9 +203,9 @@ func _draw_sentence() -> void:
 
 
 func _draw_verbs() -> void:
-	var font := Theming.base_font
-	# 동사 칸은 폭이 고정이라 본문보다 크게 키우지 않는다.
-	var size: int = mini(Theming.small_font_size(), 10)
+	# 동사 칸은 폭이 고정이므로 한 단계 작은 도트 폰트를 쓴다.
+	var font := Theming.small_font
+	var size := Theming.small_font_size()
 	var layout := verb_layout()
 	var simple := is_simple_ui()
 
@@ -292,7 +292,7 @@ func _draw_item_icon(id: String, cell: Rect2) -> void:
 	var item_name := Loc.t(str(item.get("name_key", "")))
 	if item_name.is_empty():
 		return
-	var font := Theming.base_font
+	var font := Theming.small_font
 	var size := Theming.small_font_size()
 	var ch := item_name.substr(0, 1)
 	var w := font.get_string_size(ch, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x

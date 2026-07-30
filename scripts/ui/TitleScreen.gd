@@ -58,8 +58,8 @@ func _draw() -> void:
 			str(row.get("label", "")), HORIZONTAL_ALIGNMENT_LEFT, int(r.size.x - 8), size, col)
 
 	var ver := Loc.t("ui.title.version")
-	draw_string(font, Vector2(4, Layout.SCREEN.y - 4), ver, HORIZONTAL_ALIGNMENT_LEFT, -1,
-		Theming.small_font_size(), Palette.ui("text_dim"))
+	draw_string(Theming.small_font, Vector2(4, Layout.SCREEN.y - 4), ver,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size(), Palette.ui("text_dim"))
 
 
 ## 타이틀 아트가 없을 때의 임시 화면.
@@ -101,6 +101,17 @@ func _draw_placeholder_art() -> void:
 				HORIZONTAL_ALIGNMENT_LEFT, -1, big, Palette.ui("outline"))
 	draw_string(font, Vector2(roundf((320 - tw) / 2.0), 72), t,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, big, Palette.parse("pal.bull.ivory"))
-	var sw := font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size()).x
-	draw_string(font, Vector2(roundf((320 - sw) / 2.0), 84), s,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size(), Palette.ui("text_dim"))
+	# 부제목도 외곽선을 넣는다. 양초 위에 걸치면 어두운 글자색이 묻힌다.
+	var sf := Theming.small_font
+	var ss := Theming.small_font_size()
+	var sw := sf.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, ss).x
+	var sx := roundf((320 - sw) / 2.0)
+	for ox in [-1, 0, 1]:
+		for oy in [-1, 0, 1]:
+			if ox != 0 or oy != 0:
+				draw_string(sf, Vector2(sx + ox, 84 + oy), s,
+					HORIZONTAL_ALIGNMENT_LEFT, -1, ss, Palette.ui("outline"))
+	# 금색은 붉은 양초 위에서 묻힌다. 아이보리로 — 크기 차이(9px vs 11px)만으로
+	# 이미 제목과 위계가 구분된다.
+	draw_string(sf, Vector2(sx, 84), s,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, ss, Palette.parse("pal.bull.ivory"))

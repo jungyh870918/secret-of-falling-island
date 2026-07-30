@@ -101,12 +101,33 @@ red-candle/
 | `assets/ui/command_panel.png` | 320×45 | 하단 명령 패널 배경 |
 | `assets/audio/sfx/<이름>.wav` | — | 런타임 합성 효과음 |
 | `assets/audio/music/<이름>.ogg` | — | (현재 무음) |
-| `assets/fonts/pixel_ko.ttf` | — | 시스템 한글 폰트 폴백 |
 
-**폰트**: Godot 기본 폰트에는 한글 글리프가 없어 `SystemFont` 로 OS 한글 폰트
-(맥 Apple SD Gothic Neo / 윈도우 맑은 고딕 / 리눅스 Noto Sans CJK KR)를 쓴다.
-macOS 에서 9~12px 가독성은 실제 캡처로 확인했다 — 읽힌다. 다만 DOS 감성을 더 살리려면
-한글 비트맵 폰트를 위 경로에 넣으면 된다.
+### 폰트
+
+**Galmuri** (이민서, SIL Open Font License 1.1) — 한글 도트 폰트를 쓴다.
+`assets/fonts/Galmuri-LICENSE.txt` 를 재배포 시 반드시 동봉해야 한다.
+
+도트 폰트는 **설계된 픽셀 크기로만** 써야 뭉개지지 않으므로, §18 의 크기 3단계마다
+그 크기로 설계된 폰트를 따로 쓴다. 하나를 골라 배율만 바꾸지 않는다.
+
+| 단계 | 폰트 | 크기 |
+|---|---|---|
+| 작게 | `Galmuri9.ttf` | 9px |
+| 보통 | `Galmuri11.ttf` | 11px |
+| 크게 | `Galmuri14.ttf` | 14px |
+
+원본 3개는 15MB(한글 외 라틴 확장·키릴·가나까지 포함)라서
+`tools/subset_font.py` 로 이 게임이 쓰는 문자만 남겨 5MB 로 줄였다.
+**한글 11,172자는 전부 남긴다** — 여기서 줄이면 새 대사를 쓸 때마다 글자가 빠질
+위험이 생기고, 그 위험이 절약되는 몇 MB보다 비싸다.
+
+```bash
+python3 -m pip install --user fonttools
+python3 tools/subset_font.py <Galmuri_원본_폴더>
+```
+
+폰트 파일이 없으면 `Theming` 이 OS 한글 폰트로 자동 폴백한다 — 도트 느낌은
+사라지지만 두부(□)는 뜨지 않는다.
 
 ---
 

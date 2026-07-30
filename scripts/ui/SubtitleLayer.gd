@@ -10,10 +10,12 @@ const LINE_GAP := 1
 const MARGIN := 4
 
 ## §18 텍스트 속도. 초당 글자 수. 마지막 값은 '즉시'.
-const SPEED_CPS := [22.0, 42.0, 75.0, 0.0]
+## 글자가 찍히는 속도는 느리게, 다 찍힌 뒤 붙잡는 시간은 짧게 —
+## 그래야 "타자기처럼 또박또박 읽히는데 답답하지는 않은" 느낌이 된다.
+const SPEED_CPS := [12.0, 20.0, 34.0, 0.0]
 ## 다 표시된 뒤 자동으로 넘어가기까지의 여유 시간
-const HOLD_BASE := 0.40
-const HOLD_PER_CHAR := 0.024
+const HOLD_BASE := 0.45
+const HOLD_PER_CHAR := 0.026
 
 var _speaker := ""
 var _full_text := ""
