@@ -1,0 +1,87 @@
+{
+	"_comment": "프롤로그 후반 두 퍼즐. §11.3 3단계 힌트 — 1단계 한개미 혼잣말, 2단계 관찰(세라가 옆에 없는 구간은 내레이션), 3단계 구체적 지시. first_scam 은 세라가 실제로 옆에 있는 구간이라 2단계를 세라가 말한다.",
+
+	"entries": [
+		{
+			"puzzle_id": "broadcast_lure",
+			"name_key": "puzzle.broadcast_lure.name",
+			"_note": "§8.1 '투자 방송의 유혹 제시'. 퍼즐이라기보다 유혹의 절차다 — 전단지를 줍고, 주소를 확인하고, 방송을 보고, 돈을 챙긴다.",
+			"states": [
+				"not_started",
+				"has_flyer",
+				"watched",
+				"ready_to_leave"
+			],
+			"fail_safe": {
+				"resettable": true,
+				"lost_items_restored": true
+			},
+			"hints": {
+				"not_started": [
+					{ "speaker": "player", "key": "hint.lure.0.1" },
+					{ "speaker": "narrator", "key": "hint.lure.0.2" },
+					{ "speaker": "hint", "key": "hint.lure.0.3" }
+				],
+				"has_flyer": [
+					{ "speaker": "player", "key": "hint.lure.1.1" },
+					{ "speaker": "narrator", "key": "hint.lure.1.2" },
+					{ "speaker": "hint", "key": "hint.lure.1.3" }
+				],
+				"watched": [
+					{ "speaker": "player", "key": "hint.lure.2.1" },
+					{ "speaker": "narrator", "key": "hint.lure.2.2" },
+					{ "speaker": "hint", "key": "hint.lure.2.3" }
+				],
+				"ready_to_leave": [
+					{ "speaker": "player", "key": "hint.lure.3.1" },
+					{ "speaker": "narrator", "key": "hint.lure.3.2" },
+					{ "speaker": "hint", "key": "hint.lure.3.3" }
+				]
+			}
+		},
+
+		{
+			"puzzle_id": "first_scam",
+			"name_key": "puzzle.first_scam.name",
+			"_note": "§8.1 '첫 사기 피해' 와 '윤세라 첫 등장'. confronted 이후는 배틀 승패와 무관하게 진행된다 — §9.5 '오답을 선택해도 즉시 패배하지 않는다'.",
+			"states": [
+				"not_started",
+				"scammed",
+				"met_sera",
+				"confronted",
+				"closed"
+			],
+			"fail_safe": {
+				"resettable": true,
+				"lost_items_restored": true
+			},
+			"hints": {
+				"not_started": [
+					{ "speaker": "player", "key": "hint.scam.0.1" },
+					{ "speaker": "narrator", "key": "hint.scam.0.2" },
+					{ "speaker": "hint", "key": "hint.scam.0.3" }
+				],
+				"scammed": [
+					{ "speaker": "player", "key": "hint.scam.1.1" },
+					{ "speaker": "narrator", "key": "hint.scam.1.2" },
+					{ "speaker": "hint", "key": "hint.scam.1.3" }
+				],
+				"met_sera": [
+					{ "speaker": "player", "key": "hint.scam.2.1" },
+					{ "speaker": "sera", "key": "hint.scam.2.2" },
+					{ "speaker": "hint", "key": "hint.scam.2.3" }
+				],
+				"confronted": [
+					{ "speaker": "player", "key": "hint.scam.3.1" },
+					{ "speaker": "sera", "key": "hint.scam.3.2" },
+					{ "speaker": "hint", "key": "hint.scam.3.3" }
+				],
+				"closed": [
+					{ "speaker": "player", "key": "hint.scam.4.1" },
+					{ "speaker": "sera", "key": "hint.scam.4.2" },
+					{ "speaker": "hint", "key": "hint.scam.4.3" }
+				]
+			}
+		}
+	]
+}

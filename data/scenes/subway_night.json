@@ -1,0 +1,196 @@
+{
+	"_comment": "명세서 §8.1 프롤로그 장소 3번 '지하철'. 퇴근한 한개미가 집으로 가는 구간. 퍼즐은 없고 관찰만 있다 — §8.1 목적 '한개미의 삶과 결핍 제시'. '마지막 기회' 전단지(§10.2)를 여기서 얻는다. 못 집고 내려도 신발에 붙어 따라오므로 진행 불가가 생기지 않는다(§11.2).",
+
+	"scene_id": "subway_night",
+	"name_key": "scene.subway_night",
+	"background": "res://assets/backgrounds/subway_night.png",
+	"palette": "bear",
+	"music": "office_night",
+	"active_puzzles": ["broadcast_lure"],
+
+	"walkbox": [16, 100, 288, 26],
+
+	"spawn_points": {
+		"default": [200, 116],
+		"from_office": [268, 116]
+	},
+
+	"blocks": [
+		{ "_": "객실 벽과 천장", "rect": [0, 0, 320, 92], "color": "#3d5670" },
+		{ "rect": [0, 0, 320, 6], "color": "#c8d8e4" },
+		{ "rect": [0, 6, 320, 3], "color": "#8f9a8c" },
+		{ "rect": [0, 54, 320, 38], "color": "#2f3f52", "dither": "2x2", "color2": "#3d5670" },
+		{ "rect": [0, 90, 320, 2], "color": "#1b2430" },
+		{ "_": "바닥", "rect": [0, 92, 320, 43], "color": "#245a5e", "dither": "4x4", "color2": "#1b2430" },
+
+		{ "_": "좌석", "rect": [20, 64, 280, 24], "color": "#3a2c4d" },
+		{ "rect": [20, 64, 280, 3], "color": "#4a3a60" },
+		{ "rect": [20, 86, 280, 2], "color": "#1b1820" },
+
+		{ "_": "내리는 문", "hotspot": "subway_door", "rect": [4, 26, 40, 70], "color": "#5f6d78" },
+		{ "hotspot": "subway_door", "rect": [7, 29, 34, 40], "color": "#141c2e" },
+		{ "hotspot": "subway_door", "rect": [7, 29, 34, 40], "outline": "#c8d8e4", "color": "#00000000" },
+		{ "hotspot": "subway_door", "rect": [22, 26, 2, 70], "color": "#3d5670" },
+		{ "hotspot": "subway_door", "rect": [4, 26, 40, 70], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "창문 — 바깥은 터널이라 유리가 거울이 된다", "hotspot": "subway_window", "rect": [128, 26, 60, 28], "color": "#141c2e" },
+		{ "hotspot": "subway_window", "rect": [131, 29, 54, 22], "color": "#1b2430", "dither": "2x2", "color2": "#141c2e" },
+		{ "_": "유리에 비친 한개미", "hotspot": "subway_window", "rect": [150, 33, 10, 16], "color": "#2a3a4a" },
+		{ "hotspot": "subway_window", "rect": [152, 31, 6, 5], "color": "#38414e" },
+		{ "hotspot": "subway_window", "rect": [128, 26, 60, 28], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "투자 광고판 — §8.1 '투자 방송의 유혹 제시'", "hotspot": "subway_ad", "rect": [112, 6, 84, 18], "color": "#0d0b10" },
+		{ "hotspot": "subway_ad", "rect": [114, 8, 80, 14], "color": "#4a1220" },
+		{ "hotspot": "subway_ad", "rect": [117, 11, 30, 3], "color": "#e0b23a", "anim": "flicker" },
+		{ "hotspot": "subway_ad", "rect": [117, 16, 44, 2], "color": "#e8d9b8" },
+		{ "hotspot": "subway_ad", "rect": [166, 10, 24, 10], "color": "#c8352e" },
+		{ "hotspot": "subway_ad", "rect": [169, 13, 18, 2], "color": "#e8d9b8" },
+		{ "hotspot": "subway_ad", "rect": [112, 6, 84, 18], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "손잡이", "hotspot": "handrail", "rect": [200, 8, 36, 4], "color": "#8f9a8c" },
+		{ "hotspot": "handrail", "rect": [204, 12, 2, 8], "color": "#5f6d78" },
+		{ "hotspot": "handrail", "rect": [201, 20, 8, 4], "color": "#c9c6b4" },
+		{ "hotspot": "handrail", "rect": [218, 12, 2, 8], "color": "#5f6d78" },
+		{ "hotspot": "handrail", "rect": [215, 20, 8, 4], "color": "#c9c6b4" },
+		{ "hotspot": "handrail", "rect": [230, 12, 2, 8], "color": "#5f6d78" },
+		{ "hotspot": "handrail", "rect": [227, 20, 8, 4], "color": "#c9c6b4" },
+
+		{ "_": "노선도", "hotspot": "subway_map", "rect": [246, 6, 58, 16], "color": "#e8d9b8" },
+		{ "hotspot": "subway_map", "rect": [250, 13, 50, 2], "color": "#245a5e" },
+		{ "hotspot": "subway_map", "rect": [252, 11, 3, 3], "color": "#4a4a4c" },
+		{ "hotspot": "subway_map", "rect": [266, 11, 3, 3], "color": "#4a4a4c" },
+		{ "hotspot": "subway_map", "rect": [280, 11, 3, 3], "color": "#4a4a4c" },
+		{ "hotspot": "subway_map", "rect": [294, 11, 4, 4], "color": "#c8352e", "anim": "blink" },
+		{ "hotspot": "subway_map", "rect": [246, 6, 58, 16], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "조는 승객 — 같은 시각에 같은 자세로 앉아 있다", "hotspot": "sleeping_worker", "rect": [58, 60, 24, 28], "color": "#3d3a44" },
+		{ "hotspot": "sleeping_worker", "rect": [62, 56, 16, 14], "color": "#d0a084" },
+		{ "hotspot": "sleeping_worker", "rect": [62, 56, 16, 5], "color": "#241c22" },
+		{ "hotspot": "sleeping_worker", "rect": [66, 64, 8, 2], "color": "#8c3327" },
+		{ "hotspot": "sleeping_worker", "rect": [56, 74, 28, 14], "color": "#2c2634" },
+		{ "hotspot": "sleeping_worker", "rect": [52, 56, 36, 34], "outline": "#1b1820", "color": "#00000000" },
+
+		{
+			"_": "바닥의 전단지 — 집으면 사라진다",
+			"hotspot": "flyer_floor", "rect": [148, 108, 16, 8], "color": "#e8d9b8",
+			"visible_if": { "not_items": ["last_chance_flyer"] }
+		},
+		{ "hotspot": "flyer_floor", "rect": [150, 110, 10, 2], "color": "#c8352e",
+			"visible_if": { "not_items": ["last_chance_flyer"] } },
+		{ "hotspot": "flyer_floor", "rect": [148, 108, 16, 8], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "not_items": ["last_chance_flyer"] } }
+	],
+
+	"hotspots": [
+		{
+			"id": "subway_ad",
+			"name_key": "hotspot.subway_ad",
+			"default_verb": "look",
+			"rect": [112, 6, 84, 18],
+			"walk_to": [152, 104],
+			"actions": ["look", "use", "pickup"],
+			"defaults": {
+				"talk": "fail.subway_ad.talk",
+				"push": "fail.subway_ad.push",
+				"pull": "fail.subway_ad.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "subway_window",
+			"name_key": "hotspot.subway_window",
+			"default_verb": "look",
+			"rect": [128, 26, 60, 28],
+			"walk_to": [158, 106],
+			"actions": ["look", "use", "open"],
+			"defaults": {
+				"talk": "fail.subway_window.talk",
+				"pickup": "fail.subway_window.pickup",
+				"push": "fail.subway_window.push",
+				"pull": "fail.subway_window.push",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "handrail",
+			"name_key": "hotspot.handrail",
+			"default_verb": "use",
+			"rect": [198, 6, 40, 20],
+			"walk_to": [216, 104],
+			"actions": ["look", "use", "pull", "push"],
+			"defaults": {
+				"talk": "fail.handrail.talk",
+				"pickup": "fail.handrail.pickup",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "subway_map",
+			"name_key": "hotspot.subway_map",
+			"default_verb": "look",
+			"rect": [246, 6, 58, 16],
+			"walk_to": [272, 104],
+			"actions": ["look", "use"],
+			"defaults": {
+				"talk": "fail.subway_map.talk",
+				"pickup": "fail.subway_map.pickup",
+				"push": "fail.subway_map.push",
+				"pull": "fail.subway_map.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "sleeping_worker",
+			"name_key": "hotspot.sleeping_worker",
+			"default_verb": "look",
+			"rect": [52, 56, 36, 34],
+			"walk_to": [74, 106],
+			"actions": ["look", "talk", "use", "push"],
+			"defaults": {
+				"pickup": "fail.sleeping_worker.pickup",
+				"pull": "fail.sleeping_worker.pull",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "flyer_floor",
+			"name_key": "hotspot.flyer_floor",
+			"default_verb": "pickup",
+			"rect": [144, 104, 24, 16],
+			"walk_to": [156, 118],
+			"visible_if": { "not_items": ["last_chance_flyer"] },
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.flyer_floor.talk",
+				"push": "fail.flyer_floor.push",
+				"pull": "fail.flyer_floor.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"id": "subway_door",
+			"name_key": "hotspot.subway_door",
+			"default_verb": "walk",
+			"rect": [4, 26, 40, 70],
+			"walk_to": [36, 116],
+			"target": "studio_room",
+			"entry": "from_subway",
+			"actions": ["look", "open", "use", "walk"],
+			"defaults": {
+				"talk": "fail.subway_door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close",
+				"push": "fail.subway_door.push",
+				"pull": "fail.subway_door.push"
+			}
+		}
+	]
+}

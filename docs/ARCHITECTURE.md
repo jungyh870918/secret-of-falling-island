@@ -42,13 +42,15 @@ Autoload (project.godot, 이 순서로 초기화됨)
   Loc            키 → 문장. 누락 키는 ⟪key⟫ 로 표시 (§21)
   GameState      플래그/인벤/퍼즐/관계/플레이타임 (§17)
   SaveManager    슬롯 10 + 자동 3 순환, 도트 썸네일, 설정 (§17, §18)
-  AudioDirector  펄스파 런타임 합성 효과음, 파일 있으면 파일 우선 (§7.3)
+  AudioDirector  펄스파 런타임 합성 효과음 + MusicSynth 배경음악, 파일 있으면 파일 우선 (§7)
   SceneDirector  장면 전환 + 계단식 암전 + 전환 시 자동 저장
 
 Main (scenes/core/Main.tscn — 유일한 .tscn)
 ├── World (Node2D)              ← SceneDirector 가 LocationView 를 붙인다
-└── UI (CanvasLayer)
+└── UI (CanvasLayer)            ← 붙인 순서가 곧 그리는 순서. 자막은 늘 위에 온다(§18)
     ├── CommandPanel            하단 25%: 문장 라인 + 동사 8개 + 인벤 16칸 (§5.1)
+    ├── PortraitView            96×96 초상화, 분기 대화·배틀에서만 (§5.4, §6.2)
+    ├── BattleView              멘탈 차트 · 군중 · 모순 카드 (§5.4, §9.2)
     ├── SubtitleLayer           화자 머리 위 자막, 화자별 색 (§5.1, §18)
     ├── ChoiceBox               선택지 최대 4개 (§5.4)
     ├── TitleScreen / MenuList(일시정지) / MenuList(설정) / SaveSlotMenu
@@ -144,7 +146,7 @@ Main (scenes/core/Main.tscn — 유일한 .tscn)
 | `hotspots` / `exits` | `{"boss": false}` | 켜기/끄기. `"scene_id/id"` 로 타 장면 지정 |
 | `lines` | 위와 같음 | 상태 변경 **후** 대사 |
 | `dialogue` | `"boss_leaving"` | 분기 대화 시작 (끝까지 await) |
-| `event` | `"prologue_end"` | Main 의 특수 연출 (await 가능) |
+| `event` | `"prologue_end"` / `"battle:broker_booth"` | Main 의 특수 연출. `battle:` 접두사는 §9 대화 배틀 (await 가능) |
 | `goto` | `"scene_id"` 또는 `{scene, entry}` | 장면 이동 |
 | `autosave` | `true` | §17 자동 저장 시점 |
 
@@ -284,9 +286,43 @@ Main (scenes/core/Main.tscn — 유일한 .tscn)
              └ ✗ → on_fail: 부장 "됐네. 난 이따 내 걸로 마셔."   ← 고유 실패 대사 = 힌트
 
   복도    ─ 엘리베이터
-             ├ boss_left ✓ → event: prologue_end → 컷신 카드 → 타이틀
+             ├ boss_left ✓ → goto: subway_night
              └ ✗ → on_fail: "부장님이 아직 계신다."
 ```
+
+### 프롤로그 후반 (§8.1 장소 3~5)
+
+```
+  지하철  ─ 보다 → 노선도 ──────────────────────► knows_harbor_name
+          ─ 집다 → 바닥의 전단지 ──► last_chance_flyer   puzzle: has_flyer
+          ─ 내리는 문
+             ├ 전단지 없음 → 신발에 붙어 따라온다 + give   ← §11.2 를 농담으로 처리
+             └ goto: studio_room
+
+  원룸    ─ 사용 → 노트북 + last_chance_flyer ──► park_broadcast 대화
+                                                 saw_broadcast, puzzle: watched
+          ─ 열다 → 가방 ──► cash_envelope
+          ─ 현관문
+             ├ saw_broadcast ✓ + cash_envelope ✓ → goto: bull_harbor_entrance
+             ├ saw_broadcast ✓                   → "빈손으로 가면 그냥 견학이다"
+             └ ✗                                 → "전단지에 주소가 있었다"
+
+  황소항  ─ 보다 → 경고문 ─────────────────────► read_warning (배틀 선택지 1장 해금)
+          ─ 사용 → 환전소 + cash_envelope ──► broker_scam 대화
+                                             take cash_envelope / give loss_receipt
+                                             scam_done → 세라 등장, puzzle: scammed
+          ─ 말하다 → 세라 ──► sera_first_meet          puzzle: met_sera
+          ─ 말하다 → 환전소 ──► event: battle:broker_booth
+                                ├ 승 → give refund_coins, battle_broker_won
+                                └ 패 → (잃는 것 없음)      둘 다 puzzle: confronted
+          ─ 말하다 → 세라 ──► sera_after_battle
+                                give sera_card, event: prologue_end → 컷신 → 타이틀
+```
+
+**환전소 앞의 세 갈래가 그대로 배틀의 세 페이즈가 된다.**
+호객 대화(`broker_pitch`)에서 규정·지정·수수료를 물으면 세 번 다 다른 답이 나오고,
+배틀은 그 세 답을 상대 앞에 다시 놓는 일이다. 대화를 건너뛰어도 배틀이 같은 모순을
+스스로 꺼내므로 진행이 막히지 않는다.
 
 고유 실패 대사가 세 군데 더 있다(§21):
 
@@ -300,14 +336,105 @@ Main (scenes/core/Main.tscn — 유일한 .tscn)
 
 ---
 
+### 4.7 대화 배틀 (`data/battles/*.json`) — §9
+
+`BattleRunner` 하나가 모든 배틀을 돌린다. 배틀별 분기는 코드에 없다.
+상호작용 룰에서 `"event": "battle:<battle_id>"` 로 부르면 Main 이 접두사를 보고 넘긴다.
+
+```jsonc
+{
+  "battle_id": "broker_booth",
+  "opponent": "broker",              // character_id → 초상화가 고정된다 (§5.4)
+  "ally": "sera",                    // §9.5 오답 시 힌트를 주는 인물
+  "weakness_type": "self_contradiction",  // §9.3 약점 10종 중 하나
+  "confidence": 100, "crowd_support": 55,
+  "support_line": 30,                // 자신감이 이 아래로 내려가면 승리 (§9.4-7)
+  "music": "bull_harbor",
+  "intro":  [{ "speaker": "broker", "key": "..." }],
+
+  "phases": [{
+    "id": "p1",
+    "claim": [{ "speaker": "broker", "key": "..." }],     // §9.4-1 상대 주장
+    "options": [{                                        // §9.4-2 3~4개
+      "text_key": "...",
+      "quality": "best",             // best(즉시 다음 페이즈) / good / weak / wrong
+      "requires": { "flags": ["read_warning"] },   // 조건부 선택지
+      "confidence": -30, "crowd": -15,             // §9.2 상태값 변화
+      "card": "rule_three",                        // §9.4-5 모순 카드
+      "reply": [{ "speaker": "player", "key": "..." }],
+      "crowd_line": "..."                          // §9.4-4 군중 반응
+    }]
+  }],
+
+  "hints":   { "p1": "battle.broker.hint.p1" },    // §9.5 동행자의 짧은 힌트
+  "on_win":  { "lines": [...], "result": { ... } },
+  "on_lose": { "lines": [...], "result": { ... } }
+}
+```
+
+**`on_win` 과 `on_lose` 는 퍼즐을 같은 상태로 전진시켜야 한다.**
+§9.5 "오답을 선택해도 즉시 패배하지 않는다" 를 구조로 보장하는 지점이고,
+`tests/validate_data.py` 가 둘의 `puzzle` op 이 다르면 오류로 잡는다.
+
+한 페이즈에서 오답을 `BattleRunner.MAX_ATTEMPTS`(3)회 고르면 다음 페이즈로 넘어간다.
+무한히 붙잡아 두면 §9.5 의 "재도전 가능" 이 아니라 벽이 되기 때문이다.
+
+결과는 `GameState.battle_results[battle_id]` 에 `{won, confidence, crowd, cards, attempts}`
+로 남고, 이 딕셔너리는 §17 세이브 포맷에 이미 들어 있다.
+
+---
+
+## 5b. 초상화 (§5.4, §6.2)
+
+`PortraitView` 는 96×96 을 장면 영역 아래 모서리에 붙인다.
+말하는 배우가 그 모서리에 서 있으면 반대쪽으로 옮겨 화자를 가리지 않는다.
+
+- **분기 대화와 배틀에서만** 뜬다. 핫스폿 관찰 한두 줄에는 안 뜬다 —
+  초상화가 '지금은 사람과 이야기하는 중' 이라는 신호로 읽혀야 한다.
+- 배틀 동안에는 `pin()` 으로 상대 얼굴을 고정한다. 입은 지금 말하는 사람이
+  그 얼굴의 주인일 때만 움직인다.
+- 임시 도트는 캐릭터의 `colors` / `hair_style` / `portrait.traits` 만 보고 그린다.
+  인물별 if 문이 아니라 특징 목록의 조합이므로, 새 인물은 JSON 한 덩이로 추가된다.
+- `assets/sprites/portraits/<character_id>.png` (96×96) 를 넣으면 그림이 우선한다.
+
+```jsonc
+"portrait": {
+  "traits": ["overexposed", "tie", "wide_smile"],   // glasses / shifty 도 있다
+  "backdrop": "#4a1220"
+}
+```
+
+---
+
+## 5c. 사운드 (§7)
+
+효과음도 배경음악도 파일이 아니라 코드가 만든다. 저장소에 바이너리를 넣지 않고도
+소리가 나고, 파일을 넣으면 그쪽이 먼저 쓰인다.
+
+| | 위치 | 방식 |
+|---|---|---|
+| 효과음 | `AudioDirector.SFX_RECIPES` | 펄스파/노이즈/스윕 세그먼트 조합 (§7.3) |
+| 배경음악 | `MusicSynth.SONGS` | 11025Hz FM/펄스 시퀀서, 60~64초 무이음 루프 (§7.1) |
+
+곡 3개는 §7.2 의 정의를 그대로 옮겼다.
+
+| 곡 | §7.2 정의 | 쓰이는 곳 |
+|---|---|---|
+| `office_night` | 기관성 — 박자감이 거의 없는 미니멀 루프. 프린터·키보드를 리듬으로 | 회의실 · 복도 · 탕비실 · 지하철 · 원룸 |
+| `bull_harbor` | 황소항 — 경쾌하지만 불안한 스윙. 음이 반음씩 미끄러진다 | 황소항 입구 · 대화 배틀 |
+| `sera` | 윤세라 — 낮은 베이스 위 날카로운 세 음(76-79-83) | (챕터 1 세라 동행 구간용) |
+
+**세 음 76-79-83 은 세라 테마에만 쓴다.** §7.3 "호감도 상승에 과장된 하트음 금지,
+세라 테마의 한 음이 추가되는 방식" 이 성립하려면 그 세 음이 다른 곳에 없어야 한다.
+
+---
+
 ## 6. 아직 비어 있는 자리
 
 | 위치 | 용도 | 명세서 |
 |---|---|---|
-| `scripts/battle/`, `data/battles/` | 대화 배틀 (멘탈 차트, 모순 카드, 약점 10종) | §9 |
-| `GameState.battle_results` | 배틀 결과 — 이미 세이브 포맷에 포함 | §17 |
-| `GameState.relation` 4축 | 세라 관계 — 대화 선택지 `effects` 가 이미 연결됨 | §12.2 |
+| `data/battles/` 챕터 1 배틀 3개 | 차트도사 구봉 · 만년존버 · 인버스 교단 (§9.6 에 대본 있음) | §8.2, §9 |
 | `GameState.ending_vars` | 엔딩 조건 누적치 | §15 |
-| `scenes/cutscenes/`, `assets/sprites/portraits/` | 초상화 대화 (96×96) | §5.4, §6.2 |
+| `assets/` 전체 | 배경·스프라이트·초상화·오디오. 넣으면 임시 도트를 자동 대체 | §6, §7, §22 |
 
 챕터 1을 붙일 때 세이브 포맷을 바꾸지 않아도 되도록 미리 넣어 뒀다.

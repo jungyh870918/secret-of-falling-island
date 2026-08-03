@@ -17,6 +17,7 @@ var _shot := 0
 
 
 func _ready() -> void:
+	_hide_window()
 	Engine.time_scale = TIME_SCALE
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
 	SaveManager.set_setting("text_speed", 3)
@@ -157,9 +158,107 @@ func _ready() -> void:
 	await settle(8)
 	await capture("font_large", "§18 글자 크게 — 레이아웃 유지 확인")
 	SaveManager.set_setting("font_size_index", 1)
+	main.call("_apply_settings")
+	await settle(6)
+
+	await _phase2_shots()
 
 	print("\n총 %d장 저장: %s" % [_shot, ProjectSettings.globalize_path(OUT_DIR)])
 	get_tree().quit()
+
+
+## Phase 2 구간 — 지하철·원룸·황소항, 초상화, 대화 배틀.
+## 퍼즐을 실제로 풀지 않고 상태를 직접 세워 장면만 확인한다.
+func _phase2_shots() -> void:
+	GameState.set_flag("boss_left", true)
+	GameState.advance_puzzle("decaf_swap", "completed")
+
+	await jump("subway_night", "from_office")
+	await capture("room_subway", "§8.1 심야 지하철 — 광고판 · 노선도 · 바닥의 전단지")
+
+	main.call("_interact", "subway_window", Actions.Verb.LOOK)
+	if await wait_until(func(): return bool(main.subtitles.is_active())):
+		await settle(4)
+		await capture("subway_reflection", "창문 반사 — §8.1 '결핍 제시'")
+	await auto_advance()
+
+	await jump("studio_room", "from_subway")
+	await capture("room_studio", "§8.1 한개미의 원룸 — 노트북 · 냉장고 · 매트리스")
+
+	# §5.4 초상화 대화 — 박프로 방송
+	GameState.give_item("last_chance_flyer")
+	main.held_item = "last_chance_flyer"
+	main.call("_interact", "laptop", Actions.Verb.USE)
+	if await wait_until(func(): return bool(main.portraits.speaker == "park"), 2400,
+			func(): if bool(main.subtitles.is_active()) and main.portraits.speaker != "park":
+				main.subtitles.advance()):
+		await settle(6)
+		await capture("portrait_park", "§5.4 초상화 대화 — 박프로 방송")
+	if await wait_until(func(): return bool(main.choice_box.is_active()), 2400,
+			func(): if bool(main.subtitles.is_active()): main.subtitles.advance()):
+		await settle(4)
+		await capture("portrait_choices", "§5.4 초상화 + 선택지 4개")
+	await auto_advance()
+
+	await jump("bull_harbor_entrance", "from_city")
+	await capture("room_harbor", "§8.1 황소항 입구 — 황소 동상 · 전광판 · 환전소")
+
+	# 세라 등장 상태
+	GameState.set_flag("scam_done", true)
+	GameState.advance_puzzle("first_scam", "scammed")
+	GameState.give_item("loss_receipt")
+	await jump("bull_harbor_entrance", "from_city")
+	await capture("harbor_sera", "§8.1 윤세라 첫 등장 — 코트 실루엣과 금속 자")
+
+	main.call("_interact", "sera", Actions.Verb.TALK)
+	if await wait_until(func(): return bool(main.portraits.speaker == "sera"), 2400,
+			func(): if bool(main.subtitles.is_active()) and main.portraits.speaker != "sera":
+				main.subtitles.advance()):
+		await settle(6)
+		await capture("portrait_sera", "§5.4 초상화 대화 — 윤세라")
+	await auto_advance()
+
+	# §9 대화 배틀 — 첫 페이즈의 선택지 화면과 멘탈 차트
+	GameState.advance_puzzle("first_scam", "met_sera")
+	main.call("_interact", "exchange_booth", Actions.Verb.TALK)
+	if await wait_until(func(): return bool(main.choice_box.is_active()), 3000,
+			func(): if bool(main.subtitles.is_active()): main.subtitles.advance()):
+		await settle(6)
+		await capture("battle_start", "§9 대화 배틀 — 상대 초상 · 멘탈 차트 · 군중")
+	# 결정타 하나를 넣어 캔들이 떨어진 차트를 찍는다
+	if bool(main.choice_box.is_active()):
+		main.choice_box.select_index(0)
+	if await wait_until(func(): return bool(main.choice_box.is_active()), 3000,
+			func(): if bool(main.subtitles.is_active()): main.subtitles.advance()):
+		await settle(6)
+		await capture("battle_chart", "§9.4 모순 카드 획득 후 — 캔들이 지지선으로 내려간다")
+	await auto_advance()
+
+
+## 퍼즐을 건너뛰고 장면만 세운다. 스크린샷 전용.
+func jump(scene_id: String, entry: String) -> void:
+	SceneDirector.change_scene(scene_id, entry)
+	await auto_advance()
+
+
+# ---------------------------------------------------------------- 창 숨기기
+
+## 캡처는 실제 렌더링이 필요하다 — `--headless` 는 더미 렌더러라 이미지가 안 나온다.
+## 그래서 창은 떠야 하지만, 작업 중에 앞으로 튀어나와 하던 일을 가리면 안 된다.
+## 포커스를 뺏지 않게 하고 화면 밖으로 밀어 둔다. 창은 살아 있으므로 렌더링은 계속된다.
+##
+##   godot --path . tests/Screenshots.tscn -- visible   ← 눈으로 보고 싶을 때
+func _hide_window() -> void:
+	for a in OS.get_cmdline_user_args():
+		if str(a) == "visible":
+			return
+
+	var win := get_window()
+	win.set_flag(Window.FLAG_NO_FOCUS, true)
+	# 최소화는 macOS 에서 렌더링이 멈출 수 있어 쓰지 않는다. 화면 밖으로 옮기기만 한다.
+	DisplayServer.window_set_position(Vector2i(-4000, -4000))
+	# 위치가 화면 안으로 강제 보정되는 환경이면 최소한 뒤로는 보낸다.
+	win.always_on_top = false
 
 
 # ---------------------------------------------------------------- 대기 도우미

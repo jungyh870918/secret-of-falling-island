@@ -17,6 +17,7 @@ var scenes: Dictionary = {}         ## scene_id -> Dictionary
 var dialogues: Dictionary = {}      ## dialogue_id -> Dictionary
 var puzzles: Dictionary = {}        ## puzzle_id -> Dictionary
 var chapters: Dictionary = {}       ## chapter_id -> Dictionary
+var battles: Dictionary = {}        ## battle_id -> Dictionary (§9 대화 배틀)
 var interactions: Array = []        ## 상호작용 룰 원본
 var strings: Dictionary = {}        ## 로컬라이징 키 -> 문자열 (Localization 이 가져간다)
 
@@ -37,6 +38,7 @@ func reload() -> void:
 	dialogues.clear()
 	puzzles.clear()
 	chapters.clear()
+	battles.clear()
 	interactions.clear()
 	strings.clear()
 	_rule_index.clear()
@@ -61,6 +63,8 @@ func reload() -> void:
 		_merge_keyed(puzzles, _read_json(path), "puzzle_id", path)
 	for path in _list(manifest, "chapters"):
 		_merge_keyed(chapters, _read_json(path), "chapter_id", path)
+	for path in _list(manifest, "battles"):
+		_merge_keyed(battles, _read_json(path), "battle_id", path)
 	for path in _list(manifest, "interactions"):
 		_load_interactions(path)
 
@@ -87,6 +91,10 @@ func dialogue(id: String) -> Dictionary:
 
 func puzzle(id: String) -> Dictionary:
 	return puzzles.get(id, {})
+
+
+func battle(id: String) -> Dictionary:
+	return battles.get(id, {})
 
 
 ## action/target 조합에 해당하는 룰 목록. 구체적인 룰(아이템 지정)이 앞에 온다.
@@ -137,6 +145,9 @@ func _read_json(path: String) -> Dictionary:
 
 func _merge_flat(into: Dictionary, src: Dictionary, path: String) -> void:
 	for k in src.keys():
+		# "_" 로 시작하는 키는 주석이다. 파일마다 있으므로 중복으로 세지 않는다.
+		if str(k).begins_with("_"):
+			continue
 		if into.has(k):
 			_err("중복 키 '%s' (%s)" % [k, path])
 		into[k] = src[k]

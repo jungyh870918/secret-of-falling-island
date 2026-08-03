@@ -26,6 +26,7 @@ var world: Node2D
 var ui_layer: CanvasLayer
 var panel: CommandPanel
 var subtitles: SubtitleLayer
+var portraits: PortraitView
 var choice_box: ChoiceBox
 var title_screen: TitleScreen
 var pause_menu: MenuList
@@ -36,8 +37,11 @@ var card: CardView
 var cursor: GameCursor
 var debug_panel: DebugPanel
 
+var battle_view: BattleView
+
 var result_runner: ResultRunner
 var dialogue_runner: DialogueRunner
+var battle_runner: BattleRunner
 
 var _hover_id := ""
 var _thumb_timer := 0.0
@@ -77,10 +81,24 @@ func _build_tree() -> void:
 	panel.item_examined.connect(_on_item_examined)
 	panel.hint_requested.connect(_on_hint_requested)
 
+	# §5.4 초상화는 자막보다 먼저 붙인다. 겹치면 글자가 위로 올라와야 읽힌다.
+	portraits = PortraitView.new()
+	portraits.name = "Portraits"
+	portraits.location_provider = Callable(self, "_current_view")
+	ui_layer.add_child(portraits)
+
+	# §9 대화 배틀 HUD. 초상화 위, 자막 아래 — 자막은 무엇에도 가려지면 안 된다(§18).
+	battle_view = BattleView.new()
+	battle_view.name = "BattleView"
+	ui_layer.add_child(battle_view)
+
 	subtitles = SubtitleLayer.new()
 	subtitles.name = "Subtitles"
 	subtitles.location_provider = Callable(self, "_current_view")
+	subtitles.portrait_provider = Callable(portraits, "occupied_rect")
 	ui_layer.add_child(subtitles)
+	subtitles.speaker_changed.connect(portraits.set_speaker)
+	subtitles.talking_changed.connect(portraits.set_talking)
 
 	choice_box = ChoiceBox.new()
 	choice_box.name = "ChoiceBox"
@@ -99,6 +117,18 @@ func _build_tree() -> void:
 	dialogue_runner.result_runner = result_runner
 	add_child(dialogue_runner)
 	result_runner.dialogue_runner = dialogue_runner
+	# §5.4 "일반 대화" — 초상화는 분기 대화 동안만 뜬다. 핫스폿 관찰 한두 줄에는 뜨지 않는다.
+	dialogue_runner.dialogue_started.connect(func(_id): portraits.set_enabled(true))
+	dialogue_runner.dialogue_finished.connect(func(_id): portraits.set_enabled(false))
+
+	battle_runner = BattleRunner.new()
+	battle_runner.name = "BattleRunner"
+	battle_runner.subtitles = subtitles
+	battle_runner.choice_box = choice_box
+	battle_runner.result_runner = result_runner
+	battle_runner.view = battle_view
+	battle_runner.portraits = portraits
+	add_child(battle_runner)
 
 	title_screen = TitleScreen.new()
 	title_screen.name = "TitleScreen"
@@ -694,8 +724,19 @@ func _on_hint_requested() -> void:
 	busy = false
 
 
-## ResultRunner 가 await 하는 특수 연출 처리기. (§3.2 컷신)
+## ResultRunner 가 await 하는 특수 연출 처리기. (§3.2 컷신, §9 대화 배틀)
 func _on_event_requested(event_name: String) -> void:
+	# "battle:<id>" — 배틀 하나를 끝까지 돌린다. 배틀별 분기는 데이터에 있다.
+	if event_name.begins_with("battle:"):
+		var battle_id := event_name.substr("battle:".length())
+		busy = true
+		await battle_runner.play(battle_id)
+		busy = false
+		var v := _current_view()
+		if v != null and is_instance_valid(v):
+			v.refresh_actors()
+		return
+
 	match event_name:
 		"prologue_end":
 			busy = true
@@ -704,6 +745,7 @@ func _on_event_requested(event_name: String) -> void:
 				"card.prologue_end.2",
 				"card.prologue_end.3",
 				"card.prologue_end.4",
+				"card.prologue_end.5",
 			], "prologue_end")
 			busy = false
 			_open_title()
@@ -802,6 +844,7 @@ const SETTING_ROWS := [
 	 "labels": ["ui.settings.speed_slow", "ui.settings.speed_normal", "ui.settings.speed_fast", "ui.settings.speed_instant"]},
 	{"key": "hint_level", "label": "ui.settings.hint_level", "type": "index",
 	 "labels": ["ui.settings.hint_off", "ui.settings.hint_1", "ui.settings.hint_2", "ui.settings.hint_3"]},
+	{"key": "show_portraits", "label": "ui.settings.portraits", "type": "bool"},
 	{"key": "high_contrast_hotspots", "label": "ui.settings.high_contrast", "type": "bool"},
 	{"key": "show_exit_markers", "label": "ui.settings.exit_markers", "type": "bool"},
 	{"key": "reduce_flashing", "label": "ui.settings.reduce_flashing", "type": "bool"},

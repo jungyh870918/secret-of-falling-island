@@ -102,10 +102,12 @@
 	"card.prologue_intro.2": "월급의 끝",
 	"card.prologue_intro.3": "목요일 밤 열한 시. 회사.",
 
-	"card.prologue_end.1": "부장이 퇴근했다.",
-	"card.prologue_end.2": "나는 아직 아무것도 이루지 못했지만,",
-	"card.prologue_end.3": "오늘 처음으로 내가 상황을 바꿨다.",
-	"card.prologue_end.4": "프롤로그 · 계속",
+	"_note_prologue_end": "Phase 2 에서 프롤로그가 황소항까지 늘어나면서 종료 지점이 바뀌었다. 예전 문구(부장 퇴근)는 이제 중간 지점이라 line.elevator.leave.* 가 그 감정을 맡는다.",
+	"card.prologue_end.1": "한 달 치를 잃었다.",
+	"card.prologue_end.2": "돌려받은 건 수수료뿐이지만,",
+	"card.prologue_end.3": "처음으로 상대가 자기 말에 걸려 넘어지는 걸 봤다.",
+	"card.prologue_end.4": "게이트는 아침에 열린다.",
+	"card.prologue_end.5": "프롤로그 · 계속",
 
 	"hotspot.boss": "부장",
 	"hotspot.boss_mug": "부장의 머그컵",

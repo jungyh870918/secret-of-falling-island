@@ -17,6 +17,11 @@ const SPEED_CPS := [12.0, 20.0, 34.0, 0.0]
 const HOLD_BASE := 0.45
 const HOLD_PER_CHAR := 0.026
 
+## 화자가 바뀔 때마다 알린다. PortraitView 가 이걸 듣고 초상화를 갈아 끼운다. (§5.4)
+signal speaker_changed(speaker: String)
+## 입 모양 애니메이션용 — 대사가 시작/끝날 때.
+signal talking_changed(is_talking: bool)
+
 var _speaker := ""
 var _full_text := ""
 var _shown := 0
@@ -27,6 +32,8 @@ var _anchor := Vector2(160, 90)
 
 ## Main 이 주입한다. 화자 위치를 찾기 위해 LocationView 를 참조한다.
 var location_provider: Callable = Callable()
+## Main 이 주입한다. 초상화가 덮은 영역(Rect2i)을 돌려준다 — 자막이 그 위에 겹치지 않게 한다.
+var portrait_provider: Callable = Callable()
 
 
 func _ready() -> void:
@@ -49,6 +56,7 @@ func say(speaker: String, text: String) -> void:
 	_elapsed = 0.0
 	_active = true
 	_dismiss_requested = false
+	speaker_changed.emit(speaker)
 	_update_anchor()
 	_set_talking(true)
 	DialogueLog.add(speaker, text, "line")
@@ -113,6 +121,7 @@ func _update_anchor() -> void:
 
 
 func _set_talking(v: bool) -> void:
+	talking_changed.emit(v)
 	var view = location_provider.call() if location_provider.is_valid() else null
 	if view == null or not is_instance_valid(view):
 		return
@@ -147,6 +156,7 @@ func _draw() -> void:
 		# 머리 위 공간이 없으면 아래로 내린다.
 		top = minf(_anchor.y + 8, Layout.VIEW_HEIGHT - total_h - MARGIN)
 	top = maxf(top, MARGIN)
+	cx = _avoid_portrait(cx, top, widest, total_h)
 
 	# 배경 판때기 대신 1px 외곽선 — 배경 그림을 가리지 않으면서 읽힌다. (§6.5)
 	var outline := Palette.ui("outline")
@@ -160,6 +170,29 @@ func _draw() -> void:
 					continue
 				draw_string(font, pos + Vector2(ox, oy), l, HORIZONTAL_ALIGNMENT_LEFT, -1, size, outline)
 		draw_string(font, pos, l, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
+
+
+## 초상화(§5.4)가 뜬 쪽으로 자막이 흘러가면 글자가 얼굴에 겹친다.
+## 겹치면 반대쪽으로 밀어내고, 밀 자리가 없으면 그대로 둔다 — 자막은 언제나 보여야 한다(§18).
+func _avoid_portrait(cx: float, top: float, widest: float, total_h: float) -> float:
+	if not portrait_provider.is_valid():
+		return cx
+	var pr = portrait_provider.call()
+	if not (pr is Rect2i) or (pr as Rect2i).size.x <= 0:
+		return cx
+	var box := Rect2(pr)
+	var text_rect := Rect2(cx - widest / 2.0, top, widest, total_h)
+	if not text_rect.intersects(box):
+		return cx
+
+	var half := widest / 2.0 + MARGIN
+	var left_edge := box.position.x - half            # 초상화 왼쪽으로 피하기
+	var right_edge := box.position.x + box.size.x + half
+	if right_edge <= Layout.SCREEN.x - MARGIN:
+		return right_edge
+	if left_edge >= MARGIN:
+		return left_edge
+	return cx
 
 
 ## 한국어는 어절 단위 줄바꿈이 자연스럽다. 공백이 없으면 글자 단위로 자른다.

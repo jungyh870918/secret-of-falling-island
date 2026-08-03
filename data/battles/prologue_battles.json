@@ -1,0 +1,236 @@
+{
+	"_comment": "명세서 §9 대화 배틀. 프롤로그의 첫 배틀이자 튜토리얼이다. §9.6 의 예시 배틀(차트도사 구봉)은 챕터 1 시험 B 에 들어가므로, 여기서는 같은 구조를 더 짧고 명확한 상대에게 적용했다.",
+
+	"_schema": [
+		"confidence / crowd_support / support_line : §9.2 상태값. 자신감이 지지선 아래로 내려가면 승리(§9.4-7).",
+		"weakness_type : §9.3 약점 10종 중 하나. 어떤 선택지가 정답인지의 근거다.",
+		"phases[].options[].quality : best(즉시 다음 페이즈) / good / weak / wrong",
+		"options[].card : §9.4-5 획득하는 모순 카드",
+		"options[].requires : 조건부 선택지. 경고문을 읽고 온 플레이어에게만 열리는 한 장이 있다.",
+		"hints : §9.5 오답 시 동행자(ally)가 주는 짧은 힌트",
+		"on_win / on_lose : 둘 다 퍼즐을 같은 상태로 전진시킨다. 져도 진행이 막히지 않는다(§9.5)."
+	],
+
+	"entries": [
+		{
+			"battle_id": "broker_booth",
+			"name_key": "battle.broker_booth.name",
+			"opponent": "broker",
+			"ally": "sera",
+			"weakness_type": "self_contradiction",
+			"_weakness_note": "§9.3 자기모순 — 이전 발언과 충돌. 이 남자는 규정을 세 번 말했고 세 번 다 달랐다.",
+
+			"confidence": 100,
+			"crowd_support": 55,
+			"support_line": 30,
+			"music": "bull_harbor",
+
+			"intro": [
+				{ "speaker": "narrator", "key": "battle.broker.intro.1" },
+				{ "speaker": "broker", "key": "battle.broker.intro.2" },
+				{ "speaker": "sera", "key": "battle.broker.intro.3" }
+			],
+
+			"phases": [
+				{
+					"id": "p1",
+					"_note": "§9.4-1 상대 주장. 1페이즈의 약점은 '규정' 이라는 단어를 근거로 쓰는 것 자체다.",
+					"claim": [
+						{ "speaker": "broker", "key": "battle.broker.p1.claim.1" },
+						{ "speaker": "broker", "key": "battle.broker.p1.claim.2" }
+					],
+					"options": [
+						{
+							"text_key": "battle.broker.p1.o1",
+							"quality": "best",
+							"confidence": -30,
+							"crowd": -15,
+							"card": "rule_three",
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p1.r1.1" },
+								{ "speaker": "player", "key": "battle.broker.p1.r1.2" },
+								{ "speaker": "broker", "key": "battle.broker.p1.r1.3" }
+							],
+							"crowd_line": "battle.broker.p1.crowd1"
+						},
+						{
+							"text_key": "battle.broker.p1.o2",
+							"quality": "good",
+							"confidence": -12,
+							"crowd": -5,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p1.r2.1" },
+								{ "speaker": "broker", "key": "battle.broker.p1.r2.2" }
+							]
+						},
+						{
+							"text_key": "battle.broker.p1.o3",
+							"quality": "wrong",
+							"confidence": 8,
+							"crowd": 10,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p1.r3.1" },
+								{ "speaker": "broker", "key": "battle.broker.p1.r3.2" }
+							],
+							"crowd_line": "battle.broker.p1.crowd3"
+						},
+						{
+							"_note": "§9.5 '새로운 우스운 대사 해금'. 져도 얻는 게 하나는 있어야 한다.",
+							"text_key": "battle.broker.p1.o4",
+							"quality": "weak",
+							"confidence": 0,
+							"crowd": -3,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p1.r4.1" },
+								{ "speaker": "player", "key": "battle.broker.p1.r4.2" }
+							]
+						}
+					]
+				},
+
+				{
+					"id": "p2",
+					"_note": "2페이즈의 약점은 '지정' 이다. 경고문을 읽고 왔으면 결정타가 한 장 더 열린다.",
+					"claim": [
+						{ "speaker": "broker", "key": "battle.broker.p2.claim.1" },
+						{ "speaker": "broker", "key": "battle.broker.p2.claim.2" }
+					],
+					"options": [
+						{
+							"text_key": "battle.broker.p2.o0",
+							"requires": { "flags": ["read_warning"] },
+							"quality": "best",
+							"confidence": -40,
+							"crowd": -20,
+							"card": "posted_notice",
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p2.r0.1" },
+								{ "speaker": "player", "key": "battle.broker.p2.r0.2" },
+								{ "speaker": "broker", "key": "battle.broker.p2.r0.3" }
+							],
+							"crowd_line": "battle.broker.p2.crowd0"
+						},
+						{
+							"text_key": "battle.broker.p2.o1",
+							"quality": "best",
+							"confidence": -28,
+							"crowd": -12,
+							"card": "self_appointed",
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p2.r1.1" },
+								{ "speaker": "player", "key": "battle.broker.p2.r1.2" },
+								{ "speaker": "broker", "key": "battle.broker.p2.r1.3" }
+							],
+							"crowd_line": "battle.broker.p2.crowd1"
+						},
+						{
+							"text_key": "battle.broker.p2.o2",
+							"quality": "weak",
+							"confidence": -4,
+							"crowd": 0,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p2.r2.1" }
+							]
+						},
+						{
+							"text_key": "battle.broker.p2.o3",
+							"quality": "wrong",
+							"confidence": 10,
+							"crowd": 12,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p2.r3.1" },
+								{ "speaker": "broker", "key": "battle.broker.p2.r3.2" }
+							],
+							"crowd_line": "battle.broker.p2.crowd3"
+						}
+					]
+				},
+
+				{
+					"id": "p3",
+					"_note": "3페이즈의 약점은 '수수료' 다. 없다고 했던 것이 환율 안에 있다고 했다.",
+					"claim": [
+						{ "speaker": "broker", "key": "battle.broker.p3.claim.1" },
+						{ "speaker": "broker", "key": "battle.broker.p3.claim.2" }
+					],
+					"options": [
+						{
+							"text_key": "battle.broker.p3.o1",
+							"quality": "best",
+							"confidence": -35,
+							"crowd": -18,
+							"card": "fee_that_isnt",
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p3.r1.1" },
+								{ "speaker": "player", "key": "battle.broker.p3.r1.2" },
+								{ "speaker": "broker", "key": "battle.broker.p3.r1.3" },
+								{ "speaker": "sera", "key": "battle.broker.p3.r1.4" }
+							],
+							"crowd_line": "battle.broker.p3.crowd1"
+						},
+						{
+							"text_key": "battle.broker.p3.o2",
+							"quality": "good",
+							"confidence": -14,
+							"crowd": -6,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p3.r2.1" }
+							]
+						},
+						{
+							"text_key": "battle.broker.p3.o3",
+							"quality": "wrong",
+							"confidence": 12,
+							"crowd": 8,
+							"reply": [
+								{ "speaker": "broker", "key": "battle.broker.p3.r3.1" },
+								{ "speaker": "player", "key": "battle.broker.p3.r3.2" }
+							],
+							"crowd_line": "battle.broker.p3.crowd3"
+						}
+					]
+				}
+			],
+
+			"hints": {
+				"p1": "battle.broker.hint.p1",
+				"p2": "battle.broker.hint.p2",
+				"p3": "battle.broker.hint.p3"
+			},
+
+			"on_win": {
+				"lines": [
+					{ "speaker": "narrator", "key": "battle.broker.win.1" },
+					{ "speaker": "broker", "key": "battle.broker.win.2" },
+					{ "speaker": "player", "key": "battle.broker.win.3" },
+					{ "speaker": "broker", "key": "battle.broker.win.4" },
+					{ "speaker": "narrator", "key": "battle.broker.win.5" },
+					{ "speaker": "player", "key": "battle.broker.win.6" }
+				],
+				"result": {
+					"give": ["refund_coins"],
+					"flags": { "battle_broker_won": true },
+					"puzzle": { "first_scam": "confronted" },
+					"relation": { "sera_respect": 2 },
+					"autosave": true
+				}
+			},
+
+			"on_lose": {
+				"_note": "§9.5 '오답을 선택해도 즉시 패배하지 않는다' — 여기서도 잃는 것은 없다. 셔터가 내려갈 뿐이다.",
+				"lines": [
+					{ "speaker": "narrator", "key": "battle.broker.lose.1" },
+					{ "speaker": "broker", "key": "battle.broker.lose.2" },
+					{ "speaker": "player", "key": "battle.broker.lose.3" },
+					{ "speaker": "sera", "key": "battle.broker.lose.4" }
+				],
+				"result": {
+					"flags": { "battle_broker_won": false },
+					"puzzle": { "first_scam": "confronted" },
+					"relation": { "sera_openness": 1 },
+					"autosave": true
+				}
+			}
+		}
+	]
+}

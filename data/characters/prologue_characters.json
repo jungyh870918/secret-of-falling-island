@@ -9,6 +9,7 @@
 			"walk_speed": 92,
 			"hair_style": "messy",
 			"has_bag": true,
+			"rolled_sleeves": true,
 			"frame_size": [32, 48],
 			"colors": {
 				"skin": "#d8a888",
@@ -17,6 +18,11 @@
 				"pants": "#5a4632",
 				"accent": "#8c3327",
 				"shoes": "#241f2b"
+			},
+			"portrait": {
+				"_note": "§22 한개미 초상화 — 평범한 실루엣에 과장된 표정. 넥타이는 늘 조금 비뚤어져 있다.",
+				"traits": ["tie"],
+				"backdrop": "#2c2634"
 			}
 		},
 		{
@@ -33,6 +39,11 @@
 				"pants": "#3d3a44",
 				"accent": "#4a4a4c",
 				"shoes": "#1b1820"
+			},
+			"portrait": {
+				"_note": "§6.7 부장 — 표정 변화 없음. 안경과 넥타이만으로 직함이 설명된다.",
+				"traits": ["glasses", "tie"],
+				"backdrop": "#3f3f42"
 			}
 		},
 		{
@@ -42,6 +53,7 @@
 			"walk_speed": 88,
 			"hair_style": "bob",
 			"has_coat": true,
+			"has_ruler": true,
 			"frame_size": [32, 48],
 			"colors": {
 				"skin": "#dcae90",
@@ -50,6 +62,11 @@
 				"pants": "#241f2b",
 				"accent": "#2c2634",
 				"shoes": "#0d0b10"
+			},
+			"portrait": {
+				"_note": "§22 윤세라 초상화 — 각진 실루엣, 감정이 적어 보이지만 눈썹과 시선으로 표현. 장식을 더하지 않는 것이 이 인물의 디자인이다.",
+				"traits": [],
+				"backdrop": "#1b2430"
 			}
 		}
 	]

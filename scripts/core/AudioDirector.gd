@@ -40,9 +40,17 @@ const SFX_RECIPES := {
 	"blip":     [{"kind": "pulse", "f0": 620, "f1": 620, "ms": 18, "duty": 0.3, "vol": 0.10}],
 	# 장면 전환
 	"whoosh":   [{"kind": "noise", "ms": 140, "vol": 0.12}],
+	# §7.3 대화 배틀 타격: 종이 찢김 + 캔들 붕괴음
+	"hit_paper": [{"kind": "noise", "ms": 70, "vol": 0.22},
+				  {"kind": "sweep", "f0": 700, "f1": 240, "ms": 130, "duty": 0.25, "vol": 0.20}],
+	# §7.3 멘탈 지지선 이탈: 금속 기둥 파손음
+	"support_break": [{"kind": "pulse", "f0": 330, "f1": 330, "ms": 60, "duty": 0.5, "vol": 0.26},
+					  {"kind": "noise", "ms": 90, "vol": 0.20},
+					  {"kind": "sweep", "f0": 420, "f1": 70, "ms": 520, "duty": 0.5, "vol": 0.24}],
 }
 
 var _cache: Dictionary = {}
+var _music_cache: Dictionary = {}
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _music_player: AudioStreamPlayer
 var _current_music := ""
@@ -81,6 +89,10 @@ func play_sfx(sfx_name: String) -> void:
 	p.play()
 
 
+func current_music() -> String:
+	return _current_music
+
+
 func play_music(music_name: String) -> void:
 	if music_name == _current_music:
 		return
@@ -88,15 +100,32 @@ func play_music(music_name: String) -> void:
 	if music_name.is_empty():
 		_music_player.stop()
 		return
-	var path := "%s/%s.ogg" % [MUSIC_DIR, music_name]
-	if not ResourceLoader.exists(path):
-		# Phase 2 에서 실제 곡을 넣는다. (§20 Phase 2 "배경음악 3곡")
+
+	var stream := _get_music(music_name)
+	if stream == null:
 		_music_player.stop()
 		return
-	var res := ResourceLoader.load(path)
-	if res is AudioStream:
-		_music_player.stream = res
-		_music_player.play()
+	_music_player.stream = stream
+	_music_player.play()
+
+
+## 파일이 있으면 파일, 없으면 §7.2 정의로 합성한다. 효과음과 같은 규칙이다.
+func _get_music(music_name: String) -> AudioStream:
+	if _music_cache.has(music_name):
+		return _music_cache[music_name]
+
+	var path := "%s/%s.ogg" % [MUSIC_DIR, music_name]
+	if ResourceLoader.exists(path):
+		var res := ResourceLoader.load(path)
+		if res is AudioStream:
+			_music_cache[music_name] = res
+			return res
+
+	var synth: AudioStream = MusicSynth.render(music_name)
+	if synth == null:
+		push_warning("[AudioDirector] 정의되지 않은 곡: %s" % music_name)
+	_music_cache[music_name] = synth
+	return synth
 
 
 func stop_music() -> void:
@@ -113,6 +142,7 @@ func _exit_tree() -> void:
 		_music_player.stop()
 		_music_player.stream = null
 	_cache.clear()
+	_music_cache.clear()
 
 
 func _get_sfx(sfx_name: String) -> AudioStream:

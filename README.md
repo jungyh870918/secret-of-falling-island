@@ -1,11 +1,13 @@
 # 떡락섬의 비밀 (코드명 RED_CANDLE)
 
 1990년대 DOS VGA 어드벤처 감성의 2D 포인트 앤 클릭 게임.
-이 저장소는 [통합 제작 명세서](떡락섬의_비밀_DOS_2D_어드벤처_통합제작명세서.md) **§20 Phase 1 — 플레이어블 프로토타입** 구현이다.
+이 저장소는 [통합 제작 명세서](떡락섬의_비밀_DOS_2D_어드벤처_통합제작명세서.md) **§20 Phase 2 — 수직 슬라이스** 구현이다.
 
 - 엔진: Godot 4.2+ / GDScript
 - 내부 해상도: 320×180, 정수 배율, nearest 필터, 안티앨리어싱 없음 (§6.2, §21)
-- 현재 범위: 프롤로그 회의실 → 복도 → 탕비실, 디카페인 커피 퍼즐 (§8.1)
+- 현재 범위: **프롤로그 전체** — 회의실 · 복도 · 탕비실 · 심야 지하철 · 원룸 · 황소항 입구 (§8.1)
+  - 디카페인 커피 퍼즐, 투자 방송 장면, 첫 사기 피해, 윤세라 첫 등장
+  - §9 대화 배틀 1개 (환전소), §5.4 초상화 대화, §7.2 배경음악 3곡
 
 ---
 
@@ -26,12 +28,18 @@ python3 tests/check_project.py                    # 구조 / class_name 충돌 /
 python3 tests/validate_data.py                    # JSON · 대사 키 · 룰 · 대화 그래프 · 좌표
 
 # Godot 필요
-godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 플레이, 78건 검증
-godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 17장 캡처
+godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 플레이, 135건 검증
+godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 30장 캡처
 ```
 
+`SmokeTest` 는 `--headless` 라 창이 뜨지 않는다.
+`Screenshots` 는 실제 렌더링이 필요해 창을 만들지만(헤드리스는 더미 렌더러라 이미지가
+안 나온다), **포커스를 뺏지 않고 화면 밖에서 돌기 때문에 작업을 가리지 않는다.**
+눈으로 보려면 `godot --path . tests/Screenshots.tscn -- visible`.
+
 `SmokeTest` 는 §23 완료 기준 16개 중 15개를 자동으로 확인하고,
-3개 장면 × 18개 대상 × 8동사 × 아이템 조합 **1216가지가 전부 대사를 내는지** 훑는다.
+회의실부터 황소항 대화 배틀까지 프롤로그 전 구간을 실제로 플레이한다.
+그 뒤 6개 장면 × 35개 대상 × 8동사 × 아이템 조합 **4368가지가 전부 대사를 내는지** 훑는다.
 
 현재 상태: **전부 통과**. 자세한 내용은 [docs/PROTOTYPE_QA.md](docs/PROTOTYPE_QA.md).
 
@@ -69,16 +77,17 @@ red-candle/
 ├─ docs/ARCHITECTURE.md     아키텍처와 데이터 스키마
 ├─ data/                    ★ 콘텐츠는 전부 여기. 코드 수정 없이 늘어난다
 │  ├─ manifest.json         읽어들일 파일 목록 (새 파일 추가 시 여기도 한 줄)
-│  ├─ localization/ko.json  모든 문장. 코드/데이터에는 키만 있다
+│  ├─ localization/ko*.json 모든 문장. 코드/데이터에는 키만 있다
 │  ├─ scenes/               배경 블록, 핫스폿, 출구, walkbox
 │  ├─ interactions/         ★ 상호작용 룰 테이블
 │  ├─ dialogues/            분기 대화 그래프
 │  ├─ items/ puzzles/ chapters/ characters/
-│  └─ battles/              (챕터 1부터)
+│  └─ battles/              ★ §9 대화 배틀 정의 (페이즈 · 선택지 · 모순 카드)
 ├─ scripts/
 │  ├─ core/                 Autoload, Main, Palette, Layout
 │  ├─ interaction/          Actions, Conditions, InteractionResolver, ResultRunner
 │  ├─ dialogue/             DialogueRunner, DialogueLog, HintSystem
+│  ├─ battle/               BattleRunner, BattleView (§9)
 │  ├─ locations/            LocationView, Actor
 │  ├─ ui/  save/  debug/
 ├─ assets/                  ★ 지금은 비어 있다. 넣으면 자동으로 임시 도트를 대체
@@ -89,18 +98,20 @@ red-candle/
 
 ## 에셋 교체 지점
 
-프로토타입은 임시 도트(색 블록)와 런타임 합성 효과음으로 돌아간다.
+프로토타입은 임시 도트(색 블록)와 런타임 합성 사운드로 돌아간다.
+효과음도 배경음악도 파일이 아니라 코드가 만든다 — 저장소에 바이너리가 없어도 소리가 난다.
 아래 경로에 **파일을 넣기만 하면** 코드 수정 없이 교체된다.
 
 | 넣을 곳 | 규격 | 대체 대상 |
 |---|---|---|
 | `assets/backgrounds/<scene_id>.png` | 320×135 | 장면의 `blocks` 임시 도트 |
 | `assets/sprites/characters/<character_id>.png` | 스프라이트시트, 프레임 32×48 | Actor 의 `_draw()` 임시 캐릭터 |
+| `assets/sprites/portraits/<character_id>.png` | 96×96 | PortraitView 의 임시 초상화 (§5.4) |
 | `assets/ui/items/<item_id>.png` | 16×16 | 인벤토리 색 블록 아이콘 |
 | `assets/ui/title.png` | 320×180 | 타이틀 임시 아트 |
 | `assets/ui/command_panel.png` | 320×45 | 하단 명령 패널 배경 |
 | `assets/audio/sfx/<이름>.wav` | — | 런타임 합성 효과음 |
-| `assets/audio/music/<이름>.ogg` | — | (현재 무음) |
+| `assets/audio/music/<이름>.ogg` | — | `MusicSynth` 의 런타임 합성 곡 |
 
 ### 폰트
 
@@ -131,12 +142,37 @@ python3 tools/subset_font.py <Galmuri_원본_폴더>
 
 ---
 
+## 프롤로그 진행 (§8.1)
+
+```
+회의실 ─ 디카페인 커피 퍼즐 ─► 복도 ─ 엘리베이터
+                                   │
+                              심야 지하철  광고판 · 창문 반사 · 노선도(황소항)
+                                   │      '마지막 기회' 전단지 획득
+                                   ▼
+                                 원룸     전단지 + 노트북 → 박프로 투자 방송
+                                   │      월급 봉투를 챙겨야 나갈 수 있다
+                                   ▼
+                            황소항 입구   가짜 환전소 → 첫 사기 피해
+                                   │      윤세라 첫 등장 · 첫 만남 대화
+                                   │      §9 대화 배틀 — 규정/지정/수수료의 자기모순
+                                   ▼
+                              프롤로그 종료 컷신 → 챕터 1 예고
+```
+
+배틀은 **져도 진행이 막히지 않는다**(§9.5). 이기면 수수료를 돌려받고,
+지면 셔터가 내려갈 뿐이다. 어느 쪽이든 세라의 명함을 받고 프롤로그가 끝난다.
+
+---
+
 ## 다음 단계 (§20)
 
-- **Phase 2 — 수직 슬라이스**: 프롤로그 전체(지하철·원룸·황소항 입구), 세라 첫 등장 컷신,
-  첫 대화 배틀, 배경음악 3곡, 30~45분 빌드
-- **Phase 3 — 챕터 1**: 투자자 조합 세 시험, 대화 배틀 3개, 퍼즐 6~8개
+- **Phase 3 — 챕터 1**: 투자자 조합 세 시험, 대화 배틀 3개, 퍼즐 6~8개, 챕터 종료 컷신
+- **Phase 4**: 챕터 2부터 순차 제작
 
-`scripts/battle/` 와 `data/battles/` 는 §9 대화 배틀용으로 비워 둔 자리다.
+챕터 1을 붙이려면 `data/` 에 JSON 을 더하고 `manifest.json` 에 줄을 추가하면 된다.
+배틀도 마찬가지로 `data/battles/` 에 정의만 넣으면 되고, 상호작용 룰에서
+`"event": "battle:<id>"` 로 부른다. `scripts/` 는 건드리지 않는다.
+
 `GameState` 의 관계 변수 4축(§12.2)과 `battle_results` 는 이미 저장 포맷에 들어 있어,
 챕터 1을 붙일 때 세이브 호환성이 깨지지 않는다.

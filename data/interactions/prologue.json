@@ -316,7 +316,7 @@
 
 		{
 			"id": "elevator_leave",
-			"_note": "§23 '퍼즐 해결 후 새로운 출구 활성화'. 잠금을 숨김이 아니라 룰로 표현해 이유를 항상 알 수 있게 한다.",
+			"_note": "§23 '퍼즐 해결 후 새로운 출구 활성화'. 잠금을 숨김이 아니라 룰로 표현해 이유를 항상 알 수 있게 한다. Phase 2 부터는 여기서 프롤로그가 끝나지 않고 지하철로 이어진다(§8.1 장소 3번).",
 			"action": ["walk", "open", "use", "push"],
 			"target": "elevator",
 			"preconditions": { "flags": ["boss_left"] },
@@ -324,10 +324,12 @@
 				"sfx": "door",
 				"lines": [
 					{ "speaker": "player", "key": "line.elevator.leave.1" },
-					{ "speaker": "player", "key": "line.elevator.leave.2" }
+					{ "speaker": "player", "key": "line.elevator.leave.2" },
+					{ "speaker": "narrator", "key": "line.elevator.leave.3" }
 				],
+				"flags": { "left_office": true },
 				"autosave": true,
-				"event": "prologue_end"
+				"goto": { "scene": "subway_night", "entry": "from_office" }
 			},
 			"on_fail": {
 				"sfx": "fail",

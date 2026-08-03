@@ -144,7 +144,12 @@ func _run() -> void:
 	await _t_puzzle_chain()
 	await _t_unique_failures()
 	await _t_observation_and_solve()
-	await _t_new_exit_and_end()
+	await _t_leave_office()
+	await _t_subway()
+	await _t_studio_broadcast()
+	await _t_harbor_scam()
+	await _t_first_battle()
+	await _t_prologue_end()
 	await _t_save_load()
 	await _t_no_silent_clicks()
 	await _t_missing_keys()
@@ -154,11 +159,16 @@ func _t_data_load() -> void:
 	section("데이터 로드")
 	check(GameData.load_errors.is_empty(),
 		"GameData 로드 오류 없음 (%s)" % ", ".join(GameData.load_errors))
-	check(GameData.scenes.size() == 3, "장면 3개 (실제 %d)" % GameData.scenes.size())
-	check(GameData.items.size() == 7, "아이템 7개 (실제 %d)" % GameData.items.size())
-	check(GameData.dialogues.size() == 4, "대화 4개 (실제 %d)" % GameData.dialogues.size())
-	check(GameData.interactions.size() >= 40, "상호작용 룰 %d개" % GameData.interactions.size())
-	check(GameData.strings.size() > 300, "로컬라이징 %d줄" % GameData.strings.size())
+	check(GameData.scenes.size() == 6, "장면 6개 (실제 %d)" % GameData.scenes.size())
+	check(GameData.items.size() == 12, "아이템 12개 (실제 %d)" % GameData.items.size())
+	check(GameData.dialogues.size() == 12, "대화 12개 (실제 %d)" % GameData.dialogues.size())
+	check(GameData.battles.size() == 1, "§9 배틀 1개 (실제 %d)" % GameData.battles.size())
+	check(GameData.interactions.size() >= 120, "상호작용 룰 %d개" % GameData.interactions.size())
+	check(GameData.strings.size() > 700, "로컬라이징 %d줄" % GameData.strings.size())
+
+	# §7.2 Phase 2 배경음악. 파일이 없어도 런타임 합성으로 소리가 나야 한다.
+	for song in ["office_night", "bull_harbor", "sera"]:
+		check(MusicSynth.has_song(song), "§7.2 곡 정의 존재: %s" % song)
 
 
 func _t_title() -> void:
@@ -338,7 +348,7 @@ func _t_observation_and_solve() -> void:
 	check(view.hotspot_at(Vector2(160, 100)).is_empty(), "부장 핫스폿이 비활성화됨")
 
 
-func _t_new_exit_and_end() -> void:
+func _t_leave_office() -> void:
 	section("§23-11~12 새 출구 + 자동 저장")
 	await act("door_corridor", Actions.Verb.WALK)
 	check(GameState.scene_id == "office_corridor", "복도로 이동")
@@ -346,9 +356,139 @@ func _t_new_exit_and_end() -> void:
 	DialogueLog.clear()
 	await act("elevator", Actions.Verb.WALK)
 	check(log_contains("오늘은 내가 먼저 나간다"), "§23-11 엘리베이터가 이제 열린다")
+	check(GameState.scene_id == "subway_night",
+		"§8.1 회사 → 지하철로 이어진다 (실제 %s)" % GameState.scene_id)
+	check(SaveManager.has_any_save(), "§23-12 자동 저장 파일 존재")
+
+
+## §8.1 장소 3번 — 지하철. 퍼즐은 없고 관찰과 전단지만 있다.
+func _t_subway() -> void:
+	section("§8.1 지하철")
+	DialogueLog.clear()
+	await act("subway_map", Actions.Verb.LOOK)
+	check(GameState.has_flag("knows_harbor_name"), "노선도 조사 → 황소항이라는 이름을 안다")
+	check(log_contains("황소항"), "노선도에서 황소항을 읽는다")
+
+	DialogueLog.clear()
+	await act("subway_window", Actions.Verb.LOOK)
+	check(log_contains("넥타이가 비뚤어져"), "창문 반사 — §8.1 '결핍 제시'")
+
+	# §11.2 — 전단지를 안 집고 내려도 진행이 막히지 않아야 한다.
+	check(not GameState.has_item("last_chance_flyer"), "아직 전단지를 안 집었다")
+	DialogueLog.clear()
+	await act("subway_door", Actions.Verb.WALK)
+	check(GameState.has_item("last_chance_flyer"),
+		"§11.2 전단지를 안 집고 내려도 신발에 붙어 따라온다")
+	check(log_contains("신발 밑창"), "따라오는 이유를 대사로 설명한다")
+	check(GameState.scene_id == "studio_room", "지하철 → 원룸 (실제 %s)" % GameState.scene_id)
+	check(GameState.puzzle_state("broadcast_lure") == "has_flyer", "퍼즐 → has_flyer")
+
+
+## §8.1 '투자 방송 장면'.
+func _t_studio_broadcast() -> void:
+	section("§8.1 원룸 · 투자 방송")
+	DialogueLog.clear()
+	await act("payslip", Actions.Verb.LOOK)
+	check(GameState.has_flag("knows_salary"), "급여명세서 조사 → knows_salary")
+	check(log_contains("공제 항목이 아홉 줄"), "§13.3 숫자를 말하지 않고 결핍만 보여 준다")
+
+	# 방송을 보기 전에는 나갈 수 없고, 왜 못 나가는지 문 앞에서 알려 준다 (§11.2)
+	DialogueLog.clear()
+	await act("door_out", Actions.Verb.WALK)
+	check(GameState.scene_id == "studio_room", "방송 전에는 나가지 않는다")
+	check(log_contains("전단지에 주소가 있었다"), "나갈 수 없는 이유를 대사로 알려 준다")
+
+	DialogueLog.clear()
+	queue_choices([0, 0, 0, 0])
+	await act("laptop", Actions.Verb.USE, "last_chance_flyer")
+	check(GameState.has_flag("saw_broadcast"), "방송 시청 → saw_broadcast")
+	check(GameState.puzzle_state("broadcast_lure") == "watched", "퍼즐 → watched")
+	check(log_contains("회사는 여러분의 시간을 삽니다"), "§8.1 박프로 원문 대사 1")
+	check(log_contains("지난주 은퇴는 단기 관점이었습니다"), "§8.1 박프로 원문 대사 2")
+	check(log_contains("노선도 끝에 있던 그 이름"),
+		"노선도를 봤으면 조건부 대사가 한 줄 붙는다")
+
+	# 돈 없이 나가려 하면 그것도 문 앞에서 알려 준다
+	DialogueLog.clear()
+	await act("door_out", Actions.Verb.WALK)
+	check(GameState.scene_id == "studio_room", "봉투 없이는 나가지 않는다")
+	check(log_contains("빈손으로 가면"), "봉투를 안 챙긴 이유를 알려 준다")
+
+	await act("work_bag", Actions.Verb.OPEN)
+	check(GameState.has_item("cash_envelope"), "월급 봉투 획득")
+
+	await act("door_out", Actions.Verb.WALK)
+	check(GameState.scene_id == "bull_harbor_entrance",
+		"원룸 → 황소항 입구 (실제 %s)" % GameState.scene_id)
+	check(GameState.puzzle_state("broadcast_lure") == "ready_to_leave", "퍼즐 → ready_to_leave")
+
+
+## §8.1 '첫 사기 피해' 와 '윤세라 첫 등장'.
+func _t_harbor_scam() -> void:
+	section("§8.1 황소항 · 첫 사기와 세라 등장")
+	var view: LocationView = SceneDirector.current_view
+	check(view != null and view.actor("sera") == null, "사기 전에는 세라가 없다")
+
+	DialogueLog.clear()
+	await act("warning_notice", Actions.Verb.LOOK)
+	check(GameState.has_flag("read_warning"), "경고문 조사 → read_warning (배틀 선택지 해금)")
+
+	DialogueLog.clear()
+	queue_choices([0, 0, 0, 0])
+	await act("exchange_booth", Actions.Verb.TALK)
+	check(log_contains("3조는 규정입니다"), "호객 대화 — 규정을 규정으로 설명한다")
+
+	DialogueLog.clear()
+	await act("exchange_booth", Actions.Verb.USE, "cash_envelope")
+	check(GameState.has_flag("scam_done"), "§8.1 첫 사기 피해")
+	check(not GameState.has_item("cash_envelope"), "월급 봉투가 소모됨")
+	check(GameState.has_item("loss_receipt"), "§11.2 같은 자리에서 영수증으로 대체됨")
+	check(GameState.puzzle_state("first_scam") == "scammed", "퍼즐 → scammed")
+
+	view = SceneDirector.current_view
+	check(view != null and view.actor("sera") != null, "사기 직후 세라가 나타난다")
+
+	DialogueLog.clear()
+	queue_choices([0, 0, 0])
+	await act("sera", Actions.Verb.TALK)
+	check(log_contains("처음 오셨죠?"), "§8.1 첫 만남 원문 대사 1")
+	check(log_contains("미련 보존이에요"), "§8.1 첫 만남 원문 대사 2")
+	check(GameState.puzzle_state("first_scam") == "met_sera", "퍼즐 → met_sera")
+	check(int(GameState.relation.get("sera_trust", 0)) > 0, "§12.2 관계 변수가 움직인다")
+
+
+## §9 대화 배틀.
+func _t_first_battle() -> void:
+	section("§9 첫 대화 배틀")
+	DialogueLog.clear()
+	# 첫 선택은 일부러 오답(index 2) — §9.5 "오답을 선택해도 즉시 패배하지 않는다"
+	queue_choices([2, 0, 0, 0])
+	await act("exchange_booth", Actions.Verb.TALK)
+
+	check(log_contains("고성은 곤란합니다"), "§9.5 오답에도 배틀이 계속된다")
+	check(log_contains("그 사람이 아까 한 말을 그대로"), "§9.5 오답 시 세라가 힌트를 준다")
+	check(log_contains("규정으로 규정을 설명하면"), "§9.4 모순을 찌르는 결정타가 나온다")
+
+	var result: Dictionary = GameState.battle_results.get("broker_booth", {})
+	check(not result.is_empty(), "§17 battle_results 에 결과가 기록된다")
+	check(bool(result.get("won", false)), "배틀 승리 (자신감 %s)" % str(result.get("confidence", "?")))
+	check(int(result.get("cards", []).size()) >= 2, "§9.4-5 모순 카드를 모았다")
+	check(GameState.has_item("refund_coins"), "승리 보상 지급")
+	check(GameState.puzzle_state("first_scam") == "confronted", "퍼즐 → confronted")
+	check(not bool(main.battle_view.visible), "배틀이 끝나면 HUD 가 사라진다")
+
+
+func _t_prologue_end() -> void:
+	section("§8.1 프롤로그 종료")
+	DialogueLog.clear()
+	queue_choices([0, 0])
+	await act("sera", Actions.Verb.TALK)
+
+	check(GameState.has_item("sera_card"), "세라의 명함 획득")
+	check(GameState.has_flag("prologue_complete"), "prologue_complete 플래그")
+	check(log_contains("게이트는 아침에 열려요"), "챕터 1 예고")
 	check(log_contains("프롤로그"), "종료 컷신 카드 출력")
 	check(int(main.mode) == MODE_TITLE, "프롤로그 종료 후 타이틀로 복귀")
-	check(SaveManager.has_any_save(), "§23-12 자동 저장 파일 존재")
 
 
 func _t_save_load() -> void:
@@ -368,8 +508,12 @@ func _t_save_load() -> void:
 
 	check(GameState.has_flag("boss_left"), "저장된 플래그가 복원됨")
 	check(GameState.is_puzzle_complete("decaf_swap"), "저장된 퍼즐 상태가 복원됨")
-	check(GameState.scene_id == "office_corridor", "저장된 장면이 복원됨 (%s)" % GameState.scene_id)
+	check(GameState.scene_id == "bull_harbor_entrance",
+		"저장된 장면이 복원됨 (%s)" % GameState.scene_id)
 	check(SceneDirector.current_view != null, "장면이 실제로 세워짐")
+	# §17 배틀 결과와 관계 변수도 세이브 포맷에 들어 있어야 한다
+	check(GameState.battle_results.has("broker_booth"), "§17 배틀 결과가 복원됨")
+	check(int(GameState.relation.get("sera_trust", 0)) > 0, "§12.2 관계 변수가 복원됨")
 
 
 ## §19.2 — 어떤 (동사, 대상) 조합에도 반응이 있어야 한다.

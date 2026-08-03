@@ -1,0 +1,237 @@
+{
+	"_comment": "명세서 §8.1 프롤로그 장소 4번 '한개미의 원룸'. §8.1 '투자 방송 장면' 이 여기서 일어난다. 퍼즐 broadcast_lure — 전단지의 주소로 방송을 보고, 월급 봉투를 챙겨야 나갈 수 있다. 나가는 조건을 문 앞에서 알려 주므로(§11.2) 헤매지 않는다.",
+
+	"scene_id": "studio_room",
+	"name_key": "scene.studio_room",
+	"background": "res://assets/backgrounds/studio_room.png",
+	"palette": "bear",
+	"music": "office_night",
+	"active_puzzles": ["broadcast_lure"],
+
+	"walkbox": [20, 100, 280, 26],
+
+	"spawn_points": {
+		"default": [140, 116],
+		"from_subway": [278, 116]
+	},
+
+	"blocks": [
+		{ "_": "벽지", "rect": [0, 0, 320, 94], "color": "#3a2c4d" },
+		{ "rect": [0, 62, 320, 32], "color": "#332745", "dither": "2x2", "color2": "#3a2c4d" },
+		{ "rect": [0, 92, 320, 2], "color": "#1b1820" },
+		{ "_": "장판", "rect": [0, 94, 320, 41], "color": "#6b5a44", "dither": "4x4", "color2": "#4a3d2e" },
+
+		{ "_": "창문 — 새벽 도시", "hotspot": "window_city", "rect": [14, 16, 56, 38], "color": "#141c2e" },
+		{ "hotspot": "window_city", "rect": [17, 19, 50, 32], "color": "#1b2430" },
+		{ "hotspot": "window_city", "rect": [20, 36, 8, 15], "color": "#2c2634" },
+		{ "hotspot": "window_city", "rect": [32, 30, 10, 21], "color": "#241f2b" },
+		{ "hotspot": "window_city", "rect": [46, 34, 9, 17], "color": "#2c2634" },
+		{ "hotspot": "window_city", "rect": [34, 33, 2, 2], "color": "#e0b23a", "anim": "flicker" },
+		{ "hotspot": "window_city", "rect": [48, 40, 2, 2], "color": "#e0b23a" },
+		{ "hotspot": "window_city", "rect": [40, 16, 2, 38], "color": "#5f6d78" },
+		{ "hotspot": "window_city", "rect": [14, 16, 56, 38], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "급여명세서 — 압정으로 벽에 꽂혀 있다", "hotspot": "payslip", "rect": [78, 18, 24, 22], "color": "#e8d9b8" },
+		{ "hotspot": "payslip", "rect": [81, 22, 18, 2], "color": "#4a4a4c" },
+		{ "hotspot": "payslip", "rect": [81, 26, 18, 2], "color": "#4a4a4c" },
+		{ "hotspot": "payslip", "rect": [81, 32, 11, 3], "color": "#c8352e" },
+		{ "hotspot": "payslip", "rect": [89, 17, 3, 3], "color": "#8f9a8c" },
+		{ "hotspot": "payslip", "rect": [78, 18, 24, 22], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "책상", "rect": [96, 64, 68, 6], "color": "#8a6a4a" },
+		{ "rect": [100, 70, 5, 26], "color": "#6b5a44" },
+		{ "rect": [155, 70, 5, 26], "color": "#6b5a44" },
+
+		{ "_": "노트북 — 화면이 켜져 있다", "hotspot": "laptop", "rect": [110, 44, 40, 20], "color": "#4a4a4c" },
+		{ "hotspot": "laptop", "rect": [113, 47, 34, 14], "color": "#1b2430" },
+		{ "hotspot": "laptop", "rect": [115, 49, 12, 2], "color": "#8fd48a", "anim": "flicker" },
+		{ "hotspot": "laptop", "rect": [115, 53, 22, 2], "color": "#5f6d78" },
+		{ "hotspot": "laptop", "rect": [108, 62, 44, 4], "color": "#5f6d78" },
+		{ "hotspot": "laptop", "rect": [110, 44, 40, 20], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "라면 상자", "hotspot": "noodle_box", "rect": [172, 76, 28, 20], "color": "#8c3327" },
+		{ "hotspot": "noodle_box", "rect": [172, 76, 28, 5], "color": "#5c1f18" },
+		{ "hotspot": "noodle_box", "rect": [176, 84, 20, 3], "color": "#e0b23a" },
+		{ "hotspot": "noodle_box", "rect": [172, 76, 28, 20], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "냉장고", "hotspot": "fridge", "rect": [208, 40, 34, 56], "color": "#c9c6b4" },
+		{ "hotspot": "fridge", "rect": [211, 43, 28, 20], "color": "#b8b5a4" },
+		{ "hotspot": "fridge", "rect": [211, 66, 28, 27], "color": "#b8b5a4" },
+		{ "hotspot": "fridge", "rect": [236, 52, 3, 8], "color": "#5f6d78" },
+		{ "hotspot": "fridge", "rect": [236, 70, 3, 8], "color": "#5f6d78" },
+		{ "hotspot": "fridge", "rect": [214, 46, 8, 6], "color": "#e0b23a" },
+		{ "hotspot": "fridge", "rect": [208, 40, 34, 56], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "달력 — 월급날에 동그라미", "hotspot": "calendar", "rect": [252, 14, 40, 30], "color": "#e8d9b8" },
+		{ "hotspot": "calendar", "rect": [252, 14, 40, 7], "color": "#245a5e" },
+		{ "hotspot": "calendar", "rect": [256, 25, 32, 2], "color": "#8f9a8c" },
+		{ "hotspot": "calendar", "rect": [256, 30, 32, 2], "color": "#8f9a8c" },
+		{ "hotspot": "calendar", "rect": [256, 35, 32, 2], "color": "#8f9a8c" },
+		{ "hotspot": "calendar", "rect": [270, 29, 6, 5], "outline": "#c8352e", "color": "#00000000" },
+		{ "hotspot": "calendar", "rect": [252, 14, 40, 30], "outline": "#1b1820", "color": "#00000000" },
+
+		{ "_": "매트리스 — 침대가 아니다", "hotspot": "mattress", "rect": [22, 98, 74, 22], "color": "#5f6d78" },
+		{ "hotspot": "mattress", "rect": [22, 98, 74, 4], "color": "#8f9a8c" },
+		{ "hotspot": "mattress", "rect": [26, 102, 26, 14], "color": "#3d5670" },
+		{ "hotspot": "mattress", "rect": [22, 98, 74, 22], "outline": "#1b1820", "color": "#00000000" },
+
+		{
+			"_": "직장인 가방 — 월급 봉투가 들어 있다",
+			"hotspot": "work_bag", "rect": [116, 82, 26, 16], "color": "#4a3d2e",
+			"visible_if": { "not_items": ["cash_envelope"] }
+		},
+		{ "hotspot": "work_bag", "rect": [116, 82, 26, 4], "color": "#3a2f24",
+			"visible_if": { "not_items": ["cash_envelope"] } },
+		{ "hotspot": "work_bag", "rect": [126, 79, 6, 4], "color": "#3a2f24",
+			"visible_if": { "not_items": ["cash_envelope"] } },
+		{ "hotspot": "work_bag", "rect": [116, 82, 26, 16], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "not_items": ["cash_envelope"] } },
+		{
+			"_": "봉투를 꺼낸 뒤의 빈 가방",
+			"hotspot": "work_bag", "rect": [116, 86, 26, 12], "color": "#3a2f24",
+			"visible_if": { "items": ["cash_envelope"] }
+		},
+		{ "hotspot": "work_bag", "rect": [116, 86, 26, 12], "outline": "#1b1820", "color": "#00000000",
+			"visible_if": { "items": ["cash_envelope"] } },
+
+		{ "_": "현관문", "hotspot": "door_out", "rect": [270, 48, 46, 48], "color": "#4a3d2e" },
+		{ "hotspot": "door_out", "rect": [273, 51, 40, 45], "color": "#6b5a44" },
+		{ "hotspot": "door_out", "rect": [277, 70, 4, 4], "color": "#b98a3c" },
+		{ "hotspot": "door_out", "rect": [270, 48, 46, 48], "outline": "#1b1820", "color": "#00000000" }
+	],
+
+	"hotspots": [
+		{
+			"id": "window_city",
+			"name_key": "hotspot.window_city",
+			"default_verb": "look",
+			"rect": [14, 16, 56, 38],
+			"walk_to": [42, 104],
+			"actions": ["look", "open", "close", "use"],
+			"defaults": {
+				"talk": "fail.window_city.talk",
+				"pickup": "fail.window_city.pickup",
+				"push": "fail.window_city.push",
+				"pull": "fail.window_city.push"
+			}
+		},
+		{
+			"id": "payslip",
+			"name_key": "hotspot.payslip",
+			"default_verb": "look",
+			"rect": [76, 16, 28, 26],
+			"walk_to": [90, 104],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.payslip.talk",
+				"push": "fail.payslip.push",
+				"pull": "fail.payslip.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "laptop",
+			"name_key": "hotspot.laptop",
+			"default_verb": "use",
+			"rect": [106, 42, 48, 24],
+			"walk_to": [128, 106],
+			"actions": ["look", "use", "open", "close", "push"],
+			"defaults": {
+				"talk": "fail.laptop.talk",
+				"pickup": "fail.laptop.pickup",
+				"pull": "fail.laptop.pull"
+			}
+		},
+		{
+			"id": "work_bag",
+			"name_key": "hotspot.work_bag",
+			"default_verb": "open",
+			"rect": [112, 76, 34, 22],
+			"walk_to": [128, 110],
+			"actions": ["look", "open", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.work_bag.talk",
+				"push": "fail.work_bag.push",
+				"pull": "fail.work_bag.push",
+				"close": "fail.work_bag.close"
+			}
+		},
+		{
+			"id": "noodle_box",
+			"name_key": "hotspot.noodle_box",
+			"default_verb": "look",
+			"rect": [170, 74, 32, 24],
+			"walk_to": [184, 108],
+			"actions": ["look", "open", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.noodle_box.talk",
+				"push": "fail.noodle_box.push",
+				"pull": "fail.noodle_box.push",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "fridge",
+			"name_key": "hotspot.fridge",
+			"default_verb": "open",
+			"rect": [206, 38, 38, 58],
+			"walk_to": [224, 108],
+			"actions": ["look", "open", "close", "use", "pull"],
+			"defaults": {
+				"talk": "fail.fridge.talk",
+				"pickup": "fail.fridge.pickup",
+				"push": "fail.fridge.push"
+			}
+		},
+		{
+			"id": "calendar",
+			"name_key": "hotspot.calendar",
+			"default_verb": "look",
+			"rect": [250, 12, 44, 34],
+			"walk_to": [268, 104],
+			"actions": ["look", "pickup", "use"],
+			"defaults": {
+				"talk": "fail.calendar.talk",
+				"push": "fail.calendar.push",
+				"pull": "fail.calendar.push",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		},
+		{
+			"id": "mattress",
+			"name_key": "hotspot.mattress",
+			"default_verb": "look",
+			"rect": [22, 96, 74, 24],
+			"walk_to": [58, 112],
+			"actions": ["look", "use", "push", "pull"],
+			"defaults": {
+				"talk": "fail.mattress.talk",
+				"pickup": "fail.mattress.pickup",
+				"open": "fail.generic.open",
+				"close": "fail.generic.close"
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"id": "door_out",
+			"name_key": "hotspot.door_out",
+			"default_verb": "walk",
+			"rect": [268, 46, 48, 50],
+			"walk_to": [286, 114],
+			"target": "bull_harbor_entrance",
+			"entry": "from_city",
+			"actions": ["look", "open", "use", "walk"],
+			"defaults": {
+				"talk": "fail.door.talk",
+				"pickup": "fail.door.pickup",
+				"close": "fail.door.close",
+				"push": "fail.door.push",
+				"pull": "fail.door.push"
+			}
+		}
+	]
+}

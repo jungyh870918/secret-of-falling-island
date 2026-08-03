@@ -227,6 +227,7 @@ func default_settings() -> Dictionary:
 		"high_contrast_hotspots": true,   ## §18 고대비 핫스폿.
 		## 프로토타입 기본 ON — 임시 색 블록으로는 무엇이 상호작용 가능한지 알 수 없다.
 		## 실제 배경 도트가 들어오면 false 로 되돌린다.
+		"show_portraits": true,           ## §5.4 대화 초상화. 화면의 3분의 1을 덮으므로 끌 수 있어야 한다.
 		"show_exit_markers": false,       ## §18 출구 표시
 		"reduce_shake": false,
 		"reduce_flashing": false,

@@ -1,0 +1,347 @@
+{
+	"_comment": "프롤로그 후반 대화. §8.1 '투자 방송 장면' 과 '첫 만남' 의 명세서 원문 대사를 그대로 넣고 앞뒤만 확장했다. §0-7 원칙대로 어떤 선택지도 진행을 막지 않는다 — 모든 분기는 같은 노드로 합류한다.",
+
+	"entries": [
+		{
+			"dialogue_id": "park_broadcast",
+			"_note": "§8.1 투자 방송 장면. 원문 6줄(n001~n006)은 한 글자도 바꾸지 않았다. §13.2 박프로 — 시청자에게 직접 말하고, 과거 발언을 재해석하고, '제가 말씀드렸죠' 로 끝낸다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "park", "text_key": "dlg.park.n001", "next": "n002" },
+				"n002": { "speaker": "park", "text_key": "dlg.park.n002", "next": "n003" },
+				"n003": { "speaker": "park", "text_key": "dlg.park.n003", "next": "n004" },
+				"n004": { "speaker": "park", "text_key": "dlg.park.n004", "next": "n005" },
+				"n005": { "speaker": "player", "text_key": "dlg.park.n005", "next": "n006" },
+				"n006": { "speaker": "park", "text_key": "dlg.park.n006", "next": "n007" },
+
+				"n007": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.park.c001", "next": "n010" },
+						{ "text_key": "dlg.park.c002", "next": "n020" },
+						{ "text_key": "dlg.park.c003", "next": "n030" },
+						{ "text_key": "dlg.park.c004", "next": "n040" }
+					]
+				},
+
+				"n010": { "speaker": "park", "text_key": "dlg.park.n010", "next": "n011" },
+				"n011": { "speaker": "park", "text_key": "dlg.park.n011", "next": "n012" },
+				"n012": { "speaker": "player", "text_key": "dlg.park.n012", "next": "n050" },
+
+				"n020": { "speaker": "park", "text_key": "dlg.park.n020", "next": "n021" },
+				"n021": { "speaker": "park", "text_key": "dlg.park.n021", "next": "n022" },
+				"n022": { "speaker": "player", "text_key": "dlg.park.n022", "next": "n050" },
+
+				"n030": { "speaker": "park", "text_key": "dlg.park.n030", "next": "n031" },
+				"n031": { "speaker": "player", "text_key": "dlg.park.n031", "next": "n050" },
+
+				"n040": { "speaker": "narrator", "text_key": "dlg.park.n040", "next": "n041" },
+				"n041": { "speaker": "park", "text_key": "dlg.park.n041", "next": "n042" },
+				"n042": { "speaker": "player", "text_key": "dlg.park.n042", "next": "n050" },
+
+				"n050": { "speaker": "park", "text_key": "dlg.park.n050", "next": "n051" },
+				"n051": { "speaker": "park", "text_key": "dlg.park.n051", "next": "n052" },
+				"n052": { "speaker": "park", "text_key": "dlg.park.n052", "next": "n053" },
+				"n053": { "speaker": "narrator", "text_key": "dlg.park.n053", "next": "n054" },
+				"n054": { "speaker": "player", "text_key": "dlg.park.n054", "next": "n055" },
+
+				"_note_n055": "노선도를 이미 봤으면 한 줄이 더 붙는다. 안 봤어도 막히지 않는다.",
+				"n055": {
+					"branches": [
+						{ "if": { "flags": ["knows_harbor_name"] }, "next": "n056" }
+					],
+					"next": "n060"
+				},
+				"n056": { "speaker": "player", "text_key": "dlg.park.n056", "next": "n060" },
+
+				"n060": {
+					"result": {
+						"flags": { "saw_broadcast": true },
+						"puzzle": { "broadcast_lure": "watched" },
+						"sfx": "news",
+						"autosave": true
+					},
+					"speaker": "player",
+					"text_key": "dlg.park.n060",
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "broker_pitch",
+			"_note": "환전소 호객. 규정을 세 번 말하고 세 번 다 다르게 말한다 — §9 첫 배틀의 모순 카드가 여기서 미리 깔린다. 플레이어가 이 대화를 건너뛰어도 배틀은 자체 페이즈에서 같은 모순을 다시 꺼낸다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "broker", "text_key": "dlg.broker.n001", "next": "n002" },
+				"n002": { "speaker": "broker", "text_key": "dlg.broker.n002", "next": "n003" },
+				"n003": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.broker.c001", "next": "n010", "once": true },
+						{ "text_key": "dlg.broker.c002", "next": "n020", "once": true },
+						{ "text_key": "dlg.broker.c003", "next": "n030", "once": true },
+						{ "text_key": "dlg.broker.c004", "next": "n040" }
+					]
+				},
+
+				"n010": { "speaker": "broker", "text_key": "dlg.broker.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.broker.n011", "next": "n012" },
+				"n012": {
+					"result": { "flags": { "heard_rule_three": true } },
+					"speaker": "broker",
+					"text_key": "dlg.broker.n012",
+					"next": "n003"
+				},
+
+				"n020": { "speaker": "broker", "text_key": "dlg.broker.n020", "next": "n021" },
+				"n021": {
+					"result": { "flags": { "heard_only_booth": true } },
+					"speaker": "broker",
+					"text_key": "dlg.broker.n021",
+					"next": "n003"
+				},
+
+				"n030": { "speaker": "broker", "text_key": "dlg.broker.n030", "next": "n031" },
+				"n031": {
+					"result": { "flags": { "heard_no_fee": true } },
+					"speaker": "broker",
+					"text_key": "dlg.broker.n031",
+					"next": "n003"
+				},
+
+				"n040": { "speaker": "broker", "text_key": "dlg.broker.n040", "next": "n041" },
+				"n041": {
+					"result": { "flags": { "talked_to_broker": true } },
+					"speaker": "player",
+					"text_key": "dlg.broker.n041",
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "broker_scam",
+			"_note": "§8.1 '첫 사기 피해'. §13.3 을 지켜 실제 수법을 구체적으로 재현하지 않는다 — 무슨 일이 일어났는지는 명확하되 따라 할 수 있는 절차는 남기지 않는다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "narrator", "text_key": "dlg.scam.n001", "next": "n002" },
+				"n002": { "speaker": "broker", "text_key": "dlg.scam.n002", "next": "n003" },
+				"n003": { "speaker": "narrator", "text_key": "dlg.scam.n003", "next": "n004" },
+				"n004": { "speaker": "broker", "text_key": "dlg.scam.n004", "next": "n005" },
+				"n005": { "speaker": "player", "text_key": "dlg.scam.n005", "next": "n006" },
+				"n006": { "speaker": "broker", "text_key": "dlg.scam.n006", "next": "n007" },
+				"n007": { "speaker": "player", "text_key": "dlg.scam.n007", "next": "n008" },
+				"n008": { "speaker": "broker", "text_key": "dlg.scam.n008", "next": "n009" },
+				"n009": { "speaker": "player", "text_key": "dlg.scam.n009", "next": "n010" },
+				"n010": { "speaker": "broker", "text_key": "dlg.scam.n010", "next": "n011" },
+				"n011": {
+					"result": { "sfx": "crash" },
+					"speaker": "narrator",
+					"text_key": "dlg.scam.n011",
+					"next": "n012"
+				},
+				"n012": { "speaker": "player", "text_key": "dlg.scam.n012", "next": "n013" },
+				"n013": { "speaker": "player", "text_key": "dlg.scam.n013", "next": "n014" },
+				"n014": { "speaker": "narrator", "text_key": "dlg.scam.n014", "next": "n015" },
+				"_note_n015": "필수 아이템이 소모되는 프롤로그의 유일한 지점. 같은 result 안에서 loss_receipt 로 대체되므로 인벤토리가 비는 순간이 없다. (§11.2)",
+				"n015": {
+					"result": {
+						"take": ["cash_envelope"],
+						"give": ["loss_receipt"],
+						"flags": { "scam_done": true },
+						"puzzle": { "first_scam": "scammed" },
+						"autosave": true
+					},
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "sera_first_meet",
+			"_note": "§8.1 '첫 만남'. 원문 5줄(n010~n012 경로)은 그대로다. §13.2 윤세라 — 짧고 정확하며 감정어를 쓰지 않는다. §12.2 관계 4축이 여기서 처음 움직인다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "narrator", "text_key": "dlg.sera1.n001", "next": "n002" },
+				"n002": { "speaker": "sera", "text_key": "dlg.sera1.n002", "next": "n003" },
+
+				"n003": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.sera1.c001", "next": "n010" },
+						{ "text_key": "dlg.sera1.c002", "next": "n020" },
+						{ "text_key": "dlg.sera1.c003", "next": "n030" }
+					]
+				},
+
+				"_note_n010": "명세서 원문 경로.",
+				"n010": { "speaker": "sera", "text_key": "dlg.sera1.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.sera1.n011", "next": "n012" },
+				"n012": { "speaker": "sera", "text_key": "dlg.sera1.n012", "next": "n050" },
+
+				"n020": { "speaker": "sera", "text_key": "dlg.sera1.n020", "next": "n021" },
+				"n021": { "speaker": "player", "text_key": "dlg.sera1.n021", "next": "n022" },
+				"n022": { "speaker": "sera", "text_key": "dlg.sera1.n022", "next": "n050" },
+
+				"n030": { "speaker": "sera", "text_key": "dlg.sera1.n030", "next": "n031" },
+				"n031": { "speaker": "sera", "text_key": "dlg.sera1.n031", "next": "n050" },
+
+				"n050": { "speaker": "sera", "text_key": "dlg.sera1.n050", "next": "n051" },
+				"n051": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.sera1.c010", "next": "n060", "effects": { "sera_openness": 1 } },
+						{ "text_key": "dlg.sera1.c011", "next": "n061", "effects": { "sera_respect": 1 } },
+						{ "text_key": "dlg.sera1.c012", "next": "n062", "effects": { "sera_irritation": 1 } }
+					]
+				},
+				"n060": { "speaker": "sera", "text_key": "dlg.sera1.n060", "next": "n070" },
+				"n061": { "speaker": "sera", "text_key": "dlg.sera1.n061", "next": "n070" },
+				"n062": { "speaker": "sera", "text_key": "dlg.sera1.n062", "next": "n070" },
+
+				"n070": { "speaker": "sera", "text_key": "dlg.sera1.n070", "next": "n071" },
+				"n071": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.sera1.c020", "next": "n080" },
+						{ "text_key": "dlg.sera1.c021", "next": "n081" }
+					]
+				},
+				"n080": { "speaker": "sera", "text_key": "dlg.sera1.n080", "next": "n082" },
+				"n081": { "speaker": "sera", "text_key": "dlg.sera1.n081", "next": "n082" },
+
+				"n082": { "speaker": "sera", "text_key": "dlg.sera1.n082", "next": "n083" },
+				"n083": { "speaker": "sera", "text_key": "dlg.sera1.n083", "next": "n084" },
+				"n084": { "speaker": "player", "text_key": "dlg.sera1.n084", "next": "n085" },
+				"n085": { "speaker": "sera", "text_key": "dlg.sera1.n085", "next": "n086" },
+				"n086": { "speaker": "sera", "text_key": "dlg.sera1.n086", "next": "n087" },
+				"n087": {
+					"result": {
+						"flags": { "met_sera": true },
+						"puzzle": { "first_scam": "met_sera" },
+						"relation": { "sera_trust": 1 },
+						"autosave": true
+					},
+					"speaker": "player",
+					"text_key": "dlg.sera1.n087",
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "sera_idle",
+			"_note": "배틀 전 반복 대화. §11.3 힌트와 겹치지 않는 정보만 준다. 선택지가 소진되면 짧게 끝난다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "sera", "text_key": "dlg.seraidle.n001", "next": "n002" },
+				"n002": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.seraidle.c001", "next": "n010", "once": true },
+						{ "text_key": "dlg.seraidle.c002", "next": "n020", "once": true },
+						{ "text_key": "dlg.seraidle.c003", "next": "n030", "once": true },
+						{ "text_key": "dlg.seraidle.c004", "next": "end" }
+					]
+				},
+				"n010": { "speaker": "sera", "text_key": "dlg.seraidle.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.seraidle.n011", "next": "n012" },
+				"n012": { "speaker": "sera", "text_key": "dlg.seraidle.n012", "next": "end" },
+
+				"n020": { "speaker": "sera", "text_key": "dlg.seraidle.n020", "next": "n021" },
+				"n021": { "speaker": "sera", "text_key": "dlg.seraidle.n021", "next": "end" },
+
+				"n030": { "speaker": "sera", "text_key": "dlg.seraidle.n030", "next": "n031" },
+				"n031": { "speaker": "player", "text_key": "dlg.seraidle.n031", "next": "n032" },
+				"n032": { "speaker": "sera", "text_key": "dlg.seraidle.n032", "next": "end" }
+			}
+		},
+
+		{
+			"dialogue_id": "sera_after_battle",
+			"_note": "프롤로그의 마지막 대화. 배틀 승패에 따라 갈리지만 둘 다 명함을 받고 끝난다 — §9.5 '실패해도 진행이 막히지 않는다'. 마지막 노드가 프롤로그 종료 컷신을 부른다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": {
+					"branches": [
+						{ "if": { "flags": ["battle_broker_won"] }, "next": "n010" }
+					],
+					"next": "n020"
+				},
+
+				"n010": { "speaker": "sera", "text_key": "dlg.sera2.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.sera2.n011", "next": "n012" },
+				"n012": { "speaker": "sera", "text_key": "dlg.sera2.n012", "next": "n030" },
+
+				"n020": { "speaker": "sera", "text_key": "dlg.sera2.n020", "next": "n021" },
+				"n021": { "speaker": "player", "text_key": "dlg.sera2.n021", "next": "n022" },
+				"n022": { "speaker": "sera", "text_key": "dlg.sera2.n022", "next": "n030" },
+
+				"n030": { "speaker": "sera", "text_key": "dlg.sera2.n030", "next": "n031" },
+				"n031": {
+					"speaker": "player",
+					"choices": [
+						{ "text_key": "dlg.sera2.c001", "next": "n040", "effects": { "sera_respect": 1 } },
+						{ "text_key": "dlg.sera2.c002", "next": "n041", "effects": { "sera_openness": 1 } },
+						{ "text_key": "dlg.sera2.c003", "next": "n042" }
+					]
+				},
+				"n040": { "speaker": "sera", "text_key": "dlg.sera2.n040", "next": "n050" },
+				"n041": { "speaker": "sera", "text_key": "dlg.sera2.n041", "next": "n050" },
+				"n042": { "speaker": "sera", "text_key": "dlg.sera2.n042", "next": "n050" },
+
+				"n050": {
+					"result": { "give": ["sera_card"], "sfx": "pickup" },
+					"speaker": "sera",
+					"text_key": "dlg.sera2.n050",
+					"next": "n051"
+				},
+				"n051": { "speaker": "player", "text_key": "dlg.sera2.n051", "next": "n052" },
+				"n052": { "speaker": "sera", "text_key": "dlg.sera2.n052", "next": "n053" },
+				"n053": { "speaker": "player", "text_key": "dlg.sera2.n053", "next": "n054" },
+				"n054": { "speaker": "sera", "text_key": "dlg.sera2.n054", "next": "n055" },
+				"n055": { "speaker": "narrator", "text_key": "dlg.sera2.n055", "next": "n060" },
+
+				"n060": {
+					"result": {
+						"flags": { "prologue_complete": true },
+						"puzzle": { "first_scam": "closed" },
+						"relation": { "sera_trust": 1 },
+						"autosave": true,
+						"event": "prologue_end"
+					},
+					"next": "end"
+				}
+			}
+		},
+
+		{
+			"dialogue_id": "sera_closing_idle",
+			"_note": "프롤로그가 닫힌 뒤 세라에게 다시 말을 걸었을 때. 실제로는 컷신으로 넘어가므로 거의 보이지 않지만, 빠른 불러오기로 되돌아온 경우를 위해 둔다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": { "speaker": "sera", "text_key": "dlg.seraclose.n001", "next": "n002" },
+				"n002": { "speaker": "player", "text_key": "dlg.seraclose.n002", "next": "end" }
+			}
+		},
+
+		{
+			"dialogue_id": "broker_after",
+			"_note": "배틀이 끝난 뒤의 환전소. 이겼든 졌든 셔터는 내려가 있다.",
+			"start_node": "n001",
+			"nodes": {
+				"n001": {
+					"branches": [
+						{ "if": { "flags": ["battle_broker_won"] }, "next": "n010" }
+					],
+					"next": "n020"
+				},
+				"n010": { "speaker": "narrator", "text_key": "dlg.brokerafter.n010", "next": "n011" },
+				"n011": { "speaker": "player", "text_key": "dlg.brokerafter.n011", "next": "end" },
+				"n020": { "speaker": "narrator", "text_key": "dlg.brokerafter.n020", "next": "n021" },
+				"n021": { "speaker": "player", "text_key": "dlg.brokerafter.n021", "next": "end" }
+			}
+		}
+	]
+}

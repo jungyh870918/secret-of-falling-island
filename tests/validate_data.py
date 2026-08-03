@@ -100,6 +100,10 @@ chapters = {}
 for p in manifest.get("chapters", []):
     chapters.update(entries(load(res_path(p)), "chapter_id"))
 
+battles = {}
+for p in manifest.get("battles", []):
+    battles.update(entries(load(res_path(p)), "battle_id"))
+
 rules = []
 for p in manifest.get("interactions", []):
     rules.extend(load(res_path(p)).get("rules", []))
@@ -444,6 +448,113 @@ for did, dlg in dialogues.items():
             warn(f"[dialogue {did}] 도달할 수 없는 노드: {nid}")
 
 
+# ---------------------------------------------------------------- 8b. 대화 배틀 (§9)
+
+# §9.3 약점 유형 10종
+WEAKNESS_TYPES = {
+    "hypocrisy", "hindsight", "authority", "vagueness", "fear",
+    "greed", "peer_pressure", "conspiracy", "sunk_cost", "self_contradiction",
+}
+QUALITIES = {"best", "good", "weak", "wrong"}
+
+
+def battle_lines(lines, where: str) -> None:
+    for line in lines or []:
+        if isinstance(line, dict):
+            use_key(line.get("key", ""), where)
+            check_conditions(line.get("if"), where)
+
+
+for bid, b in battles.items():
+    where = f"battle {bid}"
+    use_key(b.get("name_key", ""), where)
+
+    opp = b.get("opponent", "")
+    if opp and opp not in characters:
+        err(f"[{where}] 없는 상대 캐릭터: {opp}")
+    ally = b.get("ally", "")
+    if ally and ally not in characters:
+        err(f"[{where}] 없는 동행 캐릭터: {ally}")
+
+    wt = b.get("weakness_type", "")
+    if wt and wt not in WEAKNESS_TYPES:
+        err(f"[{where}] §9.3 에 없는 약점 유형: {wt}")
+
+    support = b.get("support_line", 30)
+    if not (0 < support < b.get("confidence", 100)):
+        err(f"[{where}] 지지선({support})이 초기 자신감({b.get('confidence', 100)}) 안에 있어야 한다.")
+
+    battle_lines(b.get("intro"), where + " intro")
+
+    phases = b.get("phases", [])
+    if not phases:
+        err(f"[{where}] phases 가 없다.")
+    phase_ids = set()
+
+    for ph in phases:
+        pid = ph.get("id", "")
+        pwhere = f"{where}/{pid}"
+        if not pid:
+            err(f"[{where}] id 없는 페이즈")
+        elif pid in phase_ids:
+            err(f"[{where}] 중복된 페이즈 id: {pid}")
+        phase_ids.add(pid)
+
+        battle_lines(ph.get("claim"), pwhere + " claim")
+        opts = ph.get("options", [])
+        # §9.4-2 "플레이어 선택지 3~4개"
+        if not 3 <= len(opts) <= 4:
+            err(f"[{pwhere}] 선택지가 {len(opts)}개다. §9.4 는 3~4개를 요구한다.")
+
+        # 조건 없이 항상 보이는 선택지만 세도 3개는 돼야 조건부 선택지가 잠겨도 성립한다.
+        unconditional = [o for o in opts if not o.get("requires")]
+        if len(unconditional) < 3:
+            err(f"[{pwhere}] 조건 없는 선택지가 {len(unconditional)}개다. "
+                f"requires 가 전부 막히면 선택지가 부족해진다.")
+
+        # §9.4-7 이길 수 있는 페이즈인가 — 자신감을 깎는 선택지가 하나는 있어야 한다.
+        if not any(o.get("confidence", 0) < 0 for o in opts):
+            err(f"[{pwhere}] 자신감을 깎는 선택지가 없다. 이 페이즈는 이길 수 없다.")
+
+        for i, o in enumerate(opts):
+            owhere = f"{pwhere} option{i}"
+            use_key(o.get("text_key", ""), owhere)
+            if o.get("say_key"):
+                use_key(o["say_key"], owhere + " say")
+            use_key(o.get("crowd_line", ""), owhere + " crowd")
+            check_conditions(o.get("requires"), owhere)
+            battle_lines(o.get("reply"), owhere + " reply")
+            q = o.get("quality", "")
+            if q not in QUALITIES:
+                err(f"[{owhere}] 알 수 없는 quality: {q}")
+
+    # §9.5 오답에 힌트가 붙는가
+    hints = b.get("hints", {})
+    for pid, key in hints.items():
+        if pid not in phase_ids:
+            err(f"[{where}] 힌트가 없는 페이즈를 가리킨다: {pid}")
+        use_key(key, where + " hint")
+    if ally:
+        missing = phase_ids - set(hints)
+        if missing:
+            warn(f"[{where}] 동행자가 있는데 힌트가 없는 페이즈: {sorted(missing)} (§9.5)")
+
+    # §9.5 "즉시 패배하지 않는다" — 이겨도 져도 같은 자리로 진행돼야 한다.
+    for branch in ("on_win", "on_lose"):
+        o = b.get(branch, {})
+        if not o:
+            err(f"[{where}] {branch} 가 없다. 승패 중 한쪽에서 진행이 멈춘다.")
+            continue
+        battle_lines(o.get("lines"), f"{where} {branch}")
+        check_result(o.get("result"), f"{where} {branch}")
+
+    win_pz = (b.get("on_win", {}).get("result") or {}).get("puzzle", {})
+    lose_pz = (b.get("on_lose", {}).get("result") or {}).get("puzzle", {})
+    if win_pz != lose_pz:
+        err(f"[{where}] 승패에 따라 퍼즐 전진이 다르다. §9.5 대로라면 져도 같은 지점으로 나아가야 한다. "
+            f"(승 {win_pz} / 패 {lose_pz})")
+
+
 # ---------------------------------------------------------------- 9. GDScript 안의 키
 
 KEY_RE = re.compile(r'Loc\.t(?:_or|_variant)?\(\s*"([^"]+)"')
@@ -454,7 +565,9 @@ for gd in sorted((ROOT / "scripts").rglob("*.gd")):
 
 # Loc.t() 를 거치지 않고 테이블/배열 리터럴로 넘기는 키
 # (Main.SETTING_ROWS, MenuList.open(title_key), CardView.show_card 등)
-LITERAL_RE = re.compile(r'"((?:ui|card|hint|verb|speaker|fallback|item|hotspot|scene|chapter|puzzle)\.[a-z0-9_.]+)"')
+LITERAL_RE = re.compile(
+    r'"((?:ui|card|hint|verb|speaker|fallback|item|hotspot|scene|chapter|puzzle|battle)'
+    r'\.[a-z0-9_.]+)"')
 for gd in sorted((ROOT / "scripts").rglob("*.gd")):
     for m in LITERAL_RE.finditer(gd.read_text(encoding="utf-8")):
         use_key(m.group(1), f"code {gd.relative_to(ROOT)}")
@@ -467,8 +580,32 @@ for verb in VALID_ACTIONS:
     # verb.simple.* 는 8개 동사 전부 필요하다.
     use_key(f"verb.simple.{verb}", "code Actions.label_key")
 use_key("fallback.use_item", "code InteractionResolver")
-for sp in ("player", "boss", "sera", "narrator", "system", "hint"):
-    use_key(f"speaker.{sp}", "code LogView")
+
+# 화자 이름표(§5.1 자막, §18 대화 기록)는 데이터가 speaker 로 지정한 값에서 나온다.
+# 하드코딩한 목록을 두면 새 인물을 넣을 때마다 여기도 고쳐야 하므로 데이터에서 모은다.
+speakers: set[str] = {"player", "narrator", "system", "hint"}   # 코드가 직접 쓰는 화자
+
+
+def collect_speakers(node) -> None:
+    if isinstance(node, dict):
+        sp = node.get("speaker")
+        if isinstance(sp, str) and sp:
+            speakers.add(sp)
+        for v in node.values():
+            collect_speakers(v)
+    elif isinstance(node, list):
+        for v in node:
+            collect_speakers(v)
+
+
+for doc in (dialogues, puzzles, scenes, chapters, battles):
+    collect_speakers(doc)
+collect_speakers(rules)
+
+for sp in sorted(speakers):
+    use_key(f"speaker.{sp}", "data speaker")
+    if sp not in characters and sp not in ("player", "narrator", "system", "hint"):
+        warn(f"화자 '{sp}' 에 대응하는 캐릭터 정의가 없다. 초상화가 임시 도트로 나온다. (§5.4)")
 
 
 # ---------------------------------------------------------------- 10. 미사용 키
@@ -483,7 +620,8 @@ for k in sorted(strings):
 # ---------------------------------------------------------------- 결과
 
 print(f"장면 {len(scenes)} · 핫스폿 {len(hotspot_ids)} · 출구 {len(exit_ids)} · 아이템 {len(items)} "
-      f"· 대화 {len(dialogues)} · 퍼즐 {len(puzzles)} · 룰 {len(rules)} · 문자열 {len(strings)}")
+      f"· 대화 {len(dialogues)} · 퍼즐 {len(puzzles)} · 배틀 {len(battles)} · 룰 {len(rules)} "
+      f"· 문자열 {len(strings)}")
 
 for w in warnings:
     print("△ " + w)

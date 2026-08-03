@@ -14,8 +14,17 @@ const SPRITE_DIR := "res://assets/sprites/characters"
 
 ## §6.6 애니메이션 원칙 — 과도하게 부드러우면 안 된다.
 const IDLE_FPS := 3.0     ## 대기 2~4프레임
-const WALK_FPS := 8.0     ## 걷기 방향당 6프레임
+const WALK_FPS := 10.0    ## 걷기 방향당 6프레임 (10fps × 6프레임 = 한 걸음 0.6초)
 const TALK_FPS := 6.0     ## 말하기 2~3프레임
+
+## §6.6 "걷기: 방향당 6프레임". 6프레임 한 주기의 포즈 표.
+## 0·3 이 접지(발이 벌어지고 몸이 내려감), 1·2·4·5 가 통과 구간이다.
+## 값을 표로 빼 두면 프레임 수를 바꿔도 그리는 코드는 그대로다.
+const WALK_LEG   := [3, 2, 0, -3, -2, 0]    ## 앞다리 오프셋. 뒷다리는 부호 반대.
+const WALK_BOB   := [0, 1, 1, 0, 1, 1]      ## 몸통 상하
+const WALK_ARM   := [-2, -1, 0, 2, 1, 0]    ## 팔은 다리와 반대로
+## 대기 3프레임 — 숨 쉬는 정도만. §6.6 "대기 2~4프레임"
+const IDLE_BOB   := [0, 0, 1]
 
 enum Facing { DOWN, LEFT, RIGHT, UP }
 
@@ -41,6 +50,8 @@ var colors := {
 var hair_style := "messy"
 var has_bag := false
 var has_coat := false
+var has_ruler := false        ## §6.7 윤세라 — 허리의 금속 자
+var rolled_sleeves := false   ## §6.7 한개미 — 와이셔츠 소매를 걷은 모습
 
 var _sprite: Sprite2D = null
 var _frame_size := Vector2i(32, 48)
@@ -57,6 +68,8 @@ func setup(def: Dictionary) -> void:
 	hair_style = str(def.get("hair_style", "messy"))
 	has_bag = bool(def.get("has_bag", false))
 	has_coat = bool(def.get("has_coat", false))
+	has_ruler = bool(def.get("has_ruler", false))
+	rolled_sleeves = bool(def.get("rolled_sleeves", false))
 	facing = _facing_from(str(def.get("facing", "down")))
 
 	var c = def.get("colors", {})
@@ -179,6 +192,19 @@ func _update_sprite_frame() -> void:
 
 # ---------------------------------------------------------------- 임시 도트
 
+## 지금 프레임의 포즈. 걷기 6프레임 / 대기 3프레임 / 말하기 2프레임. (§6.6)
+func _pose() -> Dictionary:
+	if is_walking:
+		var f := int(_anim_time * WALK_FPS) % 6
+		return {"leg": int(WALK_LEG[f]), "arm": int(WALK_ARM[f]), "bob": int(WALK_BOB[f]),
+				"mouth": 0}
+	var idle_f := int(_anim_time * IDLE_FPS) % IDLE_BOB.size()
+	var mouth := 0
+	if is_talking:
+		mouth = 1 if int(_anim_time * TALK_FPS) % 2 == 0 else 0
+	return {"leg": 0, "arm": 0, "bob": int(IDLE_BOB[idle_f]), "mouth": mouth}
+
+
 func _draw() -> void:
 	if _sprite != null:
 		return
@@ -191,80 +217,127 @@ func _draw() -> void:
 	var body_h := h - head_h - leg_h
 
 	var ol: Color = colors["outline"]
-	var bob := 0
-	if is_walking:
-		bob = 1 if (int(_anim_time * WALK_FPS) % 2 == 0) else 0
-	elif is_talking:
-		bob = 1 if (int(_anim_time * TALK_FPS) % 2 == 0) else 0
+	var p := _pose()
+	var bob: int = p["bob"]
+	var side := facing == Facing.LEFT or facing == Facing.RIGHT
+	var dir := -1 if facing == Facing.LEFT else 1
 
-	# 그림자 (§6.4 대형 그림자에 디더링)
+	# 그림자 — 발밑에만. §6.4 대형 그라데이션 대신 단색 두 겹.
 	_rect(Rect2(-w / 2 - 1, -2, w + 2, 2), Color(0, 0, 0, 0.35))
+	_rect(Rect2(-w / 2 + 1, -3, w - 2, 1), Color(0, 0, 0, 0.18))
 
-	# 다리
+	# ---- 다리. 옆을 볼 때는 앞뒤로, 앞뒤를 볼 때는 좌우로 벌어진다.
 	var leg_w := maxi(2, int(w * 0.3))
-	var swing := 0
-	if is_walking:
-		swing = int([0, 1, 0, -1][int(_anim_time * WALK_FPS) % 4])
-	_rect(Rect2(-w / 2 + 1, -leg_h, leg_w, leg_h - 2), colors["pants"], ol)
-	_rect(Rect2(w / 2 - leg_w - 1, -leg_h, leg_w, leg_h - 2), colors["pants"], ol)
-	# 신발
-	_rect(Rect2(-w / 2 + 1 + swing, -2, leg_w + 1, 2), colors["shoes"])
-	_rect(Rect2(w / 2 - leg_w - 1 - swing, -2, leg_w + 1, 2), colors["shoes"])
+	var swing: int = p["leg"]
+	var lx_a: int = -w / 2 + 1
+	var lx_b: int = w / 2 - leg_w - 1
+	if side:
+		# 옆모습에서는 두 다리가 거의 겹치고, 스윙만 앞뒤로 나온다.
+		lx_a = -leg_w / 2 + swing * dir
+		lx_b = -leg_w / 2 - swing * dir
+		_rect(Rect2(lx_b, -leg_h, leg_w, leg_h - 2), colors["pants"].darkened(0.25), ol)
+		_rect(Rect2(lx_b - 1, -2, leg_w + 2, 2), colors["shoes"].darkened(0.2))
 
-	# 몸통
-	var body_y := -leg_h - body_h
+	_rect(Rect2(lx_a, -leg_h, leg_w, leg_h - 2), colors["pants"], ol)
+	_rect(Rect2(lx_a - 1, -2, leg_w + 2, 2), colors["shoes"])
+	if not side:
+		_rect(Rect2(lx_b, -leg_h, leg_w, leg_h - 2), colors["pants"], ol)
+		_rect(Rect2(lx_b + swing, -2, leg_w + 1, 2), colors["shoes"])
+
+	# ---- 몸통
+	var body_y := -leg_h - body_h + bob
 	_rect(Rect2(-w / 2, body_y, w, body_h), colors["shirt"], ol)
-	# 넥타이/포인트 색 (§6.7 각 캐릭터의 시각적 특징)
-	_rect(Rect2(-1, body_y + 1, 2, int(body_h * 0.6)), colors["accent"])
+
+	if facing != Facing.UP:
+		# 넥타이/포인트 색. 뒤를 보고 있으면 안 보인다. (§6.7)
+		var tie_x := -1 + (dir if side else 0)
+		_rect(Rect2(tie_x, body_y + 1, 2, int(body_h * 0.6)), colors["accent"])
 
 	if has_coat:
-		# §6.7 윤세라 — 각진 실루엣의 긴 코트
-		_rect(Rect2(-w / 2 - 1, body_y, 2, body_h + int(leg_h * 0.6)), colors["accent"], ol)
-		_rect(Rect2(w / 2 - 1, body_y, 2, body_h + int(leg_h * 0.6)), colors["accent"], ol)
+		# §6.7 윤세라 — 각진 실루엣의 긴 코트. 무릎 아래까지 내려온다.
+		var coat_h := body_h + int(leg_h * 0.62)
+		_rect(Rect2(-w / 2 - 1, body_y, 2, coat_h), colors["accent"], ol)
+		_rect(Rect2(w / 2 - 1, body_y, 2, coat_h), colors["accent"], ol)
+		_rect(Rect2(-w / 2 - 1, body_y + coat_h - 1, w + 2, 1), colors["accent"].darkened(0.3))
+
+	if has_ruler:
+		# §6.7 윤세라 — 허리의 금속 자
+		var ruler_x := (w / 2 - 1) if dir > 0 else (-w / 2 - 1)
+		_rect(Rect2(ruler_x, body_y + body_h - 2, 1, 7), Color.html("#8f9a8c"))
 
 	if has_bag:
-		# §6.7 한개미 — 낡은 직장인 가방
-		_rect(Rect2(w / 2 - 1, body_y + 3, 4, 5), colors["accent"], ol)
+		# §6.7 한개미 — 낡은 직장인 가방. 걸을 때 반박자 늦게 흔들린다.
+		var bag_dx := -1 if p["arm"] < 0 else 0
+		_rect(Rect2(w / 2 - 1 + bag_dx, body_y + 3, 4, 5), colors["accent"], ol)
 
-	# 팔
-	var arm_y := body_y + 1 + bob
-	_rect(Rect2(-w / 2 - 2, arm_y, 2, int(body_h * 0.8)), colors["shirt"], ol)
-	_rect(Rect2(w / 2, arm_y, 2, int(body_h * 0.8)), colors["shirt"], ol)
+	# ---- 팔. 다리와 반대로 흔들린다.
+	var arm_len := int(body_h * 0.8)
+	var arm: int = p["arm"]
+	_draw_arm(-w / 2 - 2, body_y + 1 + (arm if side else 0), 2, arm_len, ol)
+	_draw_arm(w / 2, body_y + 1 - (arm if side else 0), 2, arm_len, ol)
 
-	# 머리
-	var head_y := body_y - head_h + bob
+	# ---- 머리
+	var head_y := body_y - head_h
 	_rect(Rect2(-head_w / 2, head_y, head_w, head_h), colors["skin"], ol)
 
-	# 머리 모양 — 작은 스프라이트에서 실루엣으로 구분되게 (§6.1)
+	_draw_hair(head_y, head_w, head_h, side, dir)
+	_draw_face(head_y, head_w, head_h, side, dir, int(p["mouth"]), ol)
+
+
+## 소매를 걷었으면 팔 아래쪽이 살색이다. (§6.7 한개미)
+func _draw_arm(x: int, y: int, w: int, length: int, ol: Color) -> void:
+	if not rolled_sleeves:
+		_rect(Rect2(x, y, w, length), colors["shirt"], ol)
+		return
+	var upper := int(length * 0.55)
+	_rect(Rect2(x, y, w, upper), colors["shirt"], ol)
+	_rect(Rect2(x, y + upper, w, length - upper), colors["skin"], ol)
+
+
+func _draw_hair(head_y: int, head_w: int, head_h: int, side: bool, dir: int) -> void:
 	match hair_style:
-		"bob":   # 단발
+		"bob":
+			# §6.7 윤세라 — 적갈색 단발. 옆에서 보면 뒤통수 쪽이 더 두껍다.
 			_rect(Rect2(-head_w / 2 - 1, head_y - 1, head_w + 2, int(head_h * 0.55)), colors["hair"])
 			_rect(Rect2(-head_w / 2 - 1, head_y, 2, head_h), colors["hair"])
 			_rect(Rect2(head_w / 2 - 1, head_y, 2, head_h), colors["hair"])
+			if side:
+				var back := (-head_w / 2 - 2) if dir > 0 else (head_w / 2)
+				_rect(Rect2(back, head_y, 2, head_h + 1), colors["hair"])
 		"bald":
 			_rect(Rect2(-head_w / 2, head_y, head_w, 1), colors["hair"])
+			_rect(Rect2(-head_w / 2 - 1, head_y + 2, 1, int(head_h * 0.4)), colors["hair"])
+			_rect(Rect2(head_w / 2, head_y + 2, 1, int(head_h * 0.4)), colors["hair"])
 		"slick":
 			_rect(Rect2(-head_w / 2, head_y - 1, head_w, int(head_h * 0.35)), colors["hair"])
-		_:       # messy
+			_rect(Rect2(-head_w / 2, head_y - 1, head_w, 1), colors["hair"].lightened(0.25))
+		_:
+			# messy — §6.7 한개미, 약간 헝클어진 머리
 			_rect(Rect2(-head_w / 2 - 1, head_y - 2, head_w + 2, int(head_h * 0.42)), colors["hair"])
 			_rect(Rect2(-head_w / 2 - 1, head_y - 3, 2, 2), colors["hair"])
 			_rect(Rect2(head_w / 2 - 2, head_y - 3, 3, 2), colors["hair"])
 
-	# 눈 — 방향에 따라 위치만 바꾼다
-	var eye_y := head_y + int(head_h * 0.5)
-	var eye_dx := 0
-	match facing:
-		Facing.LEFT: eye_dx = -1
-		Facing.RIGHT: eye_dx = 1
-		_: eye_dx = 0
-	if facing != Facing.UP:
-		_rect(Rect2(-2 + eye_dx, eye_y, 1, 1), ol)
-		_rect(Rect2(1 + eye_dx, eye_y, 1, 1), ol)
 
-	# 말하기 — 입이 2프레임으로 열리고 닫힌다 (§6.6)
-	if is_talking:
-		var mouth_h := 2 if bob == 1 else 1
-		_rect(Rect2(-1, head_y + head_h - 3, 2, mouth_h), ol)
+func _draw_face(head_y: int, head_w: int, head_h: int, side: bool, dir: int,
+		mouth: int, ol: Color) -> void:
+	# 뒤를 보고 있으면 얼굴이 없다. 이게 방향을 알려 주는 가장 확실한 신호다.
+	if facing == Facing.UP:
+		return
+	var eye_y := head_y + int(head_h * 0.5)
+	if side:
+		# 옆모습 — 눈 하나, 코 한 픽셀
+		_rect(Rect2(dir, eye_y, 1, 1), ol)
+		_rect(Rect2(dir * (head_w / 2), eye_y + 1, 1, 1), colors["skin"].darkened(0.3))
+		if mouth > 0:
+			_rect(Rect2(dir, head_y + head_h - 3, 2, 2), ol)
+		return
+
+	_rect(Rect2(-2, eye_y, 1, 1), ol)
+	_rect(Rect2(1, eye_y, 1, 1), ol)
+	if mouth > 0:
+		_rect(Rect2(-1, head_y + head_h - 3, 2, 2), ol)
+	elif is_talking:
+		_rect(Rect2(-1, head_y + head_h - 3, 2, 1), ol)
 
 
 func _rect(r: Rect2, fill: Color, outline: Color = Color(0, 0, 0, 0)) -> void:

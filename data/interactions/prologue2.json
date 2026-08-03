@@ -1,0 +1,926 @@
+{
+	"_comment": "프롤로그 후반(지하철·원룸·황소항) 상호작용 룰. 규약은 data/interactions/prologue.json 의 _convention 과 같다. 같은 대상에 여러 룰이 붙을 때는 preconditions 를 서로 배타적인 퍼즐 상태로 잡아, 정렬 순서에 의존하지 않게 했다.",
+
+	"rules": [
+
+		{
+			"_section": "지하철 — 광고판",
+			"id": "look_subway_ad_repeat",
+			"action": "look",
+			"target": "subway_ad",
+			"preconditions": { "flags": ["saw_subway_ad"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_ad.repeat.1" }] }
+		},
+		{
+			"id": "look_subway_ad_first",
+			"_note": "§8.1 '투자 방송의 유혹 제시' 의 첫 노출. 광고가 먼저 말을 걸고, 한개미는 아직 웃어넘긴다.",
+			"action": "look",
+			"target": "subway_ad",
+			"result": {
+				"flags": { "saw_subway_ad": true },
+				"lines": [
+					{ "speaker": "player", "key": "line.subway_ad.first.1" },
+					{ "speaker": "player", "key": "line.subway_ad.first.2" },
+					{ "speaker": "player", "key": "line.subway_ad.first.3" },
+					{ "speaker": "player", "key": "line.subway_ad.first.4" }
+				]
+			}
+		},
+		{
+			"id": "use_subway_ad",
+			"action": ["use", "pickup"],
+			"target": "subway_ad",
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_ad.use.1" }] }
+		},
+
+		{
+			"_section": "지하철 — 창문",
+			"id": "look_subway_window_repeat",
+			"action": "look",
+			"target": "subway_window",
+			"preconditions": { "flags": ["saw_reflection"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_window.repeat.1" }] }
+		},
+		{
+			"id": "look_subway_window_first",
+			"_note": "§8.1 목적 '한개미의 삶과 결핍 제시'. 설명하지 않고 반사만 보여 준다. (§13.1)",
+			"action": "look",
+			"target": "subway_window",
+			"result": {
+				"flags": { "saw_reflection": true },
+				"lines": [
+					{ "speaker": "narrator", "key": "line.subway_window.first.1" },
+					{ "speaker": "player", "key": "line.subway_window.first.2" },
+					{ "speaker": "player", "key": "line.subway_window.first.3" }
+				]
+			}
+		},
+		{
+			"id": "open_subway_window",
+			"action": ["open", "use"],
+			"target": "subway_window",
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_window.open.1" }] }
+		},
+
+		{
+			"_section": "지하철 — 손잡이",
+			"id": "use_handrail",
+			"action": ["use", "pull", "push"],
+			"target": "handrail",
+			"result": {
+				"lines": [
+					{ "speaker": "narrator", "key": "line.handrail.use.1" },
+					{ "speaker": "player", "key": "line.handrail.use.2" }
+				]
+			}
+		},
+		{
+			"id": "look_handrail",
+			"action": "look",
+			"target": "handrail",
+			"result": { "lines": [{ "speaker": "player", "key": "line.handrail.look.1" }] }
+		},
+
+		{
+			"_section": "지하철 — 노선도",
+			"id": "look_subway_map_repeat",
+			"action": ["look", "use"],
+			"target": "subway_map",
+			"preconditions": { "flags": ["knows_harbor_name"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_map.repeat.1" }] }
+		},
+		{
+			"id": "look_subway_map_first",
+			"_note": "'황소항' 이라는 이름을 여기서 처음 본다. 방송을 볼 때 한 줄이 더 붙는 조건이 된다.",
+			"action": ["look", "use"],
+			"target": "subway_map",
+			"result": {
+				"sfx": "news",
+				"flags": { "knows_harbor_name": true },
+				"lines": [
+					{ "speaker": "player", "key": "line.subway_map.first.1" },
+					{ "speaker": "player", "key": "line.subway_map.first.2" },
+					{ "speaker": "player", "key": "line.subway_map.first.3" }
+				]
+			}
+		},
+
+		{
+			"_section": "지하철 — 조는 승객",
+			"id": "look_sleeping_worker",
+			"action": "look",
+			"target": "sleeping_worker",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sleeper.look.1" },
+					{ "speaker": "player", "key": "line.sleeper.look.2" }
+				]
+			}
+		},
+		{
+			"id": "talk_sleeping_worker",
+			"action": "talk",
+			"target": "sleeping_worker",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sleeper.talk.1" },
+					{ "speaker": "narrator", "key": "line.sleeper.talk.2" },
+					{ "speaker": "player", "key": "line.sleeper.talk.3" }
+				]
+			}
+		},
+		{
+			"id": "push_sleeping_worker",
+			"action": ["push", "use"],
+			"target": "sleeping_worker",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.sleeper.push.1" },
+					{ "speaker": "player", "key": "line.sleeper.push.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "지하철 — 전단지",
+			"id": "look_flyer_floor",
+			"action": "look",
+			"target": "flyer_floor",
+			"result": { "lines": [{ "speaker": "player", "key": "line.flyer.look.1" }] }
+		},
+		{
+			"id": "pickup_flyer_floor",
+			"_note": "§10.2 '마지막 기회' 전단지 획득. 안 집어도 내릴 때 따라오므로 진행 불가가 없다.",
+			"action": ["pickup", "use"],
+			"target": "flyer_floor",
+			"result": {
+				"sfx": "pickup",
+				"give": ["last_chance_flyer"],
+				"puzzle": { "broadcast_lure": "has_flyer" },
+				"lines": [
+					{ "speaker": "player", "key": "line.flyer.pickup.1" },
+					{ "speaker": "player", "key": "line.flyer.pickup.2" }
+				],
+				"autosave": true
+			}
+		},
+
+		{
+			"_section": "지하철 — 내리는 문",
+			"id": "subway_door_with_flyer",
+			"_note": "전단지를 안 집고 내리려 하면 신발에 붙어 따라온다. §11.2 '한 번 놓치면 진행 불가' 를 농담으로 막는 지점.",
+			"action": ["walk", "open", "use"],
+			"target": "subway_door",
+			"preconditions": { "not_items": ["last_chance_flyer"] },
+			"result": {
+				"sfx": "door",
+				"lines_pre": [
+					{ "speaker": "narrator", "key": "line.subway_door.stuck.1" },
+					{ "speaker": "player", "key": "line.subway_door.stuck.2" },
+					{ "speaker": "player", "key": "line.subway_door.stuck.3" }
+				],
+				"give": ["last_chance_flyer"],
+				"puzzle": { "broadcast_lure": "has_flyer" },
+				"autosave": true,
+				"goto": { "scene": "studio_room", "entry": "from_subway" }
+			}
+		},
+		{
+			"id": "subway_door_leave",
+			"action": ["walk", "open", "use"],
+			"target": "subway_door",
+			"result": {
+				"sfx": "door",
+				"lines_pre": [{ "speaker": "narrator", "key": "line.subway_door.leave.1" }],
+				"autosave": true,
+				"goto": { "scene": "studio_room", "entry": "from_subway" }
+			}
+		},
+		{
+			"id": "look_subway_door",
+			"action": "look",
+			"target": "subway_door",
+			"result": { "lines": [{ "speaker": "player", "key": "line.subway_door.look.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 창문",
+			"id": "look_window_city_repeat",
+			"action": "look",
+			"target": "window_city",
+			"preconditions": { "flags": ["saw_city"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.window_city.repeat.1" }] }
+		},
+		{
+			"id": "look_window_city_first",
+			"action": "look",
+			"target": "window_city",
+			"result": {
+				"flags": { "saw_city": true },
+				"lines": [
+					{ "speaker": "narrator", "key": "line.window_city.first.1" },
+					{ "speaker": "player", "key": "line.window_city.first.2" },
+					{ "speaker": "player", "key": "line.window_city.first.3" }
+				]
+			}
+		},
+		{
+			"id": "open_window_city",
+			"action": ["open", "close", "use"],
+			"target": "window_city",
+			"result": {
+				"lines": [
+					{ "speaker": "narrator", "key": "line.window_city.open.1" },
+					{ "speaker": "player", "key": "line.window_city.open.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "원룸 — 급여명세서",
+			"id": "look_payslip_repeat",
+			"action": "look",
+			"target": "payslip",
+			"preconditions": { "flags": ["knows_salary"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.payslip.repeat.1" }] }
+		},
+		{
+			"id": "look_payslip_first",
+			"_note": "§13.3 을 지켜 파산이나 절망을 펀치라인으로 쓰지 않는다. 숫자를 말하지 않고 숫자의 자리만 보여 준다.",
+			"action": "look",
+			"target": "payslip",
+			"result": {
+				"flags": { "knows_salary": true },
+				"lines": [
+					{ "speaker": "player", "key": "line.payslip.first.1" },
+					{ "speaker": "player", "key": "line.payslip.first.2" },
+					{ "speaker": "player", "key": "line.payslip.first.3" },
+					{ "speaker": "player", "key": "line.payslip.first.4" }
+				]
+			}
+		},
+		{
+			"id": "pickup_payslip",
+			"action": ["pickup", "use"],
+			"target": "payslip",
+			"result": { "lines": [{ "speaker": "player", "key": "line.payslip.pickup.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 달력",
+			"id": "look_calendar",
+			"action": ["look", "use"],
+			"target": "calendar",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.calendar.look.1" },
+					{ "speaker": "player", "key": "line.calendar.look.2" }
+				]
+			}
+		},
+		{
+			"id": "pickup_calendar",
+			"action": "pickup",
+			"target": "calendar",
+			"result": { "lines": [{ "speaker": "player", "key": "line.calendar.pickup.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 냉장고",
+			"id": "open_fridge",
+			"action": ["open", "look", "use", "pull"],
+			"target": "fridge",
+			"result": {
+				"sfx": "door",
+				"lines": [
+					{ "speaker": "narrator", "key": "line.fridge.open.1" },
+					{ "speaker": "player", "key": "line.fridge.open.2" },
+					{ "speaker": "player", "key": "line.fridge.open.3" }
+				]
+			}
+		},
+		{
+			"id": "close_fridge",
+			"action": "close",
+			"target": "fridge",
+			"result": { "lines": [{ "speaker": "player", "key": "line.fridge.close.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 라면 상자",
+			"id": "look_noodle_box",
+			"action": ["look", "open", "use"],
+			"target": "noodle_box",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.noodle.look.1" },
+					{ "speaker": "player", "key": "line.noodle.look.2" }
+				]
+			}
+		},
+		{
+			"id": "pickup_noodle_box",
+			"action": "pickup",
+			"target": "noodle_box",
+			"result": { "lines": [{ "speaker": "player", "key": "line.noodle.pickup.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 매트리스",
+			"id": "use_mattress",
+			"action": ["use", "push", "pull"],
+			"target": "mattress",
+			"result": {
+				"lines": [
+					{ "speaker": "narrator", "key": "line.mattress.use.1" },
+					{ "speaker": "player", "key": "line.mattress.use.2" },
+					{ "speaker": "player", "key": "line.mattress.use.3" }
+				]
+			}
+		},
+		{
+			"id": "look_mattress",
+			"action": "look",
+			"target": "mattress",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.mattress.look.1" },
+					{ "speaker": "player", "key": "line.mattress.look.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "원룸 — 가방과 월급 봉투",
+			"id": "open_work_bag_empty",
+			"action": ["open", "look", "pickup", "use"],
+			"target": "work_bag",
+			"preconditions": { "items": ["cash_envelope"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.work_bag.empty.1" }] }
+		},
+		{
+			"id": "open_work_bag",
+			"action": ["open", "pickup", "use"],
+			"target": "work_bag",
+			"result": {
+				"sfx": "pickup",
+				"give": ["cash_envelope"],
+				"lines": [
+					{ "speaker": "narrator", "key": "line.work_bag.open.1" },
+					{ "speaker": "player", "key": "line.work_bag.open.2" },
+					{ "speaker": "player", "key": "line.work_bag.open.3" }
+				],
+				"autosave": true
+			}
+		},
+		{
+			"id": "look_work_bag",
+			"action": "look",
+			"target": "work_bag",
+			"result": { "lines": [{ "speaker": "player", "key": "line.work_bag.look.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 노트북과 방송",
+			"id": "use_flyer_on_laptop",
+			"_note": "§8.1 '투자 방송 장면'. 전단지의 주소를 노트북에 입력한다. 방향이 반대여도(노트북 → 전단지) InteractionResolver 가 대칭으로 한 번 더 시도한다.",
+			"action": "use",
+			"target": "laptop",
+			"item": "last_chance_flyer",
+			"preconditions": { "not_flags": ["saw_broadcast"] },
+			"result": {
+				"sfx": "news",
+				"lines_pre": [
+					{ "speaker": "player", "key": "line.laptop.type.1" },
+					{ "speaker": "narrator", "key": "line.laptop.type.2" }
+				],
+				"dialogue": "park_broadcast"
+			},
+			"on_fail": {
+				"lines": [{ "speaker": "player", "key": "fail.laptop.already.1" }]
+			}
+		},
+		{
+			"id": "use_laptop_after",
+			"action": ["use", "open"],
+			"target": "laptop",
+			"preconditions": { "flags": ["saw_broadcast"] },
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.laptop.after.1" },
+					{ "speaker": "player", "key": "line.laptop.after.2" }
+				]
+			}
+		},
+		{
+			"id": "use_laptop_has_flyer",
+			"_note": "전단지를 이미 가지고 있는데 손에 들지 않은 채 노트북을 쓴 경우. '볼 게 없다' 로 끝내면 플레이어가 자기가 가진 걸 잊는다.",
+			"action": ["use", "open"],
+			"target": "laptop",
+			"preconditions": { "items": ["last_chance_flyer"], "not_flags": ["saw_broadcast"] },
+			"result": {
+				"lines": [
+					{ "speaker": "narrator", "key": "line.laptop.idle.1" },
+					{ "speaker": "player", "key": "line.laptop.need_flyer.1" },
+					{ "speaker": "player", "key": "line.laptop.need_flyer.2" }
+				]
+			}
+		},
+		{
+			"id": "use_laptop_no_flyer",
+			"action": ["use", "open"],
+			"target": "laptop",
+			"result": {
+				"lines": [
+					{ "speaker": "narrator", "key": "line.laptop.idle.1" },
+					{ "speaker": "player", "key": "line.laptop.idle.2" }
+				]
+			}
+		},
+		{
+			"id": "look_laptop",
+			"action": "look",
+			"target": "laptop",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.laptop.look.1" },
+					{ "speaker": "player", "key": "line.laptop.look.2" }
+				]
+			}
+		},
+		{
+			"id": "close_laptop",
+			"action": ["close", "push"],
+			"target": "laptop",
+			"result": { "lines": [{ "speaker": "player", "key": "line.laptop.close.1" }] }
+		},
+
+		{
+			"_section": "원룸 — 현관문. 나가는 조건을 문 앞에서 말해 준다.",
+			"id": "exit_studio_ready",
+			"action": ["walk", "open", "use"],
+			"target": "door_out",
+			"preconditions": { "flags": ["saw_broadcast"], "items": ["cash_envelope"] },
+			"result": {
+				"sfx": "door",
+				"lines_pre": [
+					{ "speaker": "player", "key": "line.door_out.go.1" },
+					{ "speaker": "player", "key": "line.door_out.go.2" }
+				],
+				"puzzle": { "broadcast_lure": "ready_to_leave" },
+				"autosave": true,
+				"goto": { "scene": "bull_harbor_entrance", "entry": "from_city" }
+			}
+		},
+		{
+			"id": "exit_studio_no_cash",
+			"action": ["walk", "open", "use"],
+			"target": "door_out",
+			"preconditions": { "flags": ["saw_broadcast"] },
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.door_out.no_cash.1" },
+					{ "speaker": "player", "key": "line.door_out.no_cash.2" }
+				]
+			}
+		},
+		{
+			"id": "exit_studio_no_broadcast",
+			"action": ["walk", "open", "use"],
+			"target": "door_out",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.door_out.no_plan.1" },
+					{ "speaker": "player", "key": "line.door_out.no_plan.2" }
+				]
+			}
+		},
+		{
+			"id": "look_door_out",
+			"action": "look",
+			"target": "door_out",
+			"result": { "lines": [{ "speaker": "player", "key": "line.door_out.look.1" }] }
+		},
+
+		{
+			"_section": "황소항 — 전광판",
+			"id": "look_ticker_board_repeat",
+			"action": ["look", "use", "push"],
+			"target": "ticker_board",
+			"preconditions": { "flags": ["saw_ticker"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.ticker.repeat.1" }] }
+		},
+		{
+			"id": "look_ticker_board_first",
+			"action": ["look", "use", "push"],
+			"target": "ticker_board",
+			"result": {
+				"flags": { "saw_ticker": true },
+				"lines": [
+					{ "speaker": "narrator", "key": "line.ticker.first.1" },
+					{ "speaker": "player", "key": "line.ticker.first.2" },
+					{ "speaker": "player", "key": "line.ticker.first.3" }
+				]
+			}
+		},
+
+		{
+			"_section": "황소항 — 황소 동상",
+			"id": "look_bull_statue",
+			"action": "look",
+			"target": "bull_statue",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.statue.look.1" },
+					{ "speaker": "player", "key": "line.statue.look.2" },
+					{ "speaker": "player", "key": "line.statue.look.3" }
+				]
+			}
+		},
+		{
+			"id": "push_bull_statue",
+			"action": ["push", "pull", "use"],
+			"target": "bull_statue",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.statue.push.1" },
+					{ "speaker": "player", "key": "line.statue.push.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "황소항 — 경고문",
+			"id": "look_warning_notice_repeat",
+			"action": "look",
+			"target": "warning_notice",
+			"preconditions": { "flags": ["read_warning"] },
+			"result": { "lines": [{ "speaker": "player", "key": "line.warning.repeat.1" }] }
+		},
+		{
+			"id": "look_warning_notice_first",
+			"_note": "배틀에서 쓰일 모순 카드가 여기 있다. 안 읽어도 배틀은 진행되지만, 읽으면 선택지가 하나 더 열린다.",
+			"action": "look",
+			"target": "warning_notice",
+			"result": {
+				"sfx": "news",
+				"flags": { "read_warning": true },
+				"lines": [
+					{ "speaker": "narrator", "key": "line.warning.first.1" },
+					{ "speaker": "narrator", "key": "line.warning.first.2" },
+					{ "speaker": "player", "key": "line.warning.first.3" },
+					{ "speaker": "player", "key": "line.warning.first.4" }
+				]
+			}
+		},
+		{
+			"id": "pickup_warning_notice",
+			"action": ["pickup", "use"],
+			"target": "warning_notice",
+			"result": { "lines": [{ "speaker": "player", "key": "line.warning.pickup.1" }] }
+		},
+
+		{
+			"_section": "황소항 — 갈매기",
+			"id": "look_gull",
+			"action": "look",
+			"target": "gull",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.gull.look.1" },
+					{ "speaker": "player", "key": "line.gull.look.2" }
+				]
+			}
+		},
+		{
+			"id": "talk_gull",
+			"action": "talk",
+			"target": "gull",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.gull.talk.1" },
+					{ "speaker": "narrator", "key": "line.gull.talk.2" }
+				]
+			}
+		},
+		{
+			"id": "grab_gull",
+			"action": ["pickup", "use", "push"],
+			"target": "gull",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "narrator", "key": "line.gull.grab.1" },
+					{ "speaker": "player", "key": "line.gull.grab.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "황소항 — 항구 게이트. 챕터 1 로 가는 문이라 프롤로그에서는 열리지 않는다.",
+			"id": "harbor_gate_locked_after",
+			"action": ["walk", "open", "use", "push"],
+			"target": "harbor_gate",
+			"preconditions": { "puzzle_at_least": { "first_scam": "met_sera" } },
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "sera", "key": "line.gate.sera.1" },
+					{ "speaker": "sera", "key": "line.gate.sera.2" },
+					{ "speaker": "player", "key": "line.gate.sera.3" }
+				]
+			}
+		},
+		{
+			"id": "harbor_gate_locked",
+			"action": ["walk", "open", "use", "push"],
+			"target": "harbor_gate",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "narrator", "key": "line.gate.locked.1" },
+					{ "speaker": "player", "key": "line.gate.locked.2" }
+				]
+			}
+		},
+		{
+			"id": "look_harbor_gate",
+			"action": "look",
+			"target": "harbor_gate",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.gate.look.1" },
+					{ "speaker": "player", "key": "line.gate.look.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "황소항 — 환전소. 퍼즐 상태로 배타 분기한다.",
+			"id": "talk_booth_pitch",
+			"action": ["talk", "open"],
+			"target": "exchange_booth",
+			"preconditions": { "puzzle_is": { "first_scam": "not_started" } },
+			"result": { "dialogue": "broker_pitch" }
+		},
+		{
+			"id": "talk_booth_scammed",
+			"action": ["talk", "open", "push"],
+			"target": "exchange_booth",
+			"preconditions": { "puzzle_is": { "first_scam": "scammed" } },
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.booth.scammed.1" },
+					{ "speaker": "broker", "key": "line.booth.scammed.2" },
+					{ "speaker": "player", "key": "line.booth.scammed.3" },
+					{ "speaker": "broker", "key": "line.booth.scammed.4" }
+				]
+			}
+		},
+		{
+			"id": "talk_booth_battle",
+			"_note": "§9 첫 대화 배틀 진입. event 이름의 battle: 접두사를 Main 이 해석한다.",
+			"action": ["talk", "open", "push"],
+			"target": "exchange_booth",
+			"preconditions": { "puzzle_is": { "first_scam": "met_sera" } },
+			"result": {
+				"lines_pre": [
+					{ "speaker": "player", "key": "line.booth.confront.1" },
+					{ "speaker": "sera", "key": "line.booth.confront.2" }
+				],
+				"event": "battle:broker_booth"
+			}
+		},
+		{
+			"id": "talk_booth_after",
+			"action": ["talk", "open", "push"],
+			"target": "exchange_booth",
+			"preconditions": { "puzzle_at_least": { "first_scam": "confronted" } },
+			"result": { "dialogue": "broker_after" }
+		},
+		{
+			"id": "talk_booth_fallback",
+			"action": ["talk", "open", "push"],
+			"target": "exchange_booth",
+			"result": { "lines": [{ "speaker": "player", "key": "line.booth.fallback.1" }] }
+		},
+		{
+			"id": "look_exchange_booth_repeat",
+			"action": "look",
+			"target": "exchange_booth",
+			"preconditions": { "puzzle_at_least": { "first_scam": "scammed" } },
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.booth.look_after.1" },
+					{ "speaker": "player", "key": "line.booth.look_after.2" }
+				]
+			}
+		},
+		{
+			"id": "look_exchange_booth",
+			"action": "look",
+			"target": "exchange_booth",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.booth.look.1" },
+					{ "speaker": "player", "key": "line.booth.look.2" },
+					{ "speaker": "player", "key": "line.booth.look.3" }
+				]
+			}
+		},
+		{
+			"id": "use_cash_on_booth",
+			"_note": "§8.1 '첫 사기 피해'. 소모되는 유일한 필수 아이템이며 같은 대화 안에서 영수증으로 대체된다.",
+			"action": ["use", "talk", "open"],
+			"target": "exchange_booth",
+			"item": "cash_envelope",
+			"preconditions": { "puzzle_is": { "first_scam": "not_started" } },
+			"result": { "dialogue": "broker_scam" },
+			"on_fail": {
+				"lines": [{ "speaker": "player", "key": "fail.booth.cash_again.1" }]
+			}
+		},
+		{
+			"id": "use_receipt_on_booth",
+			"action": "use",
+			"target": "exchange_booth",
+			"item": "loss_receipt",
+			"result": {
+				"sfx": "fail",
+				"lines": [
+					{ "speaker": "player", "key": "line.booth.receipt.1" },
+					{ "speaker": "broker", "key": "line.booth.receipt.2" },
+					{ "speaker": "player", "key": "line.booth.receipt.3" }
+				]
+			}
+		},
+		{
+			"id": "use_flyer_on_booth",
+			"action": "use",
+			"target": "exchange_booth",
+			"item": "last_chance_flyer",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.booth.flyer.1" },
+					{ "speaker": "broker", "key": "line.booth.flyer.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "황소항 — 윤세라. 퍼즐 상태로 배타 분기한다.",
+			"id": "talk_sera_first",
+			"action": "talk",
+			"target": "sera",
+			"preconditions": { "puzzle_is": { "first_scam": "scammed" } },
+			"result": { "dialogue": "sera_first_meet" }
+		},
+		{
+			"id": "talk_sera_idle",
+			"action": "talk",
+			"target": "sera",
+			"preconditions": { "puzzle_is": { "first_scam": "met_sera" } },
+			"result": { "dialogue": "sera_idle" }
+		},
+		{
+			"id": "talk_sera_after_battle",
+			"action": "talk",
+			"target": "sera",
+			"preconditions": { "puzzle_is": { "first_scam": "confronted" } },
+			"result": { "dialogue": "sera_after_battle" }
+		},
+		{
+			"id": "talk_sera_closed",
+			"action": "talk",
+			"target": "sera",
+			"preconditions": { "puzzle_is": { "first_scam": "closed" } },
+			"result": { "dialogue": "sera_closing_idle" }
+		},
+		{
+			"id": "talk_sera_fallback",
+			"action": "talk",
+			"target": "sera",
+			"result": { "lines": [{ "speaker": "sera", "key": "line.sera.fallback.1" }] }
+		},
+		{
+			"id": "look_sera",
+			"_note": "말을 걸기 전에도 볼 수 있다. 관찰이 먼저고 대화가 나중인 것이 이 장르의 기본 리듬이다.",
+			"action": "look",
+			"target": "sera",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sera.look.1" },
+					{ "speaker": "player", "key": "line.sera.look.2" },
+					{ "speaker": "player", "key": "line.sera.look.3" }
+				]
+			}
+		},
+		{
+			"id": "use_receipt_on_sera",
+			"_note": "§10.2 손실 종목 영수증의 사용처 1번 — '세라에게 첫 사기 증거 제시'.",
+			"action": "use",
+			"target": "sera",
+			"item": "loss_receipt",
+			"preconditions": { "puzzle_at_least": { "first_scam": "met_sera" } },
+			"result": {
+				"relation": { "sera_openness": 1 },
+				"lines": [
+					{ "speaker": "player", "key": "line.sera.receipt.1" },
+					{ "speaker": "sera", "key": "line.sera.receipt.2" },
+					{ "speaker": "sera", "key": "line.sera.receipt.3" },
+					{ "speaker": "player", "key": "line.sera.receipt.4" }
+				]
+			},
+			"on_fail": {
+				"lines": [{ "speaker": "player", "key": "fail.sera.receipt_early.1" }]
+			}
+		},
+		{
+			"id": "use_flyer_on_sera",
+			"action": "use",
+			"target": "sera",
+			"item": "last_chance_flyer",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sera.flyer.1" },
+					{ "speaker": "sera", "key": "line.sera.flyer.2" },
+					{ "speaker": "sera", "key": "line.sera.flyer.3" }
+				]
+			}
+		},
+		{
+			"id": "use_card_on_sera",
+			"action": "use",
+			"target": "sera",
+			"item": "sera_card",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "line.sera.card.1" },
+					{ "speaker": "sera", "key": "line.sera.card.2" }
+				]
+			}
+		},
+
+		{
+			"_section": "새 아이템 살펴보기 (§5.3 인벤토리 우클릭)",
+			"id": "look_last_chance_flyer",
+			"action": "look",
+			"target": "last_chance_flyer",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "item.last_chance_flyer.desc" },
+					{ "speaker": "player", "key": "line.item.flyer.extra.1" }
+				]
+			}
+		},
+		{
+			"id": "look_cash_envelope",
+			"action": "look",
+			"target": "cash_envelope",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "item.cash_envelope.desc" },
+					{ "speaker": "player", "key": "line.item.cash.extra.1" }
+				]
+			}
+		},
+		{
+			"id": "look_loss_receipt",
+			"action": "look",
+			"target": "loss_receipt",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "item.loss_receipt.desc" },
+					{ "speaker": "player", "key": "line.item.receipt.extra.1" }
+				]
+			}
+		},
+		{
+			"id": "look_refund_coins",
+			"action": "look",
+			"target": "refund_coins",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "item.refund_coins.desc" },
+					{ "speaker": "player", "key": "line.item.refund.extra.1" }
+				]
+			}
+		},
+		{
+			"id": "look_sera_card",
+			"action": "look",
+			"target": "sera_card",
+			"result": {
+				"lines": [
+					{ "speaker": "player", "key": "item.sera_card.desc" },
+					{ "speaker": "player", "key": "line.item.card.extra.1" }
+				]
+			}
+		}
+	]
+}

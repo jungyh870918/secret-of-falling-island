@@ -1,0 +1,93 @@
+{
+	"_comment": "명세서 §9 대화 배틀 문장. 배틀 UI 라벨과 첫 배틀(환전소)의 대사가 들어 있다.",
+	"_style": "§9.1 '체력을 깎는 시스템이 아니다' — 그래서 타격 대사도 상대를 모욕하지 않는다. 한개미는 상대의 말을 그 사람 앞에 다시 놓기만 한다. §13.3 피해자를 조롱하는 농담 금지.",
+
+	"battle.ui.mental": "멘탈",
+	"battle.ui.crowd": "군중",
+	"battle.ui.cards": "모순",
+
+	"battle.broker_booth.name": "환전소 앞",
+
+	"battle.broker.intro.1": "부스 앞으로 사람이 몇 명 모여든다. 여기서는 이런 게 구경거리다.",
+	"battle.broker.intro.2": "손님, 업무는 끝났습니다.",
+	"battle.broker.intro.3": "규정, 지정, 수수료. 그 순서로 물어보세요.",
+
+	"battle.broker.p1.claim.1": "저는 규정대로 처리했습니다.",
+	"battle.broker.p1.claim.2": "규정은 제가 만든 게 아닙니다.",
+
+	"battle.broker.p1.o1": "아까는 그 규정이 3조라고 하셨는데, 3조가 뭐냐니까 규정이라고 하셨습니다.",
+	"battle.broker.p1.r1.1": "…그건 설명을 줄인 겁니다.",
+	"battle.broker.p1.r1.2": "규정으로 규정을 설명하면 그건 줄인 게 아니라 없는 겁니다.",
+	"battle.broker.p1.r1.3": "…",
+	"battle.broker.p1.crowd1": "뒤에서 누가 짧게 웃는다.",
+
+	"battle.broker.p1.o2": "그 규정, 어디에 적혀 있습니까?",
+	"battle.broker.p1.r2.1": "항만 관련 규정은 공개 대상이 아닙니다.",
+	"battle.broker.p1.r2.2": "…일부는 공개입니다만.",
+
+	"battle.broker.p1.o3": "제 돈 당장 내놓으세요.",
+	"battle.broker.p1.r3.1": "고성은 곤란합니다. 다들 보고 계세요.",
+	"battle.broker.p1.r3.2": "저는 절차대로 했고, 손님은 소리를 지르셨고요.",
+	"battle.broker.p1.crowd3": "구경하던 사람들이 한 걸음 물러선다.",
+
+	"battle.broker.p1.o4": "혹시 그 규정, 저도 만들 수 있습니까?",
+	"battle.broker.p1.r4.1": "…네?",
+	"battle.broker.p1.r4.2": "농담입니다. 절반은요.",
+
+	"battle.broker.p2.claim.1": "지정된 창구는 여기뿐입니다.",
+	"battle.broker.p2.claim.2": "그건 제가 정한 게 아니라 정해진 겁니다.",
+
+	"battle.broker.p2.o0": "저기 게시판에는 지정 창구가 게이트 안쪽이라고 적혀 있습니다.",
+	"battle.broker.p2.r0.1": "그 게시판은 오래됐습니다.",
+	"battle.broker.p2.r0.2": "방금은 규정이 안 바뀐다고 하셨습니다.",
+	"battle.broker.p2.r0.3": "…게시판이 오래된 겁니다.",
+	"battle.broker.p2.crowd0": "누군가 게시판 쪽으로 고개를 돌린다. 두 명이 더 따라 본다.",
+
+	"battle.broker.p2.o1": "아까는 지정한 사람도 여기 있다고 하셨습니다.",
+	"battle.broker.p2.r1.1": "그건 비유입니다.",
+	"battle.broker.p2.r1.2": "지정한 사람이 본인이면, 지정된 곳이 여기인 건 당연하죠.",
+	"battle.broker.p2.r1.3": "…비유였습니다.",
+	"battle.broker.p2.crowd1": "구경꾼 하나가 팔짱을 푼다.",
+
+	"battle.broker.p2.o2": "다른 창구는 어디 있습니까?",
+	"battle.broker.p2.r2.1": "안내는 안내소에서 받으십시오.",
+
+	"battle.broker.p2.o3": "그럼 다른 데 가겠습니다.",
+	"battle.broker.p2.r3.1": "그러세요. 예치금은 여기 있고요.",
+	"battle.broker.p2.r3.2": "돌아오시면 그때도 여기가 지정 창구입니다.",
+	"battle.broker.p2.crowd3": "사람들이 흥미를 잃기 시작한다.",
+
+	"battle.broker.p3.claim.1": "수수료는 안 받았습니다.",
+	"battle.broker.p3.claim.2": "저는 한 푼도 안 받았어요.",
+
+	"battle.broker.p3.o1": "수수료는 없다고 하시고, 환율에 이미 반영돼 있다고도 하셨습니다.",
+	"battle.broker.p3.r1.1": "그건 수수료가 아니라 환율입니다.",
+	"battle.broker.p3.r1.2": "이름을 바꾸면 안 받은 게 됩니까?",
+	"battle.broker.p3.r1.3": "…그건, 업계에서는 그렇게 씁니다.",
+	"battle.broker.p3.r1.4": "지금 업계라고 하셨어요. 아까는 규정이었고요.",
+	"battle.broker.p3.crowd1": "누가 낮게 휘파람을 분다. 셔터 옆에 서 있던 사람이 자리를 뜬다.",
+
+	"battle.broker.p3.o2": "그럼 환율은 누가 정합니까?",
+	"battle.broker.p3.r2.1": "시장이 정합니다. 저는 전달만 합니다.",
+
+	"battle.broker.p3.o3": "사기죠, 이거.",
+	"battle.broker.p3.r3.1": "말씀 조심하세요. 그건 형사 문제입니다.",
+	"battle.broker.p3.r3.2": "…형사 문제라는 말은 그쪽이 먼저 꺼내셨습니다.",
+	"battle.broker.p3.crowd3": "사람들이 어색해져서 흩어진다.",
+
+	"battle.broker.hint.p1": "그 사람이 아까 한 말을 그대로 돌려주세요. 새 논리를 만들 필요 없어요.",
+	"battle.broker.hint.p2": "'지정' 이라는 말에는 지정한 사람이 있어요. 그게 누군지 물으세요.",
+	"battle.broker.hint.p3": "없다고 한 것과 반영됐다고 한 것을 한 문장에 놓으세요.",
+
+	"battle.broker.win.1": "남자가 창구 아래를 한참 뒤진다.",
+	"battle.broker.win.2": "…환율 차액분입니다. 규정상 돌려드릴 수 있는 건 이게 답니다.",
+	"battle.broker.win.3": "방금 규정이라고 하셨습니다.",
+	"battle.broker.win.4": "셔터 내립니다.",
+	"battle.broker.win.5": "셔터가 끝까지 내려간다. 구경하던 사람들도 흩어진다.",
+	"battle.broker.win.6": "한 달 치를 잃고 수수료를 되찾았다. 계산상으로는 여전히 손실이다.",
+
+	"battle.broker.lose.1": "남자가 창구 안쪽으로 손을 넣는다.",
+	"battle.broker.lose.2": "업무 시간 끝났습니다. 오후에 오세요.",
+	"battle.broker.lose.3": "…아침인데요.",
+	"battle.broker.lose.4": "됐어요. 저 사람 오늘 안 열어요."
+}

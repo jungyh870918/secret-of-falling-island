@@ -1,0 +1,46 @@
+{
+	"_comment": "프롤로그 후반에 등장하는 캐릭터. §6.7 캐릭터 디자인. portrait 블록은 §5.4 초상화 대화(96×96)가 읽는다 — 스프라이트시트와 달리 초상화는 상반신만 그리므로 별도 특징 목록을 갖는다. assets/sprites/portraits/<id>.png 를 넣으면 그림이 우선한다.",
+
+	"entries": [
+		{
+			"character_id": "park",
+			"_note": "§6.7 박프로 — 스튜디오 조명에 과도하게 노출된 얼굴, 위쪽만 정장. 프롤로그에서는 노트북 화면 안에만 존재한다.",
+			"height": 46,
+			"walk_speed": 70,
+			"hair_style": "slick",
+			"frame_size": [32, 48],
+			"colors": {
+				"skin": "#f0c4a0",
+				"hair": "#241c22",
+				"shirt": "#e8d9b8",
+				"pants": "#8c3327",
+				"accent": "#c8352e",
+				"shoes": "#241f2b"
+			},
+			"portrait": {
+				"traits": ["overexposed", "tie", "wide_smile"],
+				"backdrop": "#4a1220"
+			}
+		},
+		{
+			"character_id": "broker",
+			"_note": "가짜 환전소 호객꾼. 이름도 직함도 밝히지 않는다 — §8.2 '세력은 실재하지 않을 수 있다' 로 이어지는 첫 복선.",
+			"height": 45,
+			"walk_speed": 60,
+			"hair_style": "slick",
+			"frame_size": [32, 48],
+			"colors": {
+				"skin": "#d0a084",
+				"hair": "#241c22",
+				"shirt": "#3d3a44",
+				"pants": "#2c2634",
+				"accent": "#e0b23a",
+				"shoes": "#1b1820"
+			},
+			"portrait": {
+				"traits": ["tie", "shifty"],
+				"backdrop": "#5c1f18"
+			}
+		}
+	]
+}

@@ -1,0 +1,60 @@
+{
+	"_comment": "프롤로그 후반(지하철·원룸·황소항) 아이템. §10.1 '아이템은 단순한 열쇠가 아니다' — 전단지·영수증은 §10.2 에 설명과 사용처가 이미 정의돼 있고, 챕터 2·5·6 에서 다시 쓰인다. cash_envelope 는 사기로 소모되지만 반드시 loss_receipt 로 대체된다(§11.2).",
+
+	"entries": [
+		{
+			"item_id": "last_chance_flyer",
+			"_note": "§10.2 '마지막 기회' 전단지. 사용처: 종이배 제작(챕터6), 리딩방 광고판 위장(챕터2), 금융당국 증거물(챕터5)",
+			"name_key": "item.last_chance_flyer.name",
+			"description_key": "item.last_chance_flyer.desc",
+			"fail_key": "fail.last_chance_flyer.generic",
+			"icon": "res://assets/ui/items/last_chance_flyer.png",
+			"icon_color": "#e8d9b8",
+			"combinations": [
+				{ "with": "laptop", "result_event": "watch_broadcast" }
+			]
+		},
+		{
+			"item_id": "cash_envelope",
+			"_note": "월급 봉투. 프롤로그의 유일한 소모 아이템이며, 소모되는 그 자리에서 loss_receipt 를 준다.",
+			"name_key": "item.cash_envelope.name",
+			"description_key": "item.cash_envelope.desc",
+			"fail_key": "fail.cash_envelope.generic",
+			"icon": "res://assets/ui/items/cash_envelope.png",
+			"icon_color": "#6f9a63",
+			"combinations": [
+				{ "with": "exchange_booth", "result_event": "first_scam" }
+			]
+		},
+		{
+			"item_id": "loss_receipt",
+			"_note": "§10.2 손실 종목 영수증. 사용처: 세라에게 첫 사기 증거 제시, 리딩방 회원과 공감대, 떡락섬 회상",
+			"name_key": "item.loss_receipt.name",
+			"description_key": "item.loss_receipt.desc",
+			"fail_key": "fail.loss_receipt.generic",
+			"icon": "res://assets/ui/items/loss_receipt.png",
+			"icon_color": "#c9c6b4",
+			"combinations": [
+				{ "with": "sera", "result_event": "show_receipt" }
+			]
+		},
+		{
+			"item_id": "refund_coins",
+			"_note": "§9 첫 대화 배틀 보상. 전액이 아니라 '수수료' 만 돌아온다 — 이겨도 손실은 남는다는 것이 이 게임의 태도다.",
+			"name_key": "item.refund_coins.name",
+			"description_key": "item.refund_coins.desc",
+			"fail_key": "fail.refund_coins.generic",
+			"icon": "res://assets/ui/items/refund_coins.png",
+			"icon_color": "#b98a3c"
+		},
+		{
+			"item_id": "sera_card",
+			"_note": "세라의 명함. 프롤로그의 마지막 아이템이자 챕터 1 의 시작 조건.",
+			"name_key": "item.sera_card.name",
+			"description_key": "item.sera_card.desc",
+			"fail_key": "fail.sera_card.generic",
+			"icon": "res://assets/ui/items/sera_card.png",
+			"icon_color": "#9fd8d0"
+		}
+	]
+}

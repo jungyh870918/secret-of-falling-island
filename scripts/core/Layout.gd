@@ -42,6 +42,17 @@ const INV_VISIBLE := 12
 const CHOICE_RECT := Rect2i(2, 134, 316, 45)
 const CHOICE_MAX := 4
 
+## §5.4 초상화 대화 / §6.2 초상화 96×96.
+## 장면 영역 아래쪽 모서리에 붙인다. 말하는 배우가 그 모서리에 서 있으면
+## 반대쪽으로 옮겨 화자를 가리지 않게 한다.
+const PORTRAIT_SIZE := 96
+const PORTRAIT_MARGIN := 3
+
+
+static func portrait_rect(on_left: bool) -> Rect2i:
+	var x := PORTRAIT_MARGIN if on_left else SCREEN.x - PORTRAIT_SIZE - PORTRAIT_MARGIN
+	return Rect2i(x, VIEW_HEIGHT - PORTRAIT_SIZE - PORTRAIT_MARGIN, PORTRAIT_SIZE, PORTRAIT_SIZE)
+
 
 static func verb_cell_rect(index: int) -> Rect2i:
 	var col := index % VERB_COLS
