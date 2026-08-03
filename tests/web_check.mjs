@@ -1,4 +1,4 @@
-// 웹 빌드 실측 검사. docs/WEB_BUILD_HANDOFF.md 의 P1-2 / P1-4 / P1-5 를 자동으로 확인한다.
+// 웹 빌드 실측 검사. docs/WEB_BUILD_HANDOFF.md 의 P1·P2 항목을 자동으로 확인한다.
 //
 //   tests/web_check.sh              # 익스포트부터 검사까지 한 번에
 //   node tests/web_check.mjs <url> <출력폴더>   # 서버와 Chrome 이 이미 떠 있을 때
@@ -8,6 +8,8 @@
 //   P1-3  타이틀 메뉴에서 「종료」가 빠졌는가
 //   P1-4  autoplay 정책 아래에서 조작 후 실제로 소리가 나는가
 //   P1-5  탭을 완전히 닫았다 다시 열어도 세이브가 남는가
+//   P2-1  터치에서 길게 누르기가 우클릭(기본 동작)을 대신하는가
+//   P2-2  게임 안 설정에서 전체 화면이 켜지는가
 //
 // 의존성은 없다. Node 의 내장 WebSocket 으로 CDP 를 직접 쓴다.
 // Chrome 은 --autoplay-policy=document-user-activation-required 로 띄워야 한다 —
@@ -64,13 +66,24 @@ class Session {
 	close() { this.ws.close(); }
 }
 
-async function newTab(url) {
+/**
+ * 뷰포트를 **정확히 16:9** 로 고정한다.
+ *
+ * 캔버스 비율이 게임 비율(320:180)과 다르면 게임이 캔버스 **안에서** 다시
+ * 레터박스되어, 캔버스 사각형과 게임 좌표가 1:1 로 대응하지 않는다.
+ * 그러면 화면 가운데는 맞고 가장자리는 빗나가는 — 찾기 고약한 — 오차가 생긴다.
+ * 사이트도 16:9 컨테이너에 넣으므로 실제 환경과도 이쪽이 같다.
+ */
+const VIEWPORT = { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false };
+
+async function newTab(url, metrics = VIEWPORT) {
 	const r = await fetch(`http://127.0.0.1:${PORT}/json/new?${encodeURIComponent(url)}`,
 		{ method: 'PUT' });
 	const t = await r.json();
 	const s = await Session.open(t.webSocketDebuggerUrl);
 	await s.send('Page.enable');
 	await s.send('Runtime.enable');
+	await s.send('Emulation.setDeviceMetricsOverride', metrics);
 	return { s, targetId: t.id };
 }
 
@@ -99,6 +112,24 @@ async function click(s, [px, py]) {
 	for (const type of ['mousePressed', 'mouseReleased'])
 		await s.send('Input.dispatchMouseEvent',
 			{ type, x, y, button: 'left', buttons: 1, clickCount: 1 });
+	await sleep(80);
+}
+
+/**
+ * 터치 탭. 터치 에뮬레이션을 켠 상태에서는 Input.dispatchMouseEvent 가 응답하지 않으므로
+ * 터치 전용 API 를 쓴다. hold 밀리초만큼 누르고 있으면 길게 누르기가 된다.
+ */
+async function tap(s, [px, py], hold = 80) {
+	const b = await s.evaluate(`(() => {
+		const c = document.querySelector('canvas'); const r = c.getBoundingClientRect();
+		return {x: r.left, y: r.top, w: r.width, h: r.height};
+	})()`);
+	const x = Math.round(b.x + b.w * (px / 320));
+	const y = Math.round(b.y + b.h * (py / 180));
+	await s.send('Input.dispatchTouchEvent',
+		{ type: 'touchStart', touchPoints: [{ x, y, id: 1 }] });
+	await sleep(hold);
+	await s.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 	await sleep(80);
 }
 
@@ -246,6 +277,115 @@ const reloadShot = await shot(s, 'web_03_title_after_reload');
 const kept = await saveFiles(s);
 check(kept.length > 0, 'P1-5 탭을 닫았다 다시 열어도 세이브가 남는다',
 	`${kept.length}개 파일`);
+
+s.close();
+await fetch(`http://127.0.0.1:${PORT}/json/close/${targetId}`);
+await sleep(1000);
+
+// ---------------------------------------------------------------- 3회차 · 터치 (P2-1)
+
+console.log('\n[3회차 — 터치 기기 흉내]');
+({ s, targetId } = await newTab('about:blank',
+	{ width: 720, height: 405, deviceScaleFactor: 2, mobile: true }));
+
+// 페이지를 읽기 **전에** 터치를 켜야 한다.
+// DisplayServer.is_touchscreen_available() 은 시작할 때 한 번 물어본다.
+//
+// 뷰포트를 16:9 로 잡는 이유 — 사이트가 게임을 16:9 컨테이너에 넣기 때문이다.
+// 세로 화면에서 index.html 을 통째로 열면 게임이 캔버스 **안에서** 레터박스로
+// 들어가, 좌표가 캔버스 사각형과 1:1 로 대응하지 않는다. 여기서 재려는 것은
+// 터치 입력이지 세로 레이아웃이 아니므로 실제 임베드 환경과 같은 비율로 맞춘다.
+await s.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+await s.send('Page.navigate', { url: URL });
+await waitReady(s, '3회차');
+await shot(s, 'web_05_touch_title');
+
+const touchAvailable = await s.evaluate(`navigator.maxTouchPoints > 0`);
+check(touchAvailable, '브라우저가 터치 기기로 인식된다',
+	`maxTouchPoints=${await s.evaluate('navigator.maxTouchPoints')}`);
+
+await tap(s, TITLE_ROW(0));                          // 「새 게임」
+for (let i = 0; i < 26; i++) { await tap(s, ADVANCE_POINT); await sleep(280); }
+await sleep(2000);
+await shot(s, 'web_06_touch_panel');
+
+/** 가장 최근 자동 저장의 scene_id 를 읽는다. 화면을 눈으로 보지 않고 상태를 확인하는 통로다. */
+async function savedScene() {
+	return s.evaluate(`(async () => {
+		const dbs = await indexedDB.databases();
+		let best = null;
+		for (const {name} of dbs) {
+			const db = await new Promise(r => {
+				const q = indexedDB.open(name); q.onsuccess = () => r(q.result);
+			});
+			for (const store of Array.from(db.objectStoreNames)) {
+				const tx = db.transaction(store, 'readonly').objectStore(store);
+				const keys = await new Promise(r => {
+					const q = tx.getAllKeys(); q.onsuccess = () => r(q.result); q.onerror = () => r([]);
+				});
+				for (const k of keys) {
+					if (!String(k).includes('/saves/auto_') || !String(k).endsWith('.json')) continue;
+					const v = await new Promise(r => {
+						const q = db.transaction(store, 'readonly').objectStore(store).get(k);
+						q.onsuccess = () => r(q.result); q.onerror = () => r(null);
+					});
+					const bytes = v && (v.contents || v);
+					if (!bytes) continue;
+					try {
+						// 저장 포맷은 {slot, save_index, ..., state:{scene_id, ...}} 다.
+						// scene_id 는 state 안에 있고, 최신 판단은 단조 증가하는 save_index 로 한다.
+						const json = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes)));
+						if (!best || (json.save_index || 0) >= (best.save_index || 0)) best = json;
+					} catch (e) {}
+				}
+			}
+			db.close();
+		}
+		return best && best.state ? (best.state.scene_id || '') : '';
+	})()`);
+}
+
+const sceneBefore = await savedScene();
+
+// P2-1 길게 누르기 = 우클릭. 회의실의 복도 문(default_verb=walk)을 길게 누르면 이동한다.
+// 짧게 탭하면 기본 동사 「보다」라 대사만 나오고 장면은 그대로다.
+const DOOR = [293, 68];                              // office_meeting_room / door_corridor 중심
+await tap(s, DOOR, 900);                             // LONG_PRESS_SEC(0.45) 보다 넉넉히
+await sleep(3500);
+await shot(s, 'web_07_touch_after_longpress');
+
+const sceneAfter = await savedScene();
+check(sceneAfter === 'office_corridor',
+	'P2-1 길게 누르기가 우클릭(기본 동작)을 대신한다',
+	`저장된 장면 ${sceneBefore || '(없음)'} → ${sceneAfter || '(없음)'}`);
+
+// ---------------------------------------------------------------- 4회차 · 전체 화면 (P2-2)
+
+console.log('\n[4회차 — 게임 안 설정에서 전체 화면]');
+s.close();
+await fetch(`http://127.0.0.1:${PORT}/json/close/${targetId}`);
+await sleep(800);
+({ s, targetId } = await newTab(URL));
+await waitReady(s, '4회차');
+
+// 설정 메뉴: box=(16,2,288,176), 제목 16px, row_h=12 (dense)
+const SETTINGS_ROW = (i) => [160, 2 + 16 + 12 * i + 6];
+const FULLSCREEN_ROW = 9;                    // Main.SETTING_ROWS 의 fullscreen 위치
+
+await click(s, TITLE_ROW(3));                // 「설정」
+await sleep(1200);
+await shot(s, 'web_08_settings');
+
+check(await s.evaluate('document.fullscreenEnabled'),
+	'브라우저가 전체 화면을 허용한다');
+await click(s, SETTINGS_ROW(FULLSCREEN_ROW));
+await sleep(1500);
+const fs1 = await s.evaluate('!!document.fullscreenElement');
+if (!fs1) { await click(s, SETTINGS_ROW(0)); await sleep(1500); }
+const fs2 = await s.evaluate('!!document.fullscreenElement');
+check(fs1 || fs2, 'P2-2 게임 안 설정에서 전체 화면이 켜진다',
+	fs1 ? '토글과 같은 클릭에서 바로' : (fs2 ? '다음 클릭에서' : '켜지지 않음'));
+await shot(s, 'web_09_fullscreen');
 
 console.log(`\n  캡처: ${freshShot}\n        ${reloadShot}`);
 

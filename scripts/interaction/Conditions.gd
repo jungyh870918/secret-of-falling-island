@@ -82,14 +82,22 @@ static func evaluate(pre: Variant) -> bool:
 		return false
 
 	var feature := str(p.get("feature", ""))
-	if not feature.is_empty() and not OS.has_feature(feature):
+	if not feature.is_empty() and not has_feature(feature):
 		return false
 
 	var not_feature := str(p.get("not_feature", ""))
-	if not not_feature.is_empty() and OS.has_feature(not_feature):
+	if not not_feature.is_empty() and has_feature(not_feature):
 		return false
 
 	return true
+
+
+## "touch" 는 OS.has_feature 에 없다 — 웹에서 모바일이냐 데스크톱이냐는
+## 빌드가 아니라 기기가 정하기 때문이다. 그것만 따로 물어본다.
+static func has_feature(feature: String) -> bool:
+	if feature == "touch":
+		return DisplayServer.is_touchscreen_available()
+	return OS.has_feature(feature)
 
 
 ## 어떤 조건 때문에 실패했는지 반환한다. 디버그 패널과 QA 용.

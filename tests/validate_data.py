@@ -313,7 +313,8 @@ def check_result(r: dict, where: str) -> None:
 
 
 # Conditions 의 feature / not_feature 가 받는 값. Godot 의 OS.has_feature 이름이다.
-KNOWN_FEATURES = {"web", "mobile", "pc", "editor", "debug", "release"}
+# "touch" 는 Conditions 가 DisplayServer.is_touchscreen_available() 로 따로 처리한다.
+KNOWN_FEATURES = {"web", "mobile", "pc", "editor", "debug", "release", "touch"}
 
 
 def check_conditions(pre, where: str) -> None:

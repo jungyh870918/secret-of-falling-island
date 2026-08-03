@@ -24,6 +24,10 @@ const THUMB_SIZE := Vector2i(64, 27)
 var last_frame: Image = null
 
 var settings: Dictionary = {}
+## 사용자가 실제로 고른 적이 있는 설정 키. settings 에는 기본값도 전부 들어 있어서
+## 그것만으로는 "고른 적 있음" 을 알 수 없다. 기기별 기본값(터치 → 간소화 UI)을
+## 적용할 때 사용자의 선택을 덮지 않으려면 이 구분이 필요하다.
+var _user_set: Dictionary = {}
 
 var _auto_cursor := 0
 
@@ -216,6 +220,8 @@ func _load_settings() -> void:
 	if parsed is Dictionary:
 		for k in (parsed as Dictionary).keys():
 			settings[k] = parsed[k]
+			if not str(k).begins_with("_"):
+				_user_set[str(k)] = true
 
 
 func default_settings() -> Dictionary:
@@ -245,14 +251,40 @@ func get_setting(key: String, default_value: Variant = null) -> Variant:
 	return d.get(key, default_value)
 
 
+## 사용자가 이 항목을 직접 고른 적이 있는가.
+## settings.has() 로는 알 수 없다 — 거기에는 기본값이 전부 들어 있다.
+func is_user_set(key: String) -> bool:
+	return _user_set.has(key)
+
+
 func set_setting(key: String, value: Variant) -> void:
 	settings[key] = value
+	_user_set[key] = true
 	_save_settings()
 
 
+## 기기 때문에 달라지는 기본값(터치 → 간소화 UI 등).
+## 사용자의 선택이 아니므로 파일에 적지 않는다 — 적으면 그 프로필을 다른 기기에서
+## 열었을 때까지 따라오고, 나중에 사용자가 고른 값과 구분되지 않는다.
+func set_device_default(key: String, value: Variant) -> void:
+	settings[key] = value
+
+
+## **사용자가 고른 값과 내부 카운터만 적는다. 기본값은 적지 않는다.**
+##
+## 전부 적으면 두 가지가 깨진다.
+##  1. 한 번 저장한 뒤로는 모든 키가 "사용자가 고른 값" 으로 보여, 기기별 기본값
+##     (터치 → 간소화 UI)을 영영 적용할 수 없다.
+##  2. 나중에 기본값을 바꿔도 기존 플레이어에게는 반영되지 않는다.
 func _save_settings() -> void:
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_string(JSON.stringify(settings, "\t"))
+	var out: Dictionary = {}
+	for k in settings.keys():
+		var key := str(k)
+		# "_" 로 시작하는 키는 자동 저장 커서 같은 내부 상태다. 항상 남긴다.
+		if key.begins_with("_") or _user_set.has(key):
+			out[key] = settings[k]
+	f.store_string(JSON.stringify(out, "\t"))
 	f.close()

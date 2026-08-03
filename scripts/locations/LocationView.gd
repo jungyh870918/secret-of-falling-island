@@ -154,6 +154,12 @@ func clamp_to_walkbox(p: Vector2) -> Vector2:
 
 
 ## 커서 아래의 핫스폿/출구. 위에 있는 것(작은 것)부터 우선.
+## 판정에 더할 여유 픽셀. 터치 기기에서 Main 이 올린다 —
+## 손가락은 커서보다 뭉툭해서 320×180 격자에서는 정확히 짚기 어렵다. (§20 Phase 2 P2-1)
+## 넓이 비교는 원래 크기로 하므로 "겹치면 작은 쪽이 이긴다" 규칙은 그대로다.
+static var hit_padding := 0.0
+
+
 func hotspot_at(p: Vector2) -> Dictionary:
 	if not Layout.in_view(p):
 		return {}
@@ -165,7 +171,7 @@ func hotspot_at(p: Vector2) -> Dictionary:
 		if not is_hotspot_visible(h):
 			continue
 		var r := _rect_of(h)
-		if r.has_area() and r.has_point(p) and r.get_area() < best_area:
+		if r.has_area() and r.grow(hit_padding).has_point(p) and r.get_area() < best_area:
 			best = h
 			best_area = r.get_area()
 	for e in data.get("exits", []):
@@ -174,7 +180,7 @@ func hotspot_at(p: Vector2) -> Dictionary:
 		if not is_exit_enabled(e):
 			continue
 		var r2 := _rect_of(e)
-		if r2.has_area() and r2.has_point(p) and r2.get_area() < best_area:
+		if r2.has_area() and r2.grow(hit_padding).has_point(p) and r2.get_area() < best_area:
 			best = e
 			best_area = r2.get_area()
 	return best

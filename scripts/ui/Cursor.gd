@@ -9,6 +9,15 @@ var pos := Vector2.ZERO
 var over_hotspot := false
 var held_item := ""
 
+## 터치 기기에서는 끈다. 손가락이 있는 곳에 십자 커서를 그릴 이유가 없고,
+## OS 커서를 숨겨 두면 마우스를 붙였을 때 아무것도 안 보인다.
+var enabled := true:
+	set(v):
+		enabled = v
+		Input.set_mouse_mode(
+			Input.MOUSE_MODE_HIDDEN if v else Input.MOUSE_MODE_VISIBLE)
+		queue_redraw()
+
 var _time := 0.0
 var _drew_hot := false
 
@@ -33,6 +42,8 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	if not enabled:
+		return
 	# 점멸 없음. 핫스폿 위에서는 색이 바뀌고 십자가 조여든다 — 즉각적으로 읽힌다.
 	_drew_hot = over_hotspot
 	var c := Palette.ui("text_hot") if over_hotspot else Palette.ui("text")

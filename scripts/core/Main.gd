@@ -52,14 +52,52 @@ var _audio_asleep := true
 var walking_to_target := false
 var _action_token := 0
 
+# ---------------------------------------------------------------- 터치 (§20 Phase 2 P2-1)
+# 터치 기기에는 우클릭도 마우스오버도 없다. 세 가지로 메운다.
+#   1. 길게 누르기 = 우클릭(그 대상의 기본 동작)
+#   2. 핫스폿 판정에 여유 픽셀 — 손가락은 커서보다 뭉툭하다
+#   3. 동사 UI 를 §5.2 간소화(4개)로 시작 — 버튼 폭이 두 배가 된다
+# Godot 이 터치를 마우스로 변환해 주므로 탭 자체는 이미 좌클릭으로 들어온다.
+
+const LONG_PRESS_SEC := 0.45
+const LONG_PRESS_SLOP := 5.0     ## 이만큼 움직이면 길게 누르기가 아니라 끌기로 본다
+const TOUCH_HIT_PAD := 4.0       ## 320×180 기준. 실제 화면에서는 배율만큼 커진다
+
+var is_touch := false
+var _press_pos := Vector2.ZERO
+var _press_elapsed := 0.0
+var _pressing := false
+var _long_fired := false
+
 
 func _ready() -> void:
 	_register_input_actions()
 	_build_tree()
+	if DisplayServer.is_touchscreen_available():
+		_enable_touch_mode()
 	_apply_settings()
 	_open_title()
 	set_process(true)
 	set_process_unhandled_input(true)
+
+
+## 터치 기기로 전환한다.
+##
+## `DisplayServer.is_touchscreen_available()` 는 웹 빌드에서도 제대로 답한다 —
+## 헤드리스 Chrome 의 터치 에뮬레이션에서 true 를 돌려주는 것을 확인했다.
+## 터치 되는 노트북도 true 가 되지만, 그때 달라지는 것은 동사 UI 기본값과
+## 길게 누르기뿐이고 둘 다 설정에서 되돌릴 수 있다.
+func _enable_touch_mode() -> void:
+	if is_touch:
+		return
+	is_touch = true
+	# 기기 때문에 바뀌는 값은 **저장하지 않는다.** 저장하면 그 프로필을 데스크톱에서
+	# 열었을 때까지 따라오고, 사용자가 고른 값과 구분되지 않는다.
+	if not SaveManager.is_user_set("verb_ui"):
+		SaveManager.set_device_default("verb_ui", "simple")   # §5.2 — 버튼 폭이 두 배
+	cursor.enabled = false      # 손가락이 있는 곳에 십자 커서를 그릴 이유가 없다
+	LocationView.hit_padding = TOUCH_HIT_PAD
+	panel.queue_redraw()
 
 
 # ---------------------------------------------------------------- 구성
@@ -337,6 +375,7 @@ func _run_chapter_intro() -> void:
 
 func _process(delta: float) -> void:
 	_update_thumbnail(delta)
+	_update_long_press(delta)
 
 	if mode != Mode.PLAY or busy:
 		return
@@ -348,6 +387,21 @@ func _process(delta: float) -> void:
 	GameState.player_position = view.player.position if view.player != null else GameState.player_position
 	_update_hover()
 	_keyboard_walk(delta)
+
+
+## 터치에서 우클릭을 대신한다 — 길게 누르면 그 대상의 기본 동작을 한다.
+## 문 앞에서 「열다」를 못 찾아 헤매지 않게 하는 우클릭 관습(§11.2 정신)을
+## 손가락에서도 그대로 쓸 수 있게 하는 유일한 통로다.
+func _update_long_press(delta: float) -> void:
+	if not _pressing or _long_fired:
+		return
+	_press_elapsed += delta
+	if _press_elapsed < LONG_PRESS_SEC:
+		return
+	_long_fired = true
+	if mode == Mode.PLAY and not busy:
+		AudioDirector.play_sfx("click")
+		_on_click(_press_pos, true)
 
 
 func _update_thumbnail(delta: float) -> void:
@@ -591,12 +645,36 @@ func _input_play(event: InputEvent) -> void:
 			await SceneDirector.enter_scene_immediate(GameState.scene_id, "default", GameState.player_position)
 		return
 
-	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed:
+	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		if mb.button_index == MOUSE_BUTTON_LEFT:
-			_on_click(mb.position, false)
-		elif mb.button_index == MOUSE_BUTTON_RIGHT:
+		if mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
 			_on_click(mb.position, true)
+			return
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+
+		# 터치에서는 누른 순간이 아니라 뗀 순간에 행동한다.
+		# 길게 누르고 있는 동안 우클릭(기본 동작)으로 갈아탈 여지를 남겨야 하기 때문이다.
+		if not is_touch:
+			if mb.pressed:
+				_on_click(mb.position, false)
+			return
+
+		if mb.pressed:
+			_pressing = true
+			_long_fired = false
+			_press_pos = mb.position
+			_press_elapsed = 0.0
+		elif _pressing:
+			_pressing = false
+			if not _long_fired:
+				_on_click(mb.position, false)
+		return
+
+	# 손가락이 미끄러지면 길게 누르기가 아니라 끌기다.
+	if is_touch and _pressing and event is InputEventMouseMotion:
+		if (event as InputEventMouseMotion).position.distance_to(_press_pos) > LONG_PRESS_SLOP:
+			_pressing = false
 		return
 
 	if event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo:
@@ -970,12 +1048,46 @@ func _apply_settings() -> void:
 	Theming.set_font_size_index(int(SaveManager.get_setting("font_size_index", 1)))
 	AudioDirector.apply_volumes()
 	var want_fs := bool(SaveManager.get_setting("fullscreen", false))
-	var is_fs := DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
-	if want_fs != is_fs:
-		DisplayServer.window_set_mode(
-			DisplayServer.WINDOW_MODE_FULLSCREEN if want_fs else DisplayServer.WINDOW_MODE_WINDOWED)
+	if OS.has_feature("web"):
+		_apply_fullscreen_web(want_fs)
+	else:
+		var is_fs := DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+		if want_fs != is_fs:
+			DisplayServer.window_set_mode(
+				DisplayServer.WINDOW_MODE_FULLSCREEN if want_fs else DisplayServer.WINDOW_MODE_WINDOWED)
 	if panel != null:
 		panel.queue_redraw()
+
+
+## §20 Phase 2 P2-2 — 웹에서 게임 안 설정으로 전체 화면 켜기.
+##
+## 브라우저는 requestFullscreen 을 **사용자 조작에서 비롯된 호출**로만 허용한다.
+## Godot 의 입력 처리는 requestAnimationFrame 안에서 일어나 그 조건을 만족하지
+## 못한다 — `DisplayServer.window_set_mode(FULLSCREEN)` 이 조용히 무시되는 것을
+## 실측으로 확인했다.
+##
+## 그래서 직접 부르지 않고, **다음 pointerup 한 번에 얹는다.** 설정을 켠 그 클릭의
+## 뗌 동작이 보통 여기에 걸리므로 대개 즉시 전환된다. 안 걸리면 다음 클릭에 된다.
+## (iframe 안에서는 부모가 allow="fullscreen" 을 줘야 성공한다 — 사이트 쪽 몫)
+func _apply_fullscreen_web(want: bool) -> void:
+	if not want:
+		JavaScriptBridge.eval(
+			"if (document.fullscreenElement) document.exitFullscreen();", true)
+		return
+	JavaScriptBridge.eval("""
+		(function () {
+			if (window.__fsPending || document.fullscreenElement) return;
+			window.__fsPending = true;
+			var go = function () {
+				document.removeEventListener('pointerup', go, true);
+				window.__fsPending = false;
+				var el = document.querySelector('canvas') || document.documentElement;
+				var req = el.requestFullscreen || el.webkitRequestFullscreen;
+				if (req) { try { req.call(el); } catch (e) {} }
+			};
+			document.addEventListener('pointerup', go, true);
+		})();
+	""", true)
 
 
 func _close_settings() -> void:
