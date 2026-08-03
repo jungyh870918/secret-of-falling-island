@@ -1,7 +1,10 @@
 # Godot 4
 .godot/
 /android/
-export_presets.cfg
+
+# export_presets.cfg 는 저장소에 포함한다 — 없으면 클론한 사람이 웹 빌드를
+# 재현할 수 없다. 웹 프리셋에는 서명 키나 비밀번호가 들어가지 않는다.
+# (안드로이드 keystore 처럼 비밀값이 들어가는 프리셋을 추가하면 그때 분리할 것)
 
 # 빌드 산출물
 /build/

@@ -133,6 +133,21 @@ func stop_music() -> void:
 	_music_player.stop()
 
 
+## 브라우저는 사용자 조작 전에는 소리를 내지 못하게 막는다(autoplay policy).
+## 임베드한 사이트에서는 iframe **바깥**의 버튼으로 게임을 띄우므로, 캔버스 안에서
+## 첫 입력이 들어오기 전까지 AudioContext 가 정지 상태일 수 있다.
+## 그동안 타이틀 음악은 소리 없이 재생 위치만 앞으로 간다 — 조작을 시작하면
+## 곡 중간부터 들리거나 아예 안 들린다.
+##
+## 그래서 첫 입력에 곡을 **처음부터 다시** 튼다. 웹이 아니면 할 일이 없다.
+func wake() -> void:
+	if not OS.has_feature("web"):
+		return
+	if _current_music.is_empty() or _music_player.stream == null:
+		return
+	_music_player.play()
+
+
 ## 종료 시 재생 중인 스트림을 놓아준다. 안 하면 AudioStreamWAV 가 누수로 보고된다.
 func _exit_tree() -> void:
 	for p in _sfx_players:

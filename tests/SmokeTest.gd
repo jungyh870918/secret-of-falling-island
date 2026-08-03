@@ -175,7 +175,13 @@ func _t_title() -> void:
 	section("§23-1 타이틀 화면")
 	check(int(main.mode) == MODE_TITLE, "실행 직후 타이틀 모드")
 	check(bool(main.title_screen.visible), "타이틀 화면이 보인다")
-	check(int(main.title_screen.rows.size()) == 5, "타이틀 항목 5개")
+	check(int(main.title_screen.rows.size()) == 5, "타이틀 항목 5개 (웹에서는 「종료」가 빠져 4개)")
+	# 메뉴 분기는 인덱스가 아니라 id 로 한다. 행을 넣고 빼도 밀리지 않게 하는 통로다.
+	var ids: Array = []
+	for r in main.title_screen.rows:
+		ids.append(str((r as Dictionary).get("id", "")))
+	check(ids == ["new_game", "continue", "load", "settings", "quit"],
+		"타이틀 행마다 id 가 있다 (%s)" % ", ".join(PackedStringArray(ids)))
 	check(not bool(main.panel.visible), "타이틀에서는 명령 패널이 숨겨진다")
 
 

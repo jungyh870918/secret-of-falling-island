@@ -45,6 +45,8 @@ var battle_runner: BattleRunner
 
 var _hover_id := ""
 var _thumb_timer := 0.0
+## 브라우저 autoplay policy — 첫 조작 전까지 소리가 막혀 있다. 한 번만 깨우면 된다.
+var _audio_asleep := true
 
 ## 대상까지 걸어가는 중인지. 이 상태에서는 클릭이 새 목표로 즉시 전환된다.
 var walking_to_target := false
@@ -137,7 +139,9 @@ func _build_tree() -> void:
 
 	pause_menu = MenuList.new()
 	pause_menu.name = "PauseMenu"
-	pause_menu.box = Rect2i(96, 40, 128, 100)
+	# 제목 16px + 6행 × 12px + 하단 안내문 자리. 100 이면 마지막 행의 아랫부분과
+	# 안내문이 맞닿아 글자가 겹쳐 보인다.
+	pause_menu.box = Rect2i(96, 34, 128, 110)
 	ui_layer.add_child(pause_menu)
 	pause_menu.activated.connect(_on_pause_activated)
 	pause_menu.cancelled.connect(_resume)
@@ -177,6 +181,15 @@ func _build_tree() -> void:
 	ui_layer.add_child(cursor)   # 항상 맨 위
 
 
+## 브라우저가 자기 기능으로 쓰는 키.
+## 캔버스가 가로챌 수 있는지는 브라우저·OS 마다 다르고, **F5 는 못 잡으면
+## 플레이 중이던 게임이 통째로 날아간다.** 그래서 웹 빌드에서는 바인딩하지 않는다.
+##
+## 대체 경로는 이미 있다 — 저장·불러오기·기록·설정이 전부 ESC 일시정지 메뉴에 있고,
+## 전체 화면은 임베드한 페이지 쪽 버튼이 담당한다.
+const BROWSER_RESERVED_KEYS := [KEY_F1, KEY_F2, KEY_F3, KEY_F5, KEY_F9, KEY_F11]
+
+
 ## project.godot 에 InputEvent 리소스를 손으로 적는 대신 런타임에 등록한다.
 func _register_input_actions() -> void:
 	_add_action("game_menu", [KEY_ESCAPE])
@@ -191,11 +204,19 @@ func _register_input_actions() -> void:
 	_add_action("debug_reload", [KEY_F3])
 
 
+## 웹에서는 브라우저 예약 키를 걸러 낸다.
+##
+## 액션 자체는 항상 등록한다. `is_action_pressed("game_quicksave")` 호출부가
+## 여러 군데라, 액션이 없으면 그 줄들이 매 프레임 오류를 낸다.
+## **키만 비우면 호출부는 그대로 두고 안전해진다** — 액션은 존재하되 영원히 안 걸린다.
 func _add_action(action_name: String, keys: Array) -> void:
 	if InputMap.has_action(action_name):
 		InputMap.erase_action(action_name)
 	InputMap.add_action(action_name)
+	var web := OS.has_feature("web")
 	for k in keys:
+		if web and BROWSER_RESERVED_KEYS.has(k):
+			continue
 		var ev := InputEventKey.new()
 		ev.physical_keycode = k
 		InputMap.action_add_event(action_name, ev)
@@ -224,24 +245,40 @@ func _open_title() -> void:
 	AudioDirector.play_music("title")
 
 
+## 웹에서는 「종료」를 뺀다. 브라우저 탭은 스크립트로 닫히지 않아서,
+## 눌러도 아무 일이 없거나 캔버스만 멈춘 것처럼 보인다.
+##
+## 항목을 빼면 그 뒤 인덱스가 전부 밀린다. 그래서 메뉴 분기를 인덱스가 아니라
+## id 로 한다 — 지금은 「종료」가 마지막이라 당장 어긋나지 않지만,
+## 메뉴가 늘어날 때 조용히 깨지는 종류의 버그다.
 func _title_rows() -> Array:
 	var has_save := SaveManager.has_any_save()
-	return [
-		{"label": Loc.t("ui.title.new_game")},
-		{"label": Loc.t("ui.title.continue"), "enabled": has_save},
-		{"label": Loc.t("ui.title.load"), "enabled": has_save},
-		{"label": Loc.t("ui.title.settings")},
-		{"label": Loc.t("ui.title.quit")},
+	var rows: Array = [
+		{"id": "new_game", "label": Loc.t("ui.title.new_game")},
+		{"id": "continue", "label": Loc.t("ui.title.continue"), "enabled": has_save},
+		{"id": "load", "label": Loc.t("ui.title.load"), "enabled": has_save},
+		{"id": "settings", "label": Loc.t("ui.title.settings")},
 	]
+	if not OS.has_feature("web"):
+		rows.append({"id": "quit", "label": Loc.t("ui.title.quit")})
+	return rows
 
 
 func _on_title_activated(index: int) -> void:
-	match index:
-		0: _start_new_game()
-		1: _continue_game()
-		2: _open_save_menu(SaveSlotMenu.Mode.LOAD)
-		3: _open_settings()
-		4: get_tree().quit()
+	match _row_id(title_screen.rows, index):
+		"new_game": _start_new_game()
+		"continue": _continue_game()
+		"load": _open_save_menu(SaveSlotMenu.Mode.LOAD)
+		"settings": _open_settings()
+		"quit": get_tree().quit()
+
+
+## 메뉴 행의 id. 행을 넣고 빼도 분기가 밀리지 않게 하는 유일한 통로다.
+static func _row_id(rows: Array, index: int) -> String:
+	if index < 0 or index >= rows.size():
+		return ""
+	var row = rows[index]
+	return str((row as Dictionary).get("id", "")) if row is Dictionary else ""
 
 
 func _start_new_game() -> void:
@@ -397,6 +434,12 @@ func _keyboard_walk(delta: float) -> void:
 # ---------------------------------------------------------------- 입력
 
 func _unhandled_input(event: InputEvent) -> void:
+	# 웹 autoplay policy — 캔버스 안에서 처음 조작이 들어온 시점에 음악을 깨운다.
+	if _audio_asleep and event.is_pressed() \
+			and (event is InputEventMouseButton or event is InputEventKey):
+		_audio_asleep = false
+		AudioDirector.wake()
+
 	if event.is_action_pressed("debug_toggle") and debug_panel != null:
 		debug_panel.toggle()
 		return
@@ -771,27 +814,28 @@ func _hide_all_menus() -> void:
 func _open_pause() -> void:
 	mode = Mode.PAUSE
 	GameState.set_timer_paused(true)
+	# 웹에서는 이 메뉴가 저장·불러오기의 **유일한** 경로다 (F5/F9 를 안 쓰므로).
 	pause_menu.open("ui.pause.title", [
-		{"label": Loc.t("ui.pause.resume")},
-		{"label": Loc.t("ui.pause.save")},
-		{"label": Loc.t("ui.pause.load"), "enabled": SaveManager.has_any_save()},
-		{"label": Loc.t("ui.pause.log")},
-		{"label": Loc.t("ui.pause.settings")},
-		{"label": Loc.t("ui.pause.title_screen")},
+		{"id": "resume", "label": Loc.t("ui.pause.resume")},
+		{"id": "save", "label": Loc.t("ui.pause.save")},
+		{"id": "load", "label": Loc.t("ui.pause.load"), "enabled": SaveManager.has_any_save()},
+		{"id": "log", "label": Loc.t("ui.pause.log")},
+		{"id": "settings", "label": Loc.t("ui.pause.settings")},
+		{"id": "title", "label": Loc.t("ui.pause.title_screen")},
 	], "ui.pause.footer")
 
 
 func _on_pause_activated(index: int) -> void:
-	match index:
-		0: _resume()
-		1: _open_save_menu(SaveSlotMenu.Mode.SAVE)
-		2: _open_save_menu(SaveSlotMenu.Mode.LOAD)
-		3:
+	match _row_id(pause_menu.rows, index):
+		"resume": _resume()
+		"save": _open_save_menu(SaveSlotMenu.Mode.SAVE)
+		"load": _open_save_menu(SaveSlotMenu.Mode.LOAD)
+		"log":
 			pause_menu.close()
 			mode = Mode.LOG
 			log_view.open()
-		4: _open_settings()
-		5:
+		"settings": _open_settings()
+		"title":
 			pause_menu.close()
 			_open_title()
 

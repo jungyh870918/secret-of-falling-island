@@ -15,8 +15,13 @@ extends RefCounted
 ##   "puzzle_not":      {"decaf_swap": "completed"},
 ##   "relation_min":    {"sera_trust": 3},
 ##   "scene": "office_pantry",
-##   "not_seen": "boss_first_talk/n001"
+##   "not_seen": "boss_first_talk/n001",
+##   "feature": "web",                             # OS.has_feature — 플랫폼 분기
+##   "not_feature": "web"
 ## }
+##
+## feature 는 세이브에 남지 않는다. 플래그로 두면 데스크톱에서 저장한 파일을
+## 웹에서 열었을 때 낡은 값이 따라오므로, 매번 실제 빌드를 물어봐야 한다.
 
 
 static func evaluate(pre: Variant) -> bool:
@@ -74,6 +79,14 @@ static func evaluate(pre: Variant) -> bool:
 
 	var seen := str(p.get("seen", ""))
 	if not seen.is_empty() and not GameState.dialogue_seen.has(seen):
+		return false
+
+	var feature := str(p.get("feature", ""))
+	if not feature.is_empty() and not OS.has_feature(feature):
+		return false
+
+	var not_feature := str(p.get("not_feature", ""))
+	if not not_feature.is_empty() and OS.has_feature(not_feature):
 		return false
 
 	return true

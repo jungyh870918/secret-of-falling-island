@@ -32,6 +32,11 @@ godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 �
 godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 30장 캡처
 ```
 
+```bash
+# 웹 빌드 — 브라우저에서만 드러나는 것(오디오 정책·IndexedDB 세이브·예약 키)
+tests/web_check.sh
+```
+
 `SmokeTest` 는 `--headless` 라 창이 뜨지 않는다.
 `Screenshots` 는 실제 렌더링이 필요해 창을 만들지만(헤드리스는 더미 렌더러라 이미지가
 안 나온다), **포커스를 뺏지 않고 화면 밖에서 돌기 때문에 작업을 가리지 않는다.**

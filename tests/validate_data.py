@@ -312,6 +312,10 @@ def check_result(r: dict, where: str) -> None:
             err(f"[{where}] 없는 출구 토글: {eid}")
 
 
+# Conditions 의 feature / not_feature 가 받는 값. Godot 의 OS.has_feature 이름이다.
+KNOWN_FEATURES = {"web", "mobile", "pc", "editor", "debug", "release"}
+
+
 def check_conditions(pre, where: str) -> None:
     if not isinstance(pre, dict):
         return
@@ -327,6 +331,11 @@ def check_conditions(pre, where: str) -> None:
     sc = pre.get("scene")
     if sc and sc not in scenes:
         err(f"[{where}] 전제조건이 없는 장면을 참조: {sc}")
+    # OS.has_feature 로 평가되는 플랫폼 분기. 오타를 잡을 수 있게 목록을 고정한다.
+    for group in ("feature", "not_feature"):
+        f = pre.get(group)
+        if f and f not in KNOWN_FEATURES:
+            err(f"[{where}] 알 수 없는 feature: {f} (아는 값: {sorted(KNOWN_FEATURES)})")
 
 
 # ---------------------------------------------------------------- 7. 상호작용 룰

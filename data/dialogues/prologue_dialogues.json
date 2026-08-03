@@ -11,7 +11,17 @@
 				"n003": { "speaker": "player", "text_key": "dlg.open.n003", "next": "n004" },
 				"_note_n004": "조작 안내. 최초 1회만. hint 화자색(연두)으로 '게임이 하는 말' 임을 구분한다.",
 				"n004": { "speaker": "hint", "text_key": "dlg.open.tutorial.1", "next": "n005" },
-				"n005": { "speaker": "hint", "text_key": "dlg.open.tutorial.2", "next": "n006" },
+				"n005": { "speaker": "hint", "text_key": "dlg.open.tutorial.2", "next": "n005b" },
+
+				"_note_n005b": "웹 빌드에서는 F5/F9 를 브라우저가 가져가므로 쓰지 않는다. ESC 메뉴가 유일한 저장 경로라서 한 번 알려 준다. feature 조건은 세이브에 남지 않는다.",
+				"n005b": {
+					"branches": [
+						{ "if": { "feature": "web" }, "next": "n005c" }
+					],
+					"next": "n006"
+				},
+				"n005c": { "speaker": "hint", "text_key": "dlg.open.tutorial.web", "next": "n006" },
+
 				"n006": {
 					"result": { "flags": { "prologue_started": true } },
 					"next": "end"
