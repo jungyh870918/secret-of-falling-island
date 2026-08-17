@@ -25,8 +25,8 @@
 
 | | 장면 | 상태 |
 |---|---|---|
-| [01](ORDER_01_bull_harbor.md) | 황소항 입구 | 1장 받음 — 고를 것이 없었다. 여러 장 다시 |
-| [05](ORDER_05_subway_night.md) | 심야 지하철 | 1장 받음 — 여러 장 다시 |
+| [01](ORDER_01_bull_harbor.md) | 황소항 입구 | **게임에 반영됨** (2026-08-17). 1장뿐이라 고를 것은 없었다 — 여러 장 다시 |
+| [05](ORDER_05_subway_night.md) | 심야 지하철 | **게임에 반영됨** (2026-08-17). 1장뿐이라 고를 것은 없었다 — 여러 장 다시 |
 | [02](ORDER_02_office_meeting_room.md) | 회의실 | 대기 |
 | [03](ORDER_03_office_corridor.md) | 복도 | 대기 |
 | [04](ORDER_04_office_pantry.md) | 탕비실 | 대기 |

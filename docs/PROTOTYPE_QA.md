@@ -14,7 +14,7 @@ Phase 2(수직 슬라이스) 기준으로 갱신됐다 — 프롤로그 전 구�
 python3 tests/check_project.py                        # 프로젝트 구조 (Godot 불필요)
 python3 tests/validate_data.py                        # 데이터 무결성 (Godot 불필요)
 godot --headless --path . tests/SmokeTest.tscn        # 통합 테스트 135건
-godot --path . tests/Screenshots.tscn                 # 렌더링 캡처 31장
+godot --path . tests/Screenshots.tscn                 # 렌더링 캡처 32장
 ```
 
 | 검사 | 결과 |

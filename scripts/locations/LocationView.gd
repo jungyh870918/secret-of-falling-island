@@ -44,8 +44,9 @@ func setup(p_scene_id: String, entry: String = "default") -> void:
 
 	_walkboxes.clear()
 	var k := _scale_of(data)
+	var o := _offset_of(data)
 	for r in _rect_list(data.get("walkbox", [])):
-		_walkboxes.append(Rect2(r.position * k, r.size * k))
+		_walkboxes.append(Rect2(r.position * k + o, r.size * k))
 
 	_spawn_actors()
 	_spawn_player(entry)
@@ -257,7 +258,24 @@ func _draw() -> void:
 	_draw_hover_outline()
 
 
+## 자리표시자는 밴드 아래쪽만 쓴다. 위에 남는 곳은 맨 첫 블록(하늘·벽) 색으로 메운다 —
+## 검은 띠보다 낫고, 어차피 배경 그림이 오면 통째로 사라지는 코드다.
+func _fill_above_blocks() -> void:
+	var o := _offset_of(data)
+	if o.y <= 0.0:
+		return
+	var top := Palette.ui("panel_dark")
+	for b in data.get("blocks", []):
+		if b is Dictionary and (b as Dictionary).has("color"):
+			var c := Palette.parse(str((b as Dictionary)["color"]))
+			if c.a > 0.0:
+				top = c
+				break
+	draw_rect(Rect2(0, 0, Layout.VIEW_RECT.size.x, o.y), top, true)
+
+
 func _draw_blocks() -> void:
+	_fill_above_blocks()
 	for b in data.get("blocks", []):
 		if not (b is Dictionary):
 			continue
@@ -361,16 +379,25 @@ func _pt(v: Variant) -> Vector2:
 	if not (v is Array) or (v as Array).size() < 2:
 		return Vector2.ZERO
 	var k := _scale_of(data)
-	return Vector2(float(v[0]) * k.x, float(v[1]) * k.y)
+	return Vector2(float(v[0]) * k.x, float(v[1]) * k.y) + _offset_of(data)
 
 
 static func _scale_of(scene: Dictionary) -> Vector2:
 	if str(scene.get("coord_space", "")) == "norm":
 		return Vector2(Layout.WORLD_SIZE)
-	# 아직 안 옮긴 옛 장면(320×135 픽셀)은 «축마다 따로» 늘려 월드 밴드를 채운다.
-	# 균일 배율로 맞추면 세로 셸의 아래 2/3 가 빈 채로 남는다.
-	# 자리표시자 blocks 와 핫스폿이 같은 배율을 타므로 서로 어긋나지 않는다.
-	return Vector2(float(Layout.WORLD_SIZE.x) / 320.0, float(Layout.WORLD_SIZE.y) / 135.0)
+	# 아직 안 옮긴 옛 장면(320×135 픽셀)은 «균일 배율»로 폭을 채운다.
+	# 축마다 따로 늘리면 세로가 9.67배가 돼 문이 판자가 되고 원근이 무너진다.
+	# 2.37 비율로 그린 방을 0.72 밴드에 억지로 채울 방법은 없다 — 채우지 않는다.
+	var k := float(Layout.WORLD_SIZE.x) / 320.0
+	return Vector2(k, k)
+
+
+## 옛 장면을 밴드 «아래»에 붙이기 위한 offset. 바닥이 인물 발밑에 남아야 한다.
+## norm 장면은 밴드를 통째로 쓰므로 0 이다.
+static func _offset_of(scene: Dictionary) -> Vector2:
+	if str(scene.get("coord_space", "")) == "norm":
+		return Vector2.ZERO
+	return Vector2(0.0, float(Layout.WORLD_SIZE.y) - 135.0 * _scale_of(scene).y)
 
 
 func _rect_of(d: Dictionary) -> Rect2:
@@ -382,7 +409,8 @@ static func _rect_in(scene: Dictionary, d: Dictionary) -> Rect2:
 	if not (r is Array) or (r as Array).size() < 4:
 		return Rect2()
 	var k := _scale_of(scene)
-	return Rect2(float(r[0]) * k.x, float(r[1]) * k.y,
+	var o := _offset_of(scene)
+	return Rect2(float(r[0]) * k.x + o.x, float(r[1]) * k.y + o.y,
 		float(r[2]) * k.x, float(r[3]) * k.y)
 
 

@@ -173,8 +173,17 @@ func _phase2_shots() -> void:
 	GameState.set_flag("boss_left", true)
 	GameState.advance_puzzle("decaf_swap", "completed")
 
+	SaveManager.set_setting("high_contrast_hotspots", false)
 	await jump("subway_night", "from_office")
+	await settle(4)
 	await capture("room_subway", "§8.1 심야 지하철 — 광고판 · 노선도 · 바닥의 전단지")
+
+	# 배경이 들어간 장면마다 판정 상자 캡처를 짝으로 낸다 (스튜디오 요청 2026-08-17)
+	SaveManager.set_setting("high_contrast_hotspots", true)
+	await settle(6)
+	await capture("subway_hotspots", "심야 지하철 핫스폿 정렬 — 정규화 좌표가 배경 위에 맞는지")
+	SaveManager.set_setting("high_contrast_hotspots", false)
+	await settle(4)
 
 	main.call("_interact", "subway_window", Actions.Verb.LOOK)
 	if await wait_until(func(): return bool(main.subtitles.is_active())):

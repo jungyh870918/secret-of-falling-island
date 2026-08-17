@@ -37,8 +37,11 @@ python3 tests/validate_data.py                    # JSON · 대사 키 · 룰 ·
 python3 tests/check_assets.py                     # 아트 에셋 크기·알파 (선택 — 화풍은 판정하지 않는다)
 
 # Godot 필요
-godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 플레이, 135건 검증
-godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 31장 캡처
+godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 플레이, 136건 검증
+godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 32장 캡처
+godot --path . tools/DemoStart.tscn               # 황소항에서 시작해 «직접 조작»
+godot --path . tools/DemoStart.tscn -- subway     #   다른 장면 (harbor·subway·studio·meeting…)
+godot --path . tools/DemoStart.tscn -- harbor sera #   윤세라 등장 상태
 ```
 
 ```bash
