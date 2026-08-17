@@ -6,16 +6,31 @@
 > **아트 방향이 2026-08-12에 바뀌었다.** 콘셉트 이미지가 최상위 기준이고, 문서와 충돌하면 그림이 이긴다.
 > 「320×180 진짜 도트」 전제는 폐기됐다 — 근거와 규칙은
 > [기획서 §23](떡락섬의_비밀_기획서.html) · [아트 브리프](떡락섬의_비밀_아트_브리프.html) · [docs/art/](docs/art/).
-> **기준 캔버스가 정해질 때까지 아래 해상도 항목은 미확정이다.**
+> **기준 캔버스는 2026-08-17 에 정해졌다** (942×1674). 남은 미정은 **인물 크기** 하나다 —
+> 아래 「아직 안 맞는 것」.
 
 - 엔진: Godot 4.2+ / GDScript
 - 내부 해상도: ~~320×180 가로~~ → **942×1674 세로** (2026-08-17 전환. 스튜디오 D1 941×1672 를
   UI 배율 3의 정수 배로 1~2px 맞춘 값 — `scripts/core/Layout.gd` 머리말 「두 좌표계」)
 - 화면은 상단 바 147 · 월드 1305 · 하단 패널 222 로 나뉜다. UI 는 314×558 설계 픽셀에 그리고 3배로 키운다
-- 아직 세로로 옮기지 않은 장면 5개는 옛 320×135 좌표를 축마다 늘려 월드 밴드를 채운다
+- 배경 그림이 들어간 장면은 **2개** (황소항 입구 · 심야 지하철). 좌표를 비율(`coord_space: norm`)로
+  옮겨 그림 위 제자리에 온다. 나머지 4장은 발주 대기
+- 아직 세로로 옮기지 않은 장면 4개는 옛 320×135 좌표를 **균일 배율 2.94배**로 키워 밴드 아래에
+  붙인다. 위쪽은 남긴다 — 2.37 비율로 그린 방을 0.72 밴드에 왜곡 없이 채울 방법은 없다
 - 현재 범위: **프롤로그 전체** — 회의실 · 복도 · 탕비실 · 심야 지하철 · 원룸 · 황소항 입구 (§8.1)
   - 디카페인 커피 퍼즐, 투자 방송 장면, 첫 사기 피해, 윤세라 첫 등장
   - §9 대화 배틀 1개 (환전소), §5.4 초상화 대화, §7.2 배경음악 3곡
+
+### 아직 안 맞는 것 (세로 전환 잔여)
+
+배경은 옮겼지만 그 위에 서는 것들이 아직 옛 가로 화면 크기 그대로다.
+자세한 내용과 증거는 [docs/PROTOTYPE_QA.md §8](docs/PROTOTYPE_QA.md).
+
+| | 지금 | 문제 |
+|---|---|---|
+| **인물 크기** | `frame_size` 32×48 을 배율 없이 그린다 | 월드 밴드 1305 중 48px — 배경이 그린 사람 옆에서 **벌레만 하다** (`docs/screenshots/21_room_subway.png`) |
+| 저장 썸네일 | 프레임 위에서 **135px** 만 잘라 쓴다 | 1674 화면에서는 상단 바 조각만 담긴다 (`SaveManager._write_thumbnail`) |
+| 인벤 아이콘 | 16×12 UI 칸에 맞춰 늘린다 | 정사각 아이콘을 넣으면 눌린다 |
 
 ---
 
@@ -108,7 +123,7 @@ red-candle/
 │  ├─ battle/               BattleRunner, BattleView (§9)
 │  ├─ locations/            LocationView, Actor
 │  ├─ ui/  save/  debug/
-├─ assets/                  ★ 지금은 비어 있다. 넣으면 자동으로 임시 도트를 대체
+├─ assets/                  ★ 배경 2장 + Galmuri 폰트. 넣으면 자동으로 임시 도트를 대체
 └─ tests/                   Godot 없이 도는 검증 스크립트
 ```
 
@@ -122,15 +137,23 @@ red-candle/
 
 | 넣을 곳 | 규격 | 대체 대상 |
 |---|---|---|
-| `assets/backgrounds/<scene_id>.png` | 320×135 | 장면의 `blocks` 임시 도트 |
-| `assets/sprites/characters/<character_id>.png` | 스프라이트시트, 프레임 32×48 | Actor 의 `_draw()` 임시 캐릭터 |
-| `assets/sprites/portraits/<character_id>.png` | 96×96 | PortraitView 의 임시 초상화 (§5.4) |
-| `assets/ui/items/<item_id>.png` | 16×16 | 인벤토리 색 블록 아이콘 |
+| `assets/backgrounds/<scene_id>.png` | **1024×1536** (2:3) | 장면의 `blocks` 임시 도트 |
+| `assets/sprites/characters/<character_id>.png` | 스프라이트시트, 프레임 = 캐릭터의 `frame_size` (지금 32×48) | Actor 의 `_draw()` 임시 캐릭터 |
+| `assets/sprites/portraits/<character_id>.png` | **189×189** | PortraitView 의 임시 초상화 (§5.4) |
+| `assets/ui/items/<item_id>.png` | **48×36** | 인벤토리 색 블록 아이콘 |
 | `assets/ui/title.png` | 942×1674 | 타이틀 임시 아트 |
 | `assets/ui/topbar.png` | 942×147 | 상단 바. 없으면 `TopBar.gd` 가 그린다 |
-| `assets/ui/command_panel.png` | 320×45 | 하단 명령 패널 배경 |
+| `assets/ui/command_panel.png` | **942×222** | 하단 명령 패널 배경 |
 | `assets/audio/sfx/<이름>.wav` | — | 런타임 합성 효과음 |
 | `assets/audio/music/<이름>.ogg` | — | `MusicSynth` 의 런타임 합성 곡 |
+
+UI 그림 규격은 전부 **UI 설계 좌표 × 3** 이다 (`Layout.UI_SCALE`). 코드는 설계 좌표 사각형에
+늘려 그리므로 3배가 아니어도 뜨기는 하지만, 정수 배가 아니면 도트가 뭉갠다.
+
+배경만 규칙이 다르다. **월드 밴드(942×1305)를 늘리지 않고 채운 뒤 남는 쪽을 잘라낸다** —
+1024×1536 을 늘려 맞추면 가로로 8% 뚱뚱해진다. 위아래 여유 59px 씩이 잘리는데 **그 잘림이
+설계다**: 자르는 위치는 장면의 `bg_anchor` 로 옮기고, 배틀 화면이 같은 그림을 더 넓게 잘라 쓴다.
+바닥 띠 규칙은 [docs/art/README.md](docs/art/README.md) 를 따른다.
 
 ### 폰트
 
