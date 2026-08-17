@@ -74,7 +74,7 @@ func _draw() -> void:
 	var size := Theming.font_size()
 	var line_h := int(font.get_height(size)) + LINE_GAP
 
-	draw_rect(Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), Color(0, 0, 0, 0.7), true)
+	draw_rect(Rect2(0, 0, Layout.UI_SIZE.x, Layout.UI_SIZE.y), Color(0, 0, 0, 0.7), true)
 	draw_rect(Rect2(BOX), Palette.ui("panel"), true)
 	draw_rect(Rect2(BOX), Palette.ui("outline"), false, 1.0)
 

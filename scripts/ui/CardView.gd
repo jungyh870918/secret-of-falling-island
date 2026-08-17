@@ -66,24 +66,24 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if not _active:
 		return
-	draw_rect(Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), Color.BLACK, true)
+	draw_rect(Rect2(0, 0, Layout.UI_SIZE.x, Layout.UI_SIZE.y), Color.BLACK, true)
 
 	var top := 40.0
 	if _image != null:
 		var s := _image.get_size()
-		draw_texture_rect(_image, Rect2((Layout.SCREEN.x - s.x) / 2.0, 18, s.x, s.y), false)
+		draw_texture_rect(_image, Rect2((Layout.UI_SIZE.x - s.x) / 2.0, 18, s.x, s.y), false)
 		top = 18 + s.y + 10
 
 	var font := Theming.base_font
 	var size := Theming.font_size()
 	var line_h := int(font.get_height(size)) + 4
 	var total := line_h * _lines.size()
-	var y: float = maxf(top, (Layout.SCREEN.y - total) / 2.0)
+	var y: float = maxf(top, (Layout.UI_SIZE.y - total) / 2.0)
 
 	for i in _lines.size():
 		var l := _lines[i]
 		var w := font.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
-		draw_string(font, Vector2(roundf((Layout.SCREEN.x - w) / 2.0), roundf(y + line_h * i + font.get_ascent(size))),
+		draw_string(font, Vector2(roundf((Layout.UI_SIZE.x - w) / 2.0), roundf(y + line_h * i + font.get_ascent(size))),
 			l, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Palette.ui("text"))
 
 	if _elapsed >= MIN_HOLD and fposmod(_elapsed, 1.2) < 0.6:
@@ -91,5 +91,5 @@ func _draw() -> void:
 		var sf := Theming.small_font
 		var ss := Theming.small_font_size()
 		var hw := sf.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, ss).x
-		draw_string(sf, Vector2(roundf((Layout.SCREEN.x - hw) / 2.0), Layout.SCREEN.y - 12),
+		draw_string(sf, Vector2(roundf((Layout.UI_SIZE.x - hw) / 2.0), Layout.UI_SIZE.y - 12),
 			hint, HORIZONTAL_ALIGNMENT_LEFT, -1, ss, Palette.ui("text_dim"))

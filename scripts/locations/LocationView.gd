@@ -8,6 +8,10 @@ extends Node2D
 ##   장면 데이터의 "background" 경로에 PNG 가 있으면 blocks 대신 그 그림을 그린다.
 ##   blocks 는 그 전까지 쓰는 임시 도트다. (§21 "단색 픽셀 블록")
 
+## 월드 층 선 두께. §06 「테두리 = 1 게임픽셀 × UI 배율」.
+## 월드는 942 폭이라 1.0 으로 그으면 머리카락이 된다.
+const LINE := float(Layout.UI_SCALE)
+
 const DITHER_2X2 := [[1, 0], [0, 1]]
 const DITHER_4X4 := [
 	[1, 0, 0, 0],
@@ -39,8 +43,9 @@ func setup(p_scene_id: String, entry: String = "default") -> void:
 			_background = res
 
 	_walkboxes.clear()
+	var k := _scale_of(data)
 	for r in _rect_list(data.get("walkbox", [])):
-		_walkboxes.append(r)
+		_walkboxes.append(Rect2(r.position * k, r.size * k))
 
 	_spawn_actors()
 	_spawn_player(entry)
@@ -86,7 +91,7 @@ func _spawn_actors() -> void:
 		a.setup(def)
 		var pos = hd.get("stand_at", null)
 		if pos is Array and (pos as Array).size() >= 2:
-			a.place(Vector2(float(pos[0]), float(pos[1])))
+			a.place(_pt(pos))
 		_actors[str(hd.get("id", actor_id))] = a
 
 
@@ -119,10 +124,10 @@ func spawn_point(entry: String) -> Vector2:
 		for key in [entry, "default", "player"]:
 			var v = d.get(key, null)
 			if v is Array and (v as Array).size() >= 2:
-				return Vector2(float(v[0]), float(v[1]))
+				return _pt(v)
 	if not _walkboxes.is_empty():
 		return _walkboxes[0].get_center()
-	return Vector2(160, 110)
+	return Vector2(Layout.WORLD_SIZE) * 0.5
 
 
 func place_player(pos: Vector2) -> void:
@@ -160,9 +165,11 @@ func clamp_to_walkbox(p: Vector2) -> Vector2:
 static var hit_padding := 0.0
 
 
-func hotspot_at(p: Vector2) -> Dictionary:
-	if not Layout.in_view(p):
+## p 는 **화면 좌표**다. 월드 로컬로 바꿔서 판정한다 (세로 셸)
+func hotspot_at(screen_p: Vector2) -> Dictionary:
+	if not Layout.in_view(screen_p):
 		return {}
+	var p := Layout.to_world(screen_p)
 	var best: Dictionary = {}
 	var best_area := INF
 	for h in data.get("hotspots", []):
@@ -208,7 +215,7 @@ func is_exit(h: Dictionary) -> bool:
 func walk_to_of(h: Dictionary) -> Vector2:
 	var w = h.get("walk_to", null)
 	if w is Array and (w as Array).size() >= 2:
-		return Vector2(float(w[0]), float(w[1]))
+		return _pt(w)
 	var r := _rect_of(h)
 	return clamp_to_walkbox(Vector2(r.get_center().x, r.position.y + r.size.y))
 
@@ -219,9 +226,27 @@ func set_hover(id: String) -> void:
 
 # ---------------------------------------------------------------- 그리기
 
+## 배경을 «늘리지 않고» 월드 밴드를 채운 뒤 남는 쪽을 잘라낸다.
+## 늘리면 8% 가로로 뚱뚱해진다 (1024×1536 → 942×1305). 아트 기준: 넉넉히 그리고 화면이 잘라 쓴다.
+## 자르는 위치는 장면의 "bg_anchor" [x, y] 로 조절한다. 기본 0.5 = 가운데.
+func _background_src() -> Rect2:
+	var dst := Vector2(Layout.VIEW_RECT.size)
+	var ts := Vector2(_background.get_size())
+	if ts.x <= 0.0 or ts.y <= 0.0:
+		return Rect2(Vector2.ZERO, ts)
+	var k := maxf(dst.x / ts.x, dst.y / ts.y)
+	var src_size := (dst / k).min(ts)
+	var a := Vector2(0.5, 0.5)
+	var av = data.get("bg_anchor", null)
+	if av is Array and (av as Array).size() >= 2:
+		a = Vector2(clampf(float(av[0]), 0.0, 1.0), clampf(float(av[1]), 0.0, 1.0))
+	return Rect2((ts - src_size) * a, src_size)
+
+
 func _draw() -> void:
 	if _background != null:
-		draw_texture_rect(_background, Rect2(Vector2.ZERO, Vector2(Layout.VIEW_RECT.size)), false)
+		draw_texture_rect_region(_background, Rect2(Vector2.ZERO, Vector2(Layout.VIEW_RECT.size)),
+			_background_src())
 	else:
 		_draw_blocks()
 
@@ -291,7 +316,7 @@ func _draw_dithered(r: Rect2, a: Color, b: Color, pattern: Array) -> void:
 func _draw_hotspot_outlines() -> void:
 	for h in data.get("hotspots", []):
 		if h is Dictionary and is_hotspot_visible(h):
-			draw_rect(_rect_of(h), Palette.ui("text_hot"), false, 1.0)
+			draw_rect(_rect_of(h), Palette.ui("text_hot"), false, LINE)
 
 
 ## §18 길 찾기용 출구 표시 옵션
@@ -319,17 +344,46 @@ func _draw_hover_outline() -> void:
 		return
 	var r := _rect_of(h)
 	# 어두운 배경에도, 밝은 배경에도 읽히도록 안쪽에 어두운 선을 한 겹 깐다.
-	draw_rect(r.grow(1), Palette.ui("outline"), false, 1.0)
-	draw_rect(r, Palette.ui("text_hot"), false, 1.0)
+	draw_rect(r.grow(LINE), Palette.ui("outline"), false, LINE)
+	draw_rect(r, Palette.ui("text_hot"), false, LINE)
 
 
 # ---------------------------------------------------------------- 유틸
 
-static func _rect_of(d: Dictionary) -> Rect2:
+## 장면 좌표 → 월드 로컬 픽셀.
+##
+## 장면에 `"coord_space": "norm"` 이 있으면 rect 는 0~1 비율이고 밴드 크기를 곱한다.
+## 없으면 옛 320×135 픽셀 공간이라 **균일 배율로** 밴드에 맞춘다 —
+## 찌그러뜨리지 않는다. 화면을 다 못 채울 뿐이다.
+## (기준 캔버스 D1 이 아직 뒤집힐 수 있어 픽셀을 데이터에 박지 않는다)
+## 장면 좌표의 «점» → 월드 로컬 픽셀. rect 와 같은 배율을 쓴다
+func _pt(v: Variant) -> Vector2:
+	if not (v is Array) or (v as Array).size() < 2:
+		return Vector2.ZERO
+	var k := _scale_of(data)
+	return Vector2(float(v[0]) * k.x, float(v[1]) * k.y)
+
+
+static func _scale_of(scene: Dictionary) -> Vector2:
+	if str(scene.get("coord_space", "")) == "norm":
+		return Vector2(Layout.WORLD_SIZE)
+	# 아직 안 옮긴 옛 장면(320×135 픽셀)은 «축마다 따로» 늘려 월드 밴드를 채운다.
+	# 균일 배율로 맞추면 세로 셸의 아래 2/3 가 빈 채로 남는다.
+	# 자리표시자 blocks 와 핫스폿이 같은 배율을 타므로 서로 어긋나지 않는다.
+	return Vector2(float(Layout.WORLD_SIZE.x) / 320.0, float(Layout.WORLD_SIZE.y) / 135.0)
+
+
+func _rect_of(d: Dictionary) -> Rect2:
+	return _rect_in(data, d)
+
+
+static func _rect_in(scene: Dictionary, d: Dictionary) -> Rect2:
 	var r = d.get("rect", null)
-	if r is Array and (r as Array).size() >= 4:
-		return Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3]))
-	return Rect2()
+	if not (r is Array) or (r as Array).size() < 4:
+		return Rect2()
+	var k := _scale_of(scene)
+	return Rect2(float(r[0]) * k.x, float(r[1]) * k.y,
+		float(r[2]) * k.x, float(r[3]) * k.y)
 
 
 static func _rect_list(v: Variant) -> Array[Rect2]:

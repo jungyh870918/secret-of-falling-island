@@ -1,204 +1,893 @@
 {
-	"_comment": "명세서 §8.1 프롤로그 장소 5번 '황소항 입구'. 여기서 §8.1 '첫 사기 피해' 와 '윤세라 첫 등장' 이 일어나고, §9 첫 대화 배틀이 붙는다. 항구 게이트는 챕터 1(§8.2 투자자 조합)로 가는 문이라 프롤로그에서는 열리지 않는다 — 숨기지 않고 룰 + on_fail 로 막아 이유를 알 수 있게 한다.",
-
-	"scene_id": "bull_harbor_entrance",
-	"name_key": "scene.bull_harbor_entrance",
-	"background": "res://assets/backgrounds/bull_harbor_entrance.png",
-	"palette": "bull",
-	"music": "bull_harbor",
-	"active_puzzles": ["first_scam"],
-
-	"walkbox": [16, 96, 288, 32],
-
-	"spawn_points": {
-		"default": [48, 114],
-		"from_city": [36, 114]
-	},
-
-	"blocks": [
-		{ "_": "새벽 하늘", "rect": [0, 0, 320, 58], "color": "#4a1220" },
-		{ "rect": [0, 22, 320, 24], "color": "#8c3327", "dither": "2x2", "color2": "#4a1220" },
-		{ "rect": [0, 42, 320, 16], "color": "#e8734a", "dither": "4x4", "color2": "#8c3327" },
-
-		{ "_": "바다", "rect": [0, 56, 320, 26], "color": "#1b2430" },
-		{ "rect": [0, 56, 320, 3], "color": "#e8734a" },
-		{ "rect": [0, 62, 320, 20], "color": "#245a5e", "dither": "2x2", "color2": "#1b2430" },
-		{ "_": "정박한 배 실루엣", "rect": [40, 44, 34, 14], "color": "#241f2b" },
-		{ "rect": [52, 34, 3, 12], "color": "#241f2b" },
-		{ "rect": [246, 46, 28, 12], "color": "#241f2b" },
-		{ "rect": [256, 38, 3, 10], "color": "#241f2b" },
-
-		{ "_": "부두 바닥", "rect": [0, 80, 320, 55], "color": "#6b5a44" },
-		{ "rect": [0, 80, 320, 3], "color": "#8a6a4a" },
-		{ "rect": [0, 94, 320, 41], "color": "#5a4632", "dither": "4x4", "color2": "#6b5a44" },
-
-		{ "_": "황소 동상 — §8.2 황소항의 상징", "hotspot": "bull_statue", "rect": [26, 46, 40, 44], "color": "#b98a3c" },
-		{ "hotspot": "bull_statue", "rect": [26, 46, 40, 6], "color": "#e0b23a" },
-		{ "hotspot": "bull_statue", "rect": [22, 40, 16, 14], "color": "#b98a3c" },
-		{ "hotspot": "bull_statue", "rect": [18, 34, 6, 8], "color": "#e8d9b8" },
-		{ "hotspot": "bull_statue", "rect": [34, 34, 6, 8], "color": "#e8d9b8" },
-		{ "hotspot": "bull_statue", "rect": [24, 44, 4, 3], "color": "#c8352e" },
-		{ "hotspot": "bull_statue", "rect": [30, 88, 6, 8], "color": "#8a6a4a" },
-		{ "hotspot": "bull_statue", "rect": [54, 88, 6, 8], "color": "#8a6a4a" },
-		{ "hotspot": "bull_statue", "rect": [20, 32, 46, 64], "outline": "#1b1820", "color": "#00000000" },
-
-		{ "_": "항구 게이트 — 챕터 1 로 가는 문", "hotspot": "harbor_gate", "rect": [96, 34, 60, 56], "color": "#4a4a4c" },
-		{ "hotspot": "harbor_gate", "rect": [99, 37, 24, 53], "color": "#5f6d78" },
-		{ "hotspot": "harbor_gate", "rect": [129, 37, 24, 53], "color": "#5f6d78" },
-		{ "hotspot": "harbor_gate", "rect": [123, 34, 6, 56], "color": "#3f3f42" },
-		{ "hotspot": "harbor_gate", "rect": [119, 58, 14, 8], "color": "#b98a3c" },
-		{ "hotspot": "harbor_gate", "rect": [96, 26, 60, 8], "color": "#8c3327" },
-		{ "hotspot": "harbor_gate", "rect": [102, 28, 48, 4], "color": "#e8d9b8" },
-		{ "hotspot": "harbor_gate", "rect": [96, 26, 60, 64], "outline": "#1b1820", "color": "#00000000" },
-
-		{ "_": "시세 전광판 — §6.6 ticker", "hotspot": "ticker_board", "rect": [102, 2, 118, 22], "color": "#0d0b10" },
-		{ "hotspot": "ticker_board", "rect": [104, 4, 114, 18], "color": "#141c2e" },
-		{ "hotspot": "ticker_board", "rect": [108, 8, 4, 12], "color": "#c8352e", "anim": "ticker" },
-		{ "hotspot": "ticker_board", "rect": [116, 8, 4, 12], "color": "#6f9a63", "anim": "ticker" },
-		{ "hotspot": "ticker_board", "rect": [124, 8, 4, 12], "color": "#c8352e", "anim": "ticker" },
-		{ "hotspot": "ticker_board", "rect": [132, 8, 4, 12], "color": "#c8352e", "anim": "ticker" },
-		{ "hotspot": "ticker_board", "rect": [140, 8, 4, 12], "color": "#6f9a63", "anim": "ticker" },
-		{ "hotspot": "ticker_board", "rect": [152, 10, 60, 3], "color": "#e0b23a", "anim": "flicker" },
-		{ "hotspot": "ticker_board", "rect": [152, 16, 44, 2], "color": "#8fd48a" },
-		{ "hotspot": "ticker_board", "rect": [102, 2, 118, 22], "outline": "#1b1820", "color": "#00000000" },
-
-		{ "_": "경고문 — 아무도 읽지 않는다", "hotspot": "warning_notice", "rect": [162, 54, 22, 22], "color": "#e8d9b8" },
-		{ "hotspot": "warning_notice", "rect": [162, 54, 22, 6], "color": "#c8352e" },
-		{ "hotspot": "warning_notice", "rect": [165, 63, 16, 2], "color": "#4a4a4c" },
-		{ "hotspot": "warning_notice", "rect": [165, 67, 16, 2], "color": "#4a4a4c" },
-		{ "hotspot": "warning_notice", "rect": [165, 71, 10, 2], "color": "#4a4a4c" },
-		{ "hotspot": "warning_notice", "rect": [172, 76, 2, 14], "color": "#5f6d78" },
-		{ "hotspot": "warning_notice", "rect": [162, 54, 22, 22], "outline": "#1b1820", "color": "#00000000" },
-
-		{ "_": "갈매기", "hotspot": "gull", "rect": [232, 12, 18, 8], "color": "#e8d9b8" },
-		{ "hotspot": "gull", "rect": [232, 12, 18, 3], "color": "#c9c6b4" },
-		{ "hotspot": "gull", "rect": [248, 14, 4, 2], "color": "#e0b23a" },
-		{ "hotspot": "gull", "rect": [236, 20, 3, 4], "color": "#e0b23a", "anim": "blink" },
-
-		{ "_": "가짜 환전소 부스", "hotspot": "exchange_booth", "rect": [230, 40, 60, 50], "color": "#8c3327" },
-		{ "hotspot": "exchange_booth", "rect": [233, 43, 54, 44], "color": "#5c1f18" },
-		{ "hotspot": "exchange_booth", "rect": [230, 34, 60, 8], "color": "#e0b23a" },
-		{ "hotspot": "exchange_booth", "rect": [235, 36, 50, 4], "color": "#4a1220" },
-		{ "_": "창구", "hotspot": "exchange_booth", "rect": [240, 52, 40, 22], "color": "#141c2e" },
-		{ "hotspot": "exchange_booth", "rect": [240, 72, 40, 4], "color": "#b98a3c" },
-		{ "_": "호객꾼", "hotspot": "exchange_booth", "rect": [252, 54, 16, 20], "color": "#3d3a44" },
-		{ "hotspot": "exchange_booth", "rect": [254, 50, 12, 10], "color": "#d0a084" },
-		{ "hotspot": "exchange_booth", "rect": [254, 50, 12, 4], "color": "#241c22" },
-		{ "hotspot": "exchange_booth", "rect": [256, 60, 8, 2], "color": "#e0b23a" },
-		{ "hotspot": "exchange_booth", "rect": [230, 34, 60, 56], "outline": "#1b1820", "color": "#00000000" },
-
-		{
-			"_": "세라가 서는 자리의 바닥 그림자 — 배우 자체는 character 로 세운다",
-			"hotspot": "sera", "rect": [194, 90, 20, 3], "color": "#4a3d2e",
-			"visible_if": { "flags": ["scam_done"] }
-		}
-	],
-
-	"hotspots": [
-		{
-			"id": "ticker_board",
-			"name_key": "hotspot.ticker_board",
-			"default_verb": "look",
-			"rect": [102, 2, 118, 22],
-			"walk_to": [160, 106],
-			"actions": ["look", "use", "push"],
-			"defaults": {
-				"talk": "fail.ticker_board.talk",
-				"pickup": "fail.ticker_board.pickup",
-				"pull": "fail.ticker_board.push",
-				"open": "fail.generic.open",
-				"close": "fail.generic.close"
-			}
-		},
-		{
-			"id": "bull_statue",
-			"name_key": "hotspot.bull_statue",
-			"default_verb": "look",
-			"rect": [18, 32, 50, 58],
-			"walk_to": [46, 110],
-			"actions": ["look", "use", "push", "pull"],
-			"defaults": {
-				"talk": "fail.bull_statue.talk",
-				"pickup": "fail.bull_statue.pickup",
-				"open": "fail.generic.open",
-				"close": "fail.generic.close"
-			}
-		},
-		{
-			"id": "harbor_gate",
-			"name_key": "hotspot.harbor_gate",
-			"default_verb": "walk",
-			"rect": [96, 26, 60, 64],
-			"walk_to": [124, 110],
-			"actions": ["look", "open", "use", "push", "walk"],
-			"defaults": {
-				"talk": "fail.harbor_gate.talk",
-				"pickup": "fail.harbor_gate.pickup",
-				"close": "fail.harbor_gate.close",
-				"pull": "fail.harbor_gate.pull"
-			}
-		},
-		{
-			"id": "warning_notice",
-			"name_key": "hotspot.warning_notice",
-			"default_verb": "look",
-			"rect": [160, 52, 26, 26],
-			"walk_to": [172, 108],
-			"actions": ["look", "pickup", "use"],
-			"defaults": {
-				"talk": "fail.warning_notice.talk",
-				"push": "fail.warning_notice.push",
-				"pull": "fail.warning_notice.push",
-				"open": "fail.generic.open",
-				"close": "fail.generic.close"
-			}
-		},
-		{
-			"id": "gull",
-			"name_key": "hotspot.gull",
-			"default_verb": "look",
-			"rect": [228, 8, 26, 18],
-			"walk_to": [240, 104],
-			"actions": ["look", "talk", "pickup", "use", "push"],
-			"defaults": {
-				"pull": "fail.gull.pull",
-				"open": "fail.generic.open",
-				"close": "fail.generic.close"
-			}
-		},
-		{
-			"id": "exchange_booth",
-			"name_key": "hotspot.exchange_booth",
-			"default_verb": "talk",
-			"rect": [230, 34, 60, 56],
-			"walk_to": [256, 112],
-			"actions": ["look", "talk", "use", "open", "push"],
-			"defaults": {
-				"pickup": "fail.exchange_booth.pickup",
-				"close": "fail.exchange_booth.close",
-				"pull": "fail.exchange_booth.pull"
-			}
-		},
-		{
-			"id": "sera",
-			"name_key": "hotspot.sera",
-			"default_verb": "talk",
-			"character": "sera",
-			"stand_at": [204, 92],
-			"facing": "left",
-			"rect": [190, 44, 28, 48],
-			"walk_to": [178, 112],
-			"visible_if": { "flags": ["scam_done"] },
-			"actions": ["look", "talk", "use"],
-			"defaults": {
-				"pickup": "fail.sera.pickup",
-				"push": "fail.sera.push",
-				"pull": "fail.sera.push",
-				"open": "fail.generic.open",
-				"close": "fail.generic.close"
-			}
-		}
-	],
-
-	"exits": []
+  "_comment": "명세서 §8.1 프롤로그 장소 5번 '황소항 입구'. 여기서 §8.1 '첫 사기 피해' 와 '윤세라 첫 등장' 이 일어나고, §9 첫 대화 배틀이 붙는다. 항구 게이트는 챕터 1(§8.2 투자자 조합)로 가는 문이라 프롤로그에서는 열리지 않는다 — 숨기지 않고 룰 + on_fail 로 막아 이유를 알 수 있게 한다.",
+  "scene_id": "bull_harbor_entrance",
+  "name_key": "scene.bull_harbor_entrance",
+  "background": "res://assets/backgrounds/bull_harbor_entrance.png",
+  "coord_space": "norm",
+  "bg_anchor": [
+    0.5,
+    0.5
+  ],
+  "palette": "bull",
+  "music": "bull_harbor",
+  "active_puzzles": [
+    "first_scam"
+  ],
+  "walkbox": [
+    0.0586,
+    0.7693,
+    0.8984,
+    0.2256
+  ],
+  "spawn_points": {
+    "default": [
+      0.3223,
+      0.8962
+    ],
+    "from_city": [
+      0.1465,
+      0.8962
+    ]
+  },
+  "blocks": [
+    {
+      "_": "새벽 하늘",
+      "rect": [
+        0.0,
+        0.0,
+        1.0,
+        0.4296
+      ],
+      "color": "#4a1220"
+    },
+    {
+      "rect": [
+        0.0,
+        0.163,
+        1.0,
+        0.1778
+      ],
+      "color": "#8c3327",
+      "dither": "2x2",
+      "color2": "#4a1220"
+    },
+    {
+      "rect": [
+        0.0,
+        0.3111,
+        1.0,
+        0.1185
+      ],
+      "color": "#e8734a",
+      "dither": "4x4",
+      "color2": "#8c3327"
+    },
+    {
+      "_": "바다",
+      "rect": [
+        0.0,
+        0.4148,
+        1.0,
+        0.1926
+      ],
+      "color": "#1b2430"
+    },
+    {
+      "rect": [
+        0.0,
+        0.4148,
+        1.0,
+        0.0222
+      ],
+      "color": "#e8734a"
+    },
+    {
+      "rect": [
+        0.0,
+        0.4593,
+        1.0,
+        0.1481
+      ],
+      "color": "#245a5e",
+      "dither": "2x2",
+      "color2": "#1b2430"
+    },
+    {
+      "_": "정박한 배 실루엣",
+      "rect": [
+        0.125,
+        0.3259,
+        0.1062,
+        0.1037
+      ],
+      "color": "#241f2b"
+    },
+    {
+      "rect": [
+        0.1625,
+        0.2519,
+        0.0094,
+        0.0889
+      ],
+      "color": "#241f2b"
+    },
+    {
+      "rect": [
+        0.7688,
+        0.3407,
+        0.0875,
+        0.0889
+      ],
+      "color": "#241f2b"
+    },
+    {
+      "rect": [
+        0.8,
+        0.2815,
+        0.0094,
+        0.0741
+      ],
+      "color": "#241f2b"
+    },
+    {
+      "_": "부두 바닥",
+      "rect": [
+        0.0,
+        0.5926,
+        1.0,
+        0.4074
+      ],
+      "color": "#6b5a44"
+    },
+    {
+      "rect": [
+        0.0,
+        0.5926,
+        1.0,
+        0.0222
+      ],
+      "color": "#8a6a4a"
+    },
+    {
+      "rect": [
+        0.0,
+        0.6963,
+        1.0,
+        0.3037
+      ],
+      "color": "#5a4632",
+      "dither": "4x4",
+      "color2": "#6b5a44"
+    },
+    {
+      "_": "황소 동상 — §8.2 황소항의 상징",
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0813,
+        0.3407,
+        0.125,
+        0.3259
+      ],
+      "color": "#b98a3c"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0813,
+        0.3407,
+        0.125,
+        0.0444
+      ],
+      "color": "#e0b23a"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0688,
+        0.2963,
+        0.05,
+        0.1037
+      ],
+      "color": "#b98a3c"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0563,
+        0.2519,
+        0.0187,
+        0.0593
+      ],
+      "color": "#e8d9b8"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.1062,
+        0.2519,
+        0.0187,
+        0.0593
+      ],
+      "color": "#e8d9b8"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.075,
+        0.3259,
+        0.0125,
+        0.0222
+      ],
+      "color": "#c8352e"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0938,
+        0.6519,
+        0.0187,
+        0.0593
+      ],
+      "color": "#8a6a4a"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.1688,
+        0.6519,
+        0.0187,
+        0.0593
+      ],
+      "color": "#8a6a4a"
+    },
+    {
+      "hotspot": "bull_statue",
+      "rect": [
+        0.0625,
+        0.237,
+        0.1437,
+        0.4741
+      ],
+      "outline": "#1b1820",
+      "color": "#00000000"
+    },
+    {
+      "_": "항구 게이트 — 챕터 1 로 가는 문",
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3,
+        0.2519,
+        0.1875,
+        0.4148
+      ],
+      "color": "#4a4a4c"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3094,
+        0.2741,
+        0.075,
+        0.3926
+      ],
+      "color": "#5f6d78"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.4031,
+        0.2741,
+        0.075,
+        0.3926
+      ],
+      "color": "#5f6d78"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3844,
+        0.2519,
+        0.0187,
+        0.4148
+      ],
+      "color": "#3f3f42"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3719,
+        0.4296,
+        0.0437,
+        0.0593
+      ],
+      "color": "#b98a3c"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3,
+        0.1926,
+        0.1875,
+        0.0593
+      ],
+      "color": "#8c3327"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3187,
+        0.2074,
+        0.15,
+        0.0296
+      ],
+      "color": "#e8d9b8"
+    },
+    {
+      "hotspot": "harbor_gate",
+      "rect": [
+        0.3,
+        0.1926,
+        0.1875,
+        0.4741
+      ],
+      "outline": "#1b1820",
+      "color": "#00000000"
+    },
+    {
+      "_": "시세 전광판 — §6.6 ticker",
+      "hotspot": "ticker_board",
+      "rect": [
+        0.3187,
+        0.0148,
+        0.3688,
+        0.163
+      ],
+      "color": "#0d0b10"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.325,
+        0.0296,
+        0.3563,
+        0.1333
+      ],
+      "color": "#141c2e"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.3375,
+        0.0593,
+        0.0125,
+        0.0889
+      ],
+      "color": "#c8352e",
+      "anim": "ticker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.3625,
+        0.0593,
+        0.0125,
+        0.0889
+      ],
+      "color": "#6f9a63",
+      "anim": "ticker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.3875,
+        0.0593,
+        0.0125,
+        0.0889
+      ],
+      "color": "#c8352e",
+      "anim": "ticker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.4125,
+        0.0593,
+        0.0125,
+        0.0889
+      ],
+      "color": "#c8352e",
+      "anim": "ticker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.4375,
+        0.0593,
+        0.0125,
+        0.0889
+      ],
+      "color": "#6f9a63",
+      "anim": "ticker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.475,
+        0.0741,
+        0.1875,
+        0.0222
+      ],
+      "color": "#e0b23a",
+      "anim": "flicker"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.475,
+        0.1185,
+        0.1375,
+        0.0148
+      ],
+      "color": "#8fd48a"
+    },
+    {
+      "hotspot": "ticker_board",
+      "rect": [
+        0.3187,
+        0.0148,
+        0.3688,
+        0.163
+      ],
+      "outline": "#1b1820",
+      "color": "#00000000"
+    },
+    {
+      "_": "경고문 — 아무도 읽지 않는다",
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5062,
+        0.4,
+        0.0688,
+        0.163
+      ],
+      "color": "#e8d9b8"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5062,
+        0.4,
+        0.0688,
+        0.0444
+      ],
+      "color": "#c8352e"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5156,
+        0.4667,
+        0.05,
+        0.0148
+      ],
+      "color": "#4a4a4c"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5156,
+        0.4963,
+        0.05,
+        0.0148
+      ],
+      "color": "#4a4a4c"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5156,
+        0.5259,
+        0.0312,
+        0.0148
+      ],
+      "color": "#4a4a4c"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5375,
+        0.563,
+        0.0063,
+        0.1037
+      ],
+      "color": "#5f6d78"
+    },
+    {
+      "hotspot": "warning_notice",
+      "rect": [
+        0.5062,
+        0.4,
+        0.0688,
+        0.163
+      ],
+      "outline": "#1b1820",
+      "color": "#00000000"
+    },
+    {
+      "_": "갈매기",
+      "hotspot": "gull",
+      "rect": [
+        0.725,
+        0.0889,
+        0.0563,
+        0.0593
+      ],
+      "color": "#e8d9b8"
+    },
+    {
+      "hotspot": "gull",
+      "rect": [
+        0.725,
+        0.0889,
+        0.0563,
+        0.0222
+      ],
+      "color": "#c9c6b4"
+    },
+    {
+      "hotspot": "gull",
+      "rect": [
+        0.775,
+        0.1037,
+        0.0125,
+        0.0148
+      ],
+      "color": "#e0b23a"
+    },
+    {
+      "hotspot": "gull",
+      "rect": [
+        0.7375,
+        0.1481,
+        0.0094,
+        0.0296
+      ],
+      "color": "#e0b23a",
+      "anim": "blink"
+    },
+    {
+      "_": "가짜 환전소 부스",
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7188,
+        0.2963,
+        0.1875,
+        0.3704
+      ],
+      "color": "#8c3327"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7281,
+        0.3185,
+        0.1688,
+        0.3259
+      ],
+      "color": "#5c1f18"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7188,
+        0.2519,
+        0.1875,
+        0.0593
+      ],
+      "color": "#e0b23a"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7344,
+        0.2667,
+        0.1562,
+        0.0296
+      ],
+      "color": "#4a1220"
+    },
+    {
+      "_": "창구",
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.75,
+        0.3852,
+        0.125,
+        0.163
+      ],
+      "color": "#141c2e"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.75,
+        0.5333,
+        0.125,
+        0.0296
+      ],
+      "color": "#b98a3c"
+    },
+    {
+      "_": "호객꾼",
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7875,
+        0.4,
+        0.05,
+        0.1481
+      ],
+      "color": "#3d3a44"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7937,
+        0.3704,
+        0.0375,
+        0.0741
+      ],
+      "color": "#d0a084"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7937,
+        0.3704,
+        0.0375,
+        0.0296
+      ],
+      "color": "#241c22"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.8,
+        0.4444,
+        0.025,
+        0.0148
+      ],
+      "color": "#e0b23a"
+    },
+    {
+      "hotspot": "exchange_booth",
+      "rect": [
+        0.7188,
+        0.2519,
+        0.1875,
+        0.4148
+      ],
+      "outline": "#1b1820",
+      "color": "#00000000"
+    },
+    {
+      "_": "세라가 서는 자리의 바닥 그림자 — 배우 자체는 character 로 세운다",
+      "hotspot": "sera",
+      "rect": [
+        0.5713,
+        0.8962,
+        0.0781,
+        0.0127
+      ],
+      "color": "#4a3d2e",
+      "visible_if": {
+        "flags": [
+          "scam_done"
+        ]
+      }
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "ticker_board",
+      "name_key": "hotspot.ticker_board",
+      "default_verb": "look",
+      "rect": [
+        0.2266,
+        0.0418,
+        0.4492,
+        0.1939
+      ],
+      "walk_to": [
+        0.459,
+        0.8962
+      ],
+      "actions": [
+        "look",
+        "use",
+        "push"
+      ],
+      "defaults": {
+        "talk": "fail.ticker_board.talk",
+        "pickup": "fail.ticker_board.pickup",
+        "pull": "fail.ticker_board.push",
+        "open": "fail.generic.open",
+        "close": "fail.generic.close"
+      }
+    },
+    {
+      "id": "bull_statue",
+      "name_key": "hotspot.bull_statue",
+      "default_verb": "look",
+      "rect": [
+        0.002,
+        0.3661,
+        0.2344,
+        0.4265
+      ],
+      "walk_to": [
+        0.1758,
+        0.875
+      ],
+      "actions": [
+        "look",
+        "use",
+        "push",
+        "pull"
+      ],
+      "defaults": {
+        "talk": "fail.bull_statue.talk",
+        "pickup": "fail.bull_statue.pickup",
+        "open": "fail.generic.open",
+        "close": "fail.generic.close"
+      }
+    },
+    {
+      "id": "harbor_gate",
+      "name_key": "hotspot.harbor_gate",
+      "default_verb": "walk",
+      "rect": [
+        0.3047,
+        0.3195,
+        0.2783,
+        0.3525
+      ],
+      "walk_to": [
+        0.4443,
+        0.8398
+      ],
+      "actions": [
+        "look",
+        "open",
+        "use",
+        "push",
+        "walk"
+      ],
+      "defaults": {
+        "talk": "fail.harbor_gate.talk",
+        "pickup": "fail.harbor_gate.pickup",
+        "close": "fail.harbor_gate.close",
+        "pull": "fail.harbor_gate.pull"
+      }
+    },
+    {
+      "id": "warning_notice",
+      "name_key": "hotspot.warning_notice",
+      "default_verb": "look",
+      "rect": [
+        0.2559,
+        0.4154,
+        0.0703,
+        0.0811
+      ],
+      "walk_to": [
+        0.293,
+        0.868
+      ],
+      "actions": [
+        "look",
+        "pickup",
+        "use"
+      ],
+      "defaults": {
+        "talk": "fail.warning_notice.talk",
+        "push": "fail.warning_notice.push",
+        "pull": "fail.warning_notice.push",
+        "open": "fail.generic.open",
+        "close": "fail.generic.close"
+      }
+    },
+    {
+      "id": "gull",
+      "name_key": "hotspot.gull",
+      "default_verb": "look",
+      "rect": [
+        0.7344,
+        0.0841,
+        0.0859,
+        0.0881
+      ],
+      "walk_to": [
+        0.7715,
+        0.8962
+      ],
+      "actions": [
+        "look",
+        "talk",
+        "pickup",
+        "use",
+        "push"
+      ],
+      "defaults": {
+        "pull": "fail.gull.pull",
+        "open": "fail.generic.open",
+        "close": "fail.generic.close"
+      }
+    },
+    {
+      "id": "exchange_booth",
+      "name_key": "hotspot.exchange_booth",
+      "default_verb": "talk",
+      "rect": [
+        0.6445,
+        0.2371,
+        0.3418,
+        0.3983
+      ],
+      "walk_to": [
+        0.8105,
+        0.9103
+      ],
+      "actions": [
+        "look",
+        "talk",
+        "use",
+        "open",
+        "push"
+      ],
+      "defaults": {
+        "pickup": "fail.exchange_booth.pickup",
+        "close": "fail.exchange_booth.close",
+        "pull": "fail.exchange_booth.pull"
+      }
+    },
+    {
+      "id": "sera",
+      "name_key": "hotspot.sera",
+      "default_verb": "talk",
+      "character": "sera",
+      "stand_at": [
+        0.6104,
+        0.9032
+      ],
+      "facing": "left",
+      "rect": [
+        0.5469,
+        0.6706,
+        0.127,
+        0.2326
+      ],
+      "walk_to": [
+        0.5469,
+        0.9138
+      ],
+      "visible_if": {
+        "flags": [
+          "scam_done"
+        ]
+      },
+      "actions": [
+        "look",
+        "talk",
+        "use"
+      ],
+      "defaults": {
+        "pickup": "fail.sera.pickup",
+        "push": "fail.sera.push",
+        "pull": "fail.sera.push",
+        "open": "fail.generic.open",
+        "close": "fail.generic.close"
+      }
+    }
+  ],
+  "exits": []
 }

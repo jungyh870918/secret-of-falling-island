@@ -25,15 +25,15 @@ SceneDirector="*res://scripts/core/SceneDirector.gd"
 
 [display]
 
-; 명세서 §6.2 내부 기준 해상도 320x180
-window/size/viewport_width=320
-window/size/viewport_height=180
-window/size/window_width_override=1280
-window/size/window_height_override=720
-; §21 pixel-perfect / integer scaling
-window/stretch/mode="viewport"
+; 2026-08-17 세로 전환. 기준 캔버스 941x1672 (스튜디오 D1)
+; 320x180 도트 전제는 기획서 §23 으로 폐기됐다
+window/size/viewport_width=942
+window/size/viewport_height=1674
+window/size/window_width_override=471
+window/size/window_height_override=837
+window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
-window/stretch/scale_mode="integer"
+window/stretch/scale_mode="fractional"
 
 [gui]
 

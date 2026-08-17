@@ -1,10 +1,18 @@
 # 떡락섬의 비밀 (코드명 RED_CANDLE)
 
-1990년대 DOS VGA 어드벤처 감성의 2D 포인트 앤 클릭 게임.
+레트로 감성의 2D 포인트 앤 클릭 게임.
 이 저장소는 [통합 제작 명세서](떡락섬의_비밀_DOS_2D_어드벤처_통합제작명세서.md) **§20 Phase 2 — 수직 슬라이스** 구현이다.
 
+> **아트 방향이 2026-08-12에 바뀌었다.** 콘셉트 이미지가 최상위 기준이고, 문서와 충돌하면 그림이 이긴다.
+> 「320×180 진짜 도트」 전제는 폐기됐다 — 근거와 규칙은
+> [기획서 §23](떡락섬의_비밀_기획서.html) · [아트 브리프](떡락섬의_비밀_아트_브리프.html) · [docs/art/](docs/art/).
+> **기준 캔버스가 정해질 때까지 아래 해상도 항목은 미확정이다.**
+
 - 엔진: Godot 4.2+ / GDScript
-- 내부 해상도: 320×180, 정수 배율, nearest 필터, 안티앨리어싱 없음 (§6.2, §21)
+- 내부 해상도: ~~320×180 가로~~ → **942×1674 세로** (2026-08-17 전환. 스튜디오 D1 941×1672 를
+  UI 배율 3의 정수 배로 1~2px 맞춘 값 — `scripts/core/Layout.gd` 머리말 「두 좌표계」)
+- 화면은 상단 바 147 · 월드 1305 · 하단 패널 222 로 나뉜다. UI 는 314×558 설계 픽셀에 그리고 3배로 키운다
+- 아직 세로로 옮기지 않은 장면 5개는 옛 320×135 좌표를 축마다 늘려 월드 밴드를 채운다
 - 현재 범위: **프롤로그 전체** — 회의실 · 복도 · 탕비실 · 심야 지하철 · 원룸 · 황소항 입구 (§8.1)
   - 디카페인 커피 퍼즐, 투자 방송 장면, 첫 사기 피해, 윤세라 첫 등장
   - §9 대화 배틀 1개 (환전소), §5.4 초상화 대화, §7.2 배경음악 3곡
@@ -26,10 +34,11 @@ Godot 편집기에서 처음 열면 `.godot/` 캐시가 생성된다. `scenes/co
 # Godot 없이 — 의존성 없는 파이썬 스크립트
 python3 tests/check_project.py                    # 구조 / class_name 충돌 / 경로 / 들여쓰기
 python3 tests/validate_data.py                    # JSON · 대사 키 · 룰 · 대화 그래프 · 좌표
+python3 tests/check_assets.py                     # 아트 에셋 크기·알파 (선택 — 화풍은 판정하지 않는다)
 
 # Godot 필요
 godot --headless --path . tests/SmokeTest.tscn    # 프롤로그 전체 자동 플레이, 135건 검증
-godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 30장 캡처
+godot --path . tests/Screenshots.tscn             # docs/screenshots/ 에 31장 캡처
 ```
 
 ```bash
@@ -78,7 +87,7 @@ tests/web_check.sh
 
 ```
 red-candle/
-├─ project.godot            Godot 설정 (autoload, 320×180, integer scaling)
+├─ project.godot            Godot 설정 (autoload, 942×1674 세로)
 ├─ scenes/core/Main.tscn    유일한 .tscn — 나머지 노드는 전부 코드로 구성
 ├─ docs/ARCHITECTURE.md     아키텍처와 데이터 스키마
 ├─ data/                    ★ 콘텐츠는 전부 여기. 코드 수정 없이 늘어난다
@@ -114,7 +123,8 @@ red-candle/
 | `assets/sprites/characters/<character_id>.png` | 스프라이트시트, 프레임 32×48 | Actor 의 `_draw()` 임시 캐릭터 |
 | `assets/sprites/portraits/<character_id>.png` | 96×96 | PortraitView 의 임시 초상화 (§5.4) |
 | `assets/ui/items/<item_id>.png` | 16×16 | 인벤토리 색 블록 아이콘 |
-| `assets/ui/title.png` | 320×180 | 타이틀 임시 아트 |
+| `assets/ui/title.png` | 942×1674 | 타이틀 임시 아트 |
+| `assets/ui/topbar.png` | 942×147 | 상단 바. 없으면 `TopBar.gd` 가 그린다 |
 | `assets/ui/command_panel.png` | 320×45 | 하단 명령 패널 배경 |
 | `assets/audio/sfx/<이름>.wav` | — | 런타임 합성 효과음 |
 | `assets/audio/music/<이름>.ogg` | — | `MusicSynth` 의 런타임 합성 곡 |

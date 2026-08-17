@@ -24,6 +24,7 @@ var held_item := ""
 
 var world: Node2D
 var ui_layer: CanvasLayer
+var top_bar: TopBar
 var panel: CommandPanel
 var subtitles: SubtitleLayer
 var portraits: PortraitView
@@ -105,13 +106,24 @@ func _enable_touch_mode() -> void:
 func _build_tree() -> void:
 	world = Node2D.new()
 	world.name = "World"
+	world.position = Vector2(Layout.WORLD_ORIGIN)   # 상단 바 아래로 내린다 (세로 셸)
 	add_child(world)
 	SceneDirector.world_root = world
 
 	ui_layer = CanvasLayer.new()
 	ui_layer.name = "UI"
 	ui_layer.layer = 1
+	# UI 는 «설계 픽셀» 314×558 로 그리고 여기서 정수 배로 키운다 (Layout 머리말 「두 좌표계」).
+	# 도트 폰트가 정수 배가 아니면 뭉갠다.
+	ui_layer.transform = Transform2D().scaled(Vector2(Layout.UI_SCALE, Layout.UI_SCALE))
 	add_child(ui_layer)
+
+	top_bar = TopBar.new()
+	ui_layer.add_child(top_bar)
+	top_bar.menu_pressed.connect(_open_pause)
+	top_bar.log_pressed.connect(func():
+		mode = Mode.LOG
+		log_view.open())
 
 	panel = CommandPanel.new()
 	panel.name = "CommandPanel"
@@ -430,7 +442,8 @@ func _grab_frame() -> void:
 func _update_hover() -> void:
 	var view := _current_view()
 	var p := get_viewport().get_mouse_position()
-	panel.hover(p)
+	panel.hover(Layout.to_ui(p))
+	top_bar.hover(Layout.to_ui(p))
 
 	var hover_id := ""
 	var target_name := ""
@@ -535,11 +548,11 @@ func _input_busy(event: InputEvent) -> void:
 
 	if choice_box.is_active():
 		if event is InputEventMouseMotion:
-			choice_box.hover_at((event as InputEventMouseMotion).position)
+			choice_box.hover_at(Layout.to_ui((event as InputEventMouseMotion).position))
 			return
 		if event is InputEventMouseButton and (event as InputEventMouseButton).pressed:
 			if (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
-				choice_box.select_at((event as InputEventMouseButton).position)
+				choice_box.select_at(Layout.to_ui((event as InputEventMouseButton).position))
 			return
 		if event.is_action_pressed("ui_down"):
 			choice_box.move_selection(1)
@@ -688,8 +701,13 @@ func _input_play(event: InputEvent) -> void:
 
 
 func _on_click(p: Vector2, right: bool) -> void:
-	if panel.handles_point(p):
-		panel.click(p, right)
+	# p 는 화면 좌표. 패널·상단 바는 UI 좌표에 산다
+	var up := Layout.to_ui(p)
+	if top_bar.handles_point(up):
+		top_bar.click(up)
+		return
+	if panel.handles_point(up):
+		panel.click(up, right)
 		return
 
 	var view := _current_view()
@@ -725,7 +743,7 @@ func _walk_then_interact(view: LocationView, h: Dictionary, verb: int) -> void:
 	if INSTANT_VERBS.has(verb):
 		if player != null:
 			player.stop()
-			player.face_towards(LocationView._rect_of(h).get_center())
+			player.face_towards(view._rect_of(h).get_center())
 		await _interact(str(h.get("id", "")), verb)
 		return
 
@@ -750,7 +768,7 @@ func _walk_then_interact(view: LocationView, h: Dictionary, verb: int) -> void:
 		busy = false
 
 	if player != null:
-		player.face_towards(LocationView._rect_of(h).get_center())
+		player.face_towards(view._rect_of(h).get_center())
 
 	await _interact(str(h.get("id", "")), verb)
 

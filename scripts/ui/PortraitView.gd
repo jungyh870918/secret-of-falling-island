@@ -113,7 +113,7 @@ func _pick_side() -> void:
 	if a == null or not is_instance_valid(a):
 		_on_left = true
 		return
-	_on_left = a.position.x > Layout.SCREEN.x / 2.0
+	_on_left = Layout.world_to_ui(a.position).x > Layout.UI_SIZE.x / 2.0
 
 
 # ---------------------------------------------------------------- 그리기

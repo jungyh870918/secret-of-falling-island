@@ -32,7 +32,7 @@ func _draw() -> void:
 	var font := Theming.base_font
 
 	if _art != null:
-		draw_texture_rect(_art, Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), false)
+		draw_texture_rect(_art, Rect2(0, 0, Layout.UI_SIZE.x, Layout.UI_SIZE.y), false)
 	else:
 		_draw_placeholder_art()
 
@@ -58,14 +58,14 @@ func _draw() -> void:
 			str(row.get("label", "")), HORIZONTAL_ALIGNMENT_LEFT, int(r.size.x - 8), size, col)
 
 	var ver := Loc.t("ui.title.version")
-	draw_string(Theming.small_font, Vector2(4, Layout.SCREEN.y - 4), ver,
+	draw_string(Theming.small_font, Vector2(4, Layout.UI_SIZE.y - 4), ver,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, Theming.small_font_size(), Palette.ui("text_dim"))
 
 
 ## 타이틀 아트가 없을 때의 임시 화면.
 ## §6.3 하락장 계열 배경 + 붉은 양초 실루엣.
 func _draw_placeholder_art() -> void:
-	draw_rect(Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), Palette.parse("pal.bear.navy"), true)
+	draw_rect(Rect2(0, 0, Layout.UI_SIZE.x, Layout.UI_SIZE.y), Palette.parse("pal.bear.navy"), true)
 
 	# 바다 — §6.4 디더링
 	var sea := Palette.parse("pal.bear.ink")

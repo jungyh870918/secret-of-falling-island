@@ -177,8 +177,8 @@ func _draw() -> void:
 		draw_texture_rect(_panel_bg, Rect2(Layout.PANEL_RECT), false)
 	else:
 		draw_rect(Rect2(Layout.PANEL_RECT), Palette.ui("panel"), true)
-		draw_line(Vector2(0, Layout.PANEL_Y), Vector2(320, Layout.PANEL_Y), Palette.ui("outline"), 1.0)
-		draw_line(Vector2(0, Layout.PANEL_Y + 1), Vector2(320, Layout.PANEL_Y + 1), Palette.ui("panel_light"), 1.0)
+		draw_line(Vector2(0, Layout.PANEL_Y), Vector2(Layout.UI_SIZE.x, Layout.PANEL_Y), Palette.ui("outline"), 1.0)
+		draw_line(Vector2(0, Layout.PANEL_Y + 1), Vector2(Layout.UI_SIZE.x, Layout.PANEL_Y + 1), Palette.ui("panel_light"), 1.0)
 
 	_draw_sentence()
 	_draw_verbs()

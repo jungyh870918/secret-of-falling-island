@@ -126,7 +126,7 @@ func _draw() -> void:
 	var size := Theming.small_font_size() if dense else Theming.font_size()
 
 	# 화면 전체를 살짝 덮어 뒤가 읽히지 않게 한다.
-	draw_rect(Rect2(0, 0, Layout.SCREEN.x, Layout.SCREEN.y), Color(0, 0, 0, 0.55), true)
+	draw_rect(Rect2(0, 0, Layout.UI_SIZE.x, Layout.UI_SIZE.y), Color(0, 0, 0, 0.55), true)
 
 	draw_rect(Rect2(box), Palette.ui("panel"), true)
 	draw_rect(Rect2(box), Palette.ui("outline"), false, 1.0)

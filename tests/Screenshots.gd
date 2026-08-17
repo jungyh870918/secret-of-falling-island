@@ -1,12 +1,12 @@
 extends Node
-## 화면 캡처 도구. 헤드리스가 아닌 실제 렌더링으로 320×180 프레임을 PNG 로 뽑는다.
+## 화면 캡처 도구. 헤드리스가 아닌 실제 렌더링으로 세로 프레임을 PNG 로 뽑는다.
 ##
 ##   godot --path . tests/Screenshots.tscn
 ##
 ## §19.3 아트 체크리스트와 §18 가독성을 눈으로 확인하기 위한 것이다.
-## 특히 한글이 9~12px 에서 읽히는지, 자막이 화면 밖으로 나가지 않는지.
+## 특히 한글이 설계 9~12px × UI 배율 3 에서 읽히는지, 자막이 화면 밖으로 나가지 않는지.
 ##
-## 결과: docs/screenshots/NN_<이름>.png (320×180 원본 해상도)
+## 결과: docs/screenshots/NN_<이름>.png (창 471×838 — 뷰포트 942×1674 의 절반)
 
 const MAIN_SCENE := "res://scenes/core/Main.tscn"
 const OUT_DIR := "res://docs/screenshots"
@@ -200,8 +200,17 @@ func _phase2_shots() -> void:
 		await capture("portrait_choices", "§5.4 초상화 + 선택지 4개")
 	await auto_advance()
 
+	SaveManager.set_setting("high_contrast_hotspots", false)   # 강조가 §18 에서 켜진 채로 넘어온다
 	await jump("bull_harbor_entrance", "from_city")
+	await settle(4)
 	await capture("room_harbor", "§8.1 황소항 입구 — 황소 동상 · 전광판 · 환전소")
+
+	# 세로 셸 판정용 — 핫스폿 상자가 «그림 위 제자리»에 오는지. 정규화 좌표의 증거다
+	SaveManager.set_setting("high_contrast_hotspots", true)
+	await settle(6)
+	await capture("harbor_hotspots", "황소항 핫스폿 정렬 — 정규화 좌표가 배경 위에 맞는지")
+	SaveManager.set_setting("high_contrast_hotspots", false)
+	await settle(4)
 
 	# 세라 등장 상태
 	GameState.set_flag("scam_done", true)
@@ -320,7 +329,8 @@ func hover_over(hotspot_id: String) -> void:
 	if view == null or h.is_empty():
 		push_warning("호버 대상 없음: %s" % hotspot_id)
 		return
-	var c := LocationView._rect_of(h).get_center()
+	# 월드 로컬 → 화면 좌표. 세로 셸에서 월드는 상단바 아래로 내려가 있다
+	var c := view._rect_of(h).get_center() + Vector2(Layout.WORLD_ORIGIN)
 	var scale := float(DisplayServer.window_get_size().x) / float(Layout.SCREEN.x)
 	Input.warp_mouse(c * scale)
 	await settle(8)

@@ -28,7 +28,7 @@ var _shown := 0
 var _elapsed := 0.0
 var _active := false
 var _dismiss_requested := false
-var _anchor := Vector2(160, 90)
+var _anchor := Vector2(Layout.UI_SIZE.x / 2.0, Layout.UI_WORLD_RECT.get_center().y)
 
 ## Main 이 주입한다. 화자 위치를 찾기 위해 LocationView 를 참조한다.
 var location_provider: Callable = Callable()
@@ -114,10 +114,10 @@ func _update_anchor() -> void:
 		if a == null and _speaker == "player":
 			a = view.player
 		if a != null and is_instance_valid(a):
-			_anchor = a.head_top()
+			_anchor = Layout.world_to_ui(a.head_top())
 			return
 	# 화자를 화면에서 찾을 수 없으면(내레이션 등) 장면 영역 중앙 위쪽.
-	_anchor = Vector2(Layout.VIEW_RECT.size.x / 2.0, 34)
+	_anchor = Vector2(Layout.UI_SIZE.x / 2.0, Layout.UI_WORLD_RECT.position.y + 34)
 
 
 func _set_talking(v: bool) -> void:
@@ -150,11 +150,11 @@ func _draw() -> void:
 	for l in lines:
 		widest = maxf(widest, font.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x)
 
-	var cx: float = clampf(_anchor.x, widest / 2.0 + MARGIN, Layout.SCREEN.x - widest / 2.0 - MARGIN)
+	var cx: float = clampf(_anchor.x, widest / 2.0 + MARGIN, Layout.UI_SIZE.x - widest / 2.0 - MARGIN)
 	var top: float = _anchor.y - total_h
 	if top < MARGIN:
 		# 머리 위 공간이 없으면 아래로 내린다.
-		top = minf(_anchor.y + 8, Layout.VIEW_HEIGHT - total_h - MARGIN)
+		top = minf(_anchor.y + 8, Layout.UI_WORLD_RECT.end.y - total_h - MARGIN)
 	top = maxf(top, MARGIN)
 	cx = _avoid_portrait(cx, top, widest, total_h)
 
@@ -188,7 +188,7 @@ func _avoid_portrait(cx: float, top: float, widest: float, total_h: float) -> fl
 	var half := widest / 2.0 + MARGIN
 	var left_edge := box.position.x - half            # 초상화 왼쪽으로 피하기
 	var right_edge := box.position.x + box.size.x + half
-	if right_edge <= Layout.SCREEN.x - MARGIN:
+	if right_edge <= Layout.UI_SIZE.x - MARGIN:
 		return right_edge
 	if left_edge >= MARGIN:
 		return left_edge

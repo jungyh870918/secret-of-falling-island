@@ -13,9 +13,12 @@ extends Control
 ## 색은 §6.3 상승장/하락장 계열을 그대로 쓴다.
 
 ## 세 칸은 서로 겹치지 않는다. 폰트가 커져도(§18 글자 크게) 행 높이 13px 안에서 읽힌다.
-const CHART := Rect2i(190, 5, 124, 46)
-const CROWD := Rect2i(190, 53, 124, 13)
-const CARDS := Rect2i(190, 68, 124, 13)
+## 세로 셸: 상단 바(0~49) 아래로 내린다. 예전 자리는 y=5 라 상단 바에 깔렸다.
+## 목업 `03_battle` 은 이 셋을 월드 아래 가로 3단으로 놓는다 — 그 배치는 논거 카드
+## 일러스트 11장이 나온 뒤에 한다. 지금은 «가려지지 않게» 만 한다.
+const CHART := Rect2i(186, 55, 124, 46)
+const CROWD := Rect2i(186, 103, 124, 13)
+const CARDS := Rect2i(186, 118, 124, 13)
 const MAX_CANDLES := 10
 
 var confidence := 100

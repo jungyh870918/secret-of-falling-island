@@ -5,7 +5,9 @@ extends Control
 ## §13.1 "대화 선택지는 모두 최소한 한 번은 읽을 가치가 있어야 함" — UI 는 4개를 다 보여준다.
 ## 이미 고른 선택지는 흐리게 표시해 반복 플레이 시 탐색을 돕는다.
 
-const ROW_H := 10
+## 세로 셸에서 UI 가 3배로 커졌다. 10 은 본문 폰트(11)보다 낮아 줄이 붙어 보였고,
+## 긴 선택지는 두 줄로 접히므로 두 줄이 들어갈 높이가 필요하다
+const ROW_H := 26
 const PAD_X := 4
 
 var _options: Array = []      ## [{text:String, seen:bool}]
@@ -117,5 +119,6 @@ func _draw() -> void:
 		var num := "%d." % (i + 1)
 		var base := Vector2(r.position.x + PAD_X, r.position.y + font.get_ascent(size) - 1)
 		draw_string(font, base, num, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Palette.ui("text_dim"))
-		draw_string(font, base + Vector2(12, 0), str(o.get("text", "")),
-			HORIZONTAL_ALIGNMENT_LEFT, int(r.size.x - 18), size, text_col)
+		# 한 줄로는 한국어 선택지가 314 설계 px 를 넘는다. 두 줄까지 접는다
+		draw_multiline_string(font, base + Vector2(12, 0), str(o.get("text", "")),
+			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 18, size, 2, text_col)
