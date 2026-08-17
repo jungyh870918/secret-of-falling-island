@@ -1,12 +1,13 @@
 class_name PortraitView
 extends Control
-## 대화 초상화. 명세서 §5.4 "대화 UI", §6.2 초상화 96×96, §22 초상화 프롬프트.
+## 대화 초상화. 명세서 §5.4 "대화 UI", §22 초상화 프롬프트.
+## 규격은 **189×189** — 63 설계 픽셀 × UI 배율 3. §6.2 의 96×96 은 가로 시절 값이라 폐기됐다.
 ##
 ## 일반 대사(핫스폿 관찰 한두 줄)에는 뜨지 않는다. 분기 대화와 대화 배틀에서만 뜬다 —
 ## 그래야 초상화가 '지금은 사람과 이야기하는 중' 이라는 신호로 읽힌다.
 ##
 ## [최종 에셋 교체 지점]
-##   res://assets/sprites/portraits/<character_id>.png (96×96) 를 넣으면
+##   res://assets/sprites/portraits/<character_id>.png (**189×189** — 스튜디오 P1) 를 넣으면
 ##   아래 _draw_generated() 대신 그 그림을 쓴다. 코드 수정은 필요 없다.
 ##
 ## 임시 도트는 캐릭터 데이터의 colors / hair_style / portrait.traits 만 보고 그린다.
@@ -233,6 +234,15 @@ func _draw_generated(box: Rect2i, def: Dictionary) -> void:
 		_rect(box, 44, 70, 8, 4, accent)
 		_rect(box, 45, 74, 6, 20, accent)
 
+	# 목업 채택 인물의 장신구. accent 가 금색이다
+	if traits.has("gold_necklace"):
+		_rect(box, 38, 72, 20, 2, accent)
+		_rect(box, 42, 74, 12, 2, accent)
+		_rect(box, 46, 76, 4, 3, accent)
+	if traits.has("large_earrings"):
+		_rect(box, 28, 48, 3, 6, accent)
+		_rect(box, 65, 48, 3, 6, accent)
+
 	# 얼굴 실루엣 외곽선
 	_frame(box, 30, 20, 36, 46, ink)
 	_frame(box, 6, 72, 84, 24, ink)
@@ -245,8 +255,17 @@ func _draw_hair(box: Rect2i, style: String, hair: Color) -> void:
 			_rect(box, 28, 30, 4, 14, hair)
 			_rect(box, 64, 30, 4, 14, hair)
 			_rect(box, 32, 20, 32, 3, hair.lightened(0.1))
+		"long_wave":
+			# §6.7 윤세라 — 긴 갈색 웨이브 (2026-08-17 목업 채택).
+			# 96 격자 기준. 어깨 아래까지 내려오고 바깥선이 물결친다
+			_rect(box, 24, 12, 48, 18, hair)
+			_rect(box, 24, 12, 48, 3, hair.lightened(0.15))
+			_rect(box, 21, 26, 8, 44, hair)
+			_rect(box, 67, 26, 8, 44, hair)
+			_rect(box, 18, 40, 4, 26, hair)          # 왼쪽 물결
+			_rect(box, 74, 34, 4, 30, hair)          # 오른쪽 물결
 		"bob":
-			# §6.7 윤세라 — 적갈색 단발, 각진 실루엣
+			# §6.7 옛 윤세라 규격. 다른 인물이 쓸 수 있어 남긴다
 			_rect(box, 26, 14, 44, 16, hair)
 			_rect(box, 26, 30, 6, 30, hair)
 			_rect(box, 64, 30, 6, 30, hair)

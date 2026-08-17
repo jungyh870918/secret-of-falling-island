@@ -1,6 +1,5 @@
 {
 	"_comment": "캐릭터 외형. 명세서 §6.2 크기 / §6.7 디자인. 스프라이트시트가 들어오면 assets/sprites/characters/<id>.png 가 자동으로 우선한다.",
-
 	"entries": [
 		{
 			"character_id": "han_gaemi",
@@ -10,7 +9,10 @@
 			"hair_style": "messy",
 			"has_bag": true,
 			"rolled_sleeves": true,
-			"frame_size": [32, 48],
+			"frame_size": [
+				32,
+				48
+			],
 			"colors": {
 				"skin": "#d8a888",
 				"hair": "#241c22",
@@ -21,7 +23,9 @@
 			},
 			"portrait": {
 				"_note": "§22 한개미 초상화 — 평범한 실루엣에 과장된 표정. 넥타이는 늘 조금 비뚤어져 있다.",
-				"traits": ["tie"],
+				"traits": [
+					"tie"
+				],
 				"backdrop": "#2c2634"
 			}
 		},
@@ -31,7 +35,10 @@
 			"height": 48,
 			"walk_speed": 44,
 			"hair_style": "bald",
-			"frame_size": [32, 48],
+			"frame_size": [
+				32,
+				48
+			],
 			"colors": {
 				"skin": "#d0a084",
 				"hair": "#3a3238",
@@ -42,30 +49,40 @@
 			},
 			"portrait": {
 				"_note": "§6.7 부장 — 표정 변화 없음. 안경과 넥타이만으로 직함이 설명된다.",
-				"traits": ["glasses", "tie"],
+				"traits": [
+					"glasses",
+					"tie"
+				],
 				"backdrop": "#3f3f42"
 			}
 		},
 		{
 			"character_id": "sera",
-			"_note": "§6.7 윤세라 — 적갈색 단발, 검은 터틀넥, 긴 코트, 각진 실루엣. 챕터1부터 등장하지만 정의는 미리 둔다.",
+			"_note": "§6.7 윤세라 — **긴 갈색 웨이브 · 보라색 정장 · 금 목걸이 · 큰 귀걸이.** 색은 목업 02_dialogue 의 초상에서 직접 뽑았다. (2026-08-17 디렉터 결정: 외형은 목업이 정본. 적갈색 단발·검은 터틀넥·긴 코트는 폐기)",
 			"height": 47,
 			"walk_speed": 88,
-			"hair_style": "bob",
-			"has_coat": true,
+			"hair_style": "long_wave",
+			"has_coat": false,
 			"has_ruler": true,
-			"frame_size": [32, 48],
+			"frame_size": [
+				32,
+				48
+			],
 			"colors": {
-				"skin": "#dcae90",
-				"hair": "#6b3226",
-				"shirt": "#1b1820",
-				"pants": "#241f2b",
-				"accent": "#2c2634",
-				"shoes": "#0d0b10"
+				"skin": "#c29281",
+				"hair": "#362423",
+				"shirt": "#3b2e56",
+				"pants": "#2a2140",
+				"accent": "#e9c467",
+				"shoes": "#1d1e1f"
 			},
 			"portrait": {
-				"_note": "§22 윤세라 초상화 — 각진 실루엣, 감정이 적어 보이지만 눈썹과 시선으로 표현. 장식을 더하지 않는 것이 이 인물의 디자인이다.",
-				"traits": [],
+				"_note": "§22 윤세라 초상 — 앵커는 목업 02_dialogue 의 초상 그 자체다. 외형은 화려하지만 **말투와 성격은 대사 데이터 그대로다** — 감정어를 쓰지 않는다. 그래서 표정은 3종을 유지한다.",
+				"traits": [
+					"long_wave_hair",
+					"gold_necklace",
+					"large_earrings"
+				],
 				"backdrop": "#1b2430"
 			}
 		}

@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOMETOWN CLASH — 우리동네 싸움짱 | QUATTRO MANI STUDIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0D141B; --ink-2:#131D27; --ink-3:#1A2632;
+  --line:#25333F; --line-2:#31434F;
+  --fg:#E4EBF1; --fg-2:#98A9B7; --fg-3:#5F707D;
+  --hit:#FF4D5E; --hurt:#35BDF5; --inv:#FFC24B; --ok:#4BE38C;
+  --display:'Black Han Sans',sans-serif;
+  --body:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  --hud-h:54px; --rail:252px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hud-h) + 24px)}
+body{background:var(--ink);color:var(--fg);font-family:var(--body);font-size:15.5px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;letter-spacing:-0.005em;word-break:keep-all;overflow-wrap:break-word}
+::selection{background:var(--hurt);color:#04121B}
+
+.hud{position:fixed;top:0;left:0;right:0;height:var(--hud-h);z-index:60;background:rgba(13,20,27,.93);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:20px;padding:0 18px}
+.hud-mark{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--fg);white-space:nowrap;flex-shrink:0}
+.hud-mark span{color:var(--hurt)}
+.hud-ver{font-family:var(--mono);font-size:9.5px;color:var(--fg-3);border:1px solid var(--line-2);
+  border-radius:2px;padding:1px 5px;margin-left:8px;letter-spacing:.08em}
+.hud-bar{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.hud-track{flex:1;height:11px;background:var(--ink-3);border:1px solid var(--line-2);transform:skewX(-14deg);overflow:hidden;position:relative}
+.hud-fill{height:100%;width:0%;background:linear-gradient(90deg,#1E7FB0,var(--hurt));box-shadow:0 0 12px rgba(53,189,245,.4);transition:width .12s linear}
+.hud-fill::after{content:'';position:absolute;top:0;right:0;width:3px;height:100%;background:var(--inv)}
+.hud-pct{font-family:var(--mono);font-size:10.5px;color:var(--fg-3);width:38px;text-align:right;flex-shrink:0}
+.hud-combo{display:flex;align-items:baseline;gap:7px;flex-shrink:0}
+.hud-combo-n{font-family:var(--display);font-size:24px;line-height:1;color:var(--inv);
+  transition:transform .18s cubic-bezier(.2,1.6,.4,1);transform-origin:center bottom;min-width:34px;text-align:right}
+.hud-combo-n.pop{transform:scale(1.42)}
+.hud-combo-l{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--fg-3)}
+.hud-menu{display:none;background:none;border:1px solid var(--line-2);color:var(--fg-2);
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:6px 10px;cursor:pointer;border-radius:2px}
+.hud-menu:hover{border-color:var(--hurt);color:var(--hurt)}
+
+.shell{display:flex;max-width:1440px;margin:0 auto}
+.rail{width:var(--rail);flex-shrink:0;position:sticky;top:var(--hud-h);height:calc(100vh - var(--hud-h));
+  overflow-y:auto;padding:26px 0 60px 18px;border-right:1px solid var(--line);
+  scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.rail::-webkit-scrollbar{width:5px}
+.rail::-webkit-scrollbar-thumb{background:var(--line-2)}
+.rail-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--fg-3);margin-bottom:14px;padding-left:2px}
+.rail a{display:flex;gap:10px;align-items:baseline;padding:5px 12px 5px 2px;color:var(--fg-3);text-decoration:none;
+  font-size:12.8px;line-height:1.45;border-left:2px solid transparent;transition:color .15s,border-color .15s}
+.rail a em{font-family:var(--mono);font-size:10px;font-style:normal;opacity:.65;flex-shrink:0;width:16px}
+.rail a:hover{color:var(--fg-2)}
+.rail a.on{color:var(--hurt);border-left-color:var(--hurt)}
+.rail a.on em{opacity:1}
+.main{flex:1;min-width:0;padding:0 34px 140px;max-width:940px}
+
+.hero{padding:96px 0 66px;border-bottom:1px solid var(--line)}
+.hero-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--hurt);margin-bottom:12px}
+.hero-kr{font-family:var(--mono);font-size:12px;color:var(--fg-2);letter-spacing:.06em;margin-bottom:20px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,8.4vw,86px);line-height:.93;
+  letter-spacing:-.015em;color:var(--fg);margin-bottom:16px}
+.hero h1 b{color:var(--hurt);font-weight:400}
+.hero-sub{font-size:16.5px;color:var(--fg-2);max-width:36em;margin-bottom:40px}
+.hero-sub strong{color:var(--fg);font-weight:600}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+  border:1px solid var(--line-2);background:var(--ink-2);padding:20px 22px;margin-bottom:32px}
+.vs-side{min-width:0}
+.vs-side.away{text-align:right}
+.vs-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;margin-bottom:8px}
+.vs-side.home .vs-tag{color:var(--ok)}
+.vs-side.away .vs-tag{color:var(--hit)}
+.vs-affil{font-family:var(--mono);font-size:11px;color:var(--fg-2);line-height:1.55;margin-bottom:7px}
+.vs-affil b{color:var(--hurt);font-weight:400}
+.vs-nick{font-size:20px;font-weight:800;color:var(--fg);letter-spacing:-.02em;line-height:1.25}
+.vs-meta{font-family:var(--mono);font-size:10.5px;color:var(--fg-3);margin-top:6px}
+.vs-mid{font-family:var(--display);font-size:34px;color:var(--fg-3);padding:0 14px;line-height:1}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;border:1px solid var(--line-2);
+  color:var(--fg-2);padding:5px 10px;border-radius:2px}
+.chip.on{border-color:var(--ok);color:var(--ok)}
+.credit{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.credit-mark{font-family:var(--display);font-size:19px;color:var(--fg);letter-spacing:.02em}
+.credit-mark span{color:var(--hurt)}
+.credit-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--fg-3)}
+
+.sec{padding:66px 0 8px;border-bottom:1px solid var(--line);opacity:0;transform:translateY(16px)}
+.sec.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease}
+.sec:last-of-type{border-bottom:0}
+.sec-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:26px}
+.sec-num{font-family:var(--display);font-size:30px;line-height:.9;color:var(--line-2);flex-shrink:0;padding-top:2px}
+.sec-title h2{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.28;color:var(--fg)}
+.sec-title p{font-size:13.5px;color:var(--fg-3);margin-top:5px;font-family:var(--mono);letter-spacing:.02em}
+h3{font-size:16.5px;font-weight:700;color:var(--fg);margin:38px 0 12px;padding-left:11px;border-left:3px solid var(--hurt);line-height:1.4}
+h4{font-size:14px;font-weight:700;color:var(--fg-2);margin:24px 0 8px;letter-spacing:.01em}
+p{margin:12px 0;color:#C7D3DD}
+p strong,li strong{color:var(--fg);font-weight:700}
+a{color:var(--hurt)}
+ul,ol{margin:12px 0 12px 20px}
+li{margin:6px 0;color:#C7D3DD}
+li::marker{color:var(--fg-3)}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+
+.tw{overflow-x:auto;margin:18px 0;border:1px solid var(--line);background:var(--ink-2)}
+table{width:100%;border-collapse:collapse;font-size:13.4px;min-width:460px}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-3);
+  text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-2);background:var(--ink-3);white-space:nowrap;font-weight:500}
+td{padding:11px 14px;border-bottom:1px solid var(--line);color:#C2CFD9;vertical-align:top;line-height:1.6}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{color:var(--fg);font-weight:600}
+tbody tr:hover td{background:rgba(53,189,245,.035)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.box{border-left:3px solid;padding:15px 18px;margin:20px 0;background:var(--ink-2);font-size:14.2px}
+.box p{margin:8px 0;color:#C7D3DD}
+.box p:first-child{margin-top:0}
+.box p:last-child{margin-bottom:0}
+.box ul{margin:8px 0 8px 18px}
+.box .lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;display:block;margin-bottom:8px}
+.box.warn{border-color:var(--hit);background:rgba(255,77,94,.06)}
+.box.warn .lb{color:var(--hit)}
+.box.rec{border-color:var(--ok);background:rgba(75,227,140,.05)}
+.box.rec .lb{color:var(--ok)}
+.box.note{border-color:var(--hurt);background:rgba(53,189,245,.05)}
+.box.note .lb{color:var(--hurt)}
+.box.dec{border-color:var(--inv);background:rgba(255,194,75,.055)}
+.box.dec .lb{color:var(--inv)}
+
+pre{font-family:var(--mono);font-size:12.3px;line-height:1.72;background:var(--ink-2);border:1px solid var(--line);
+  border-left:3px solid var(--line-2);padding:17px 19px;overflow-x:auto;margin:20px 0;color:#AEC0CE}
+code{font-family:var(--mono);font-size:.9em;background:var(--ink-3);padding:1.5px 5px;border-radius:2px;color:var(--inv)}
+pre code{background:none;padding:0;color:inherit;font-size:1em}
+
+.fig{margin:26px 0;border:1px solid var(--line);background:var(--ink-2);padding:20px 18px 15px}
+.fig svg{width:100%;height:auto;display:block}
+.fig-t{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--hurt);margin-bottom:14px}
+.fig-cap{margin-top:15px;padding-top:13px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:5px 20px}
+.fig-cap div{font-size:12.4px;color:var(--fg-2);line-height:1.65;display:flex;gap:7px}
+.fig-cap b{font-family:var(--mono);font-size:10.5px;color:var(--hurt);flex-shrink:0;font-weight:500;padding-top:1px}
+.fig-note{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);font-size:12.6px;color:var(--fg-3);line-height:1.7}
+.fig-note strong{color:var(--fg-2)}
+
+.fd{margin:22px 0;border:1px solid var(--line);background:var(--ink-2);padding:18px}
+.fd-row{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.fd-row:last-of-type{margin-bottom:0}
+.fd-name{font-family:var(--mono);font-size:11px;color:var(--fg-2);width:86px;flex-shrink:0;text-align:right}
+.fd-bar{display:flex;flex:1;height:19px;min-width:0}
+.fd-seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;
+  color:#08121A;font-weight:700;overflow:hidden;white-space:nowrap}
+.fd-s{background:var(--hurt)} .fd-a{background:var(--hit)} .fd-r{background:var(--inv)} .fd-c{background:var(--ok)}
+.fd-x{background:var(--ink-3);color:var(--fg-3);border:1px solid var(--line-2)}
+.fd-key{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.fd-key span{font-family:var(--mono);font-size:10px;color:var(--fg-3);display:flex;align-items:center;gap:6px}
+.fd-key i{width:11px;height:11px;display:block}
+
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;padding:2px 7px;border-radius:2px;white-space:nowrap}
+.tag.crit{background:rgba(255,77,94,.16);color:var(--hit)}
+.tag.high{background:rgba(255,194,75,.16);color:var(--inv)}
+.tag.mid{background:rgba(53,189,245,.14);color:var(--hurt)}
+.tag.done{background:rgba(75,227,140,.14);color:var(--ok)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px;margin:20px 0}
+.card{border:1px solid var(--line);background:var(--ink-2);padding:17px 18px}
+.card h5{font-size:13.5px;font-weight:700;color:var(--fg);margin-bottom:7px}
+.card p{font-size:13.2px;margin:0;color:var(--fg-2)}
+.card .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--hurt);display:block;margin-bottom:9px}
+footer{padding:56px 0 0;border-top:1px solid var(--line);margin-top:60px;font-family:var(--mono);font-size:11px;color:var(--fg-3);line-height:2}
+
+@media (max-width:1080px){
+  .rail{position:fixed;top:var(--hud-h);left:0;bottom:0;width:266px;background:var(--ink);z-index:55;
+    transform:translateX(-100%);transition:transform .22s ease;padding-left:20px}
+  .rail.open{transform:none;box-shadow:24px 0 60px rgba(0,0,0,.6)}
+  .main{padding:0 22px 110px}
+  .hud-menu{display:block}
+  .hud-bar{display:none}
+}
+@media (max-width:640px){
+  body{font-size:15px}
+  .main{padding:0 16px 100px}
+  .hero{padding:66px 0 48px}
+  .hero-sub{font-size:15px}
+  .vs{grid-template-columns:1fr;gap:14px;text-align:left}
+  .vs-side.away{text-align:left}
+  .vs-mid{padding:0;font-size:26px}
+  .sec-head{gap:12px}
+  .sec-num{font-size:23px}
+  .sec-title h2{font-size:21px}
+  .hud-mark{font-size:10px}
+  .fd-name{width:64px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .sec{opacity:1;transform:none}
+  .hud-combo-n,.hud-fill{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <button class="hud-menu" id="menuBtn" aria-label="목차 열기">목차</button>
+  <div class="hud-mark">HOMETOWN <span>CLASH</span><span class="hud-ver">기획서 v1.0</span></div>
+  <div class="hud-bar">
+    <div class="hud-track"><div class="hud-fill" id="fill"></div></div>
+    <div class="hud-pct num" id="pct">0%</div>
+  </div>
+  <div class="hud-combo">
+    <div class="hud-combo-n" id="combo">0</div>
+    <div class="hud-combo-l">HIT</div>
+  </div>
+</div>
+
+<div class="shell">
+
+<nav class="rail" id="rail">
+  <div class="rail-h">CONTENTS</div>
+  <a href="#s01"><em>01</em>개요</a>
+  <a href="#s02"><em>02</em>핵심 루프</a>
+  <a href="#s03"><em>03</em>소속 &amp; 크루</a>
+  <a href="#s04"><em>04</em>랭킹 &amp; 시즌</a>
+  <a href="#s05"><em>05</em>전투 시스템</a>
+  <a href="#s06"><em>06</em>콤보 시스템</a>
+  <a href="#s07"><em>07</em>종목 (캐릭터)</a>
+  <a href="#s08"><em>08</em>캐릭터 생성</a>
+  <a href="#s09"><em>09</em>홈 / 어웨이</a>
+  <a href="#s10"><em>10</em>매칭 &amp; 방</a>
+  <a href="#s11"><em>11</em>넷코드 &amp; 기술</a>
+  <a href="#s12"><em>12</em>경제 &amp; 과금</a>
+  <a href="#s13"><em>13</em>UGC 마켓</a>
+  <a href="#s14"><em>14</em>다국어</a>
+  <a href="#s15"><em>15</em>AI 개발</a>
+  <a href="#s16"><em>16</em>인프라</a>
+  <a href="#s17"><em>17</em>팀 &amp; 로드맵</a>
+  <a href="#s18"><em>18</em>남은 결정</a>
+</nav>
+
+<main class="main">
+
+<header class="hero">
+  <div class="hero-eyebrow">GAME DESIGN DOCUMENT · v1.0 · 2026.08.08</div>
+  <div class="hero-kr">한국 부제 「우리동네 싸움짱」</div>
+  <h1>HOMETOWN<br><b>CLASH</b></h1>
+  <p class="hero-sub">2.5D 지역 기반 1:1 온라인 대전 격투 게임. <strong>"우리 동네에서 내가 제일 세다"</strong>를 전 세계 단위로 증명하는 무료 격투 게임.</p>
+
+  <div class="vs">
+    <div class="vs-side home">
+      <div class="vs-tag">HOME · 방장</div>
+      <div class="vs-affil">경기도 용인시 기흥구 <b>(기흥구 야근조)</b></div>
+      <div class="vs-nick">우리동네짱</div>
+      <div class="vs-meta num">검도가 · RANK 3 / 1,284</div>
+    </div>
+    <div class="vs-mid">VS</div>
+    <div class="vs-side away">
+      <div class="vs-tag">AWAY · 원정</div>
+      <div class="vs-affil">California, Los Angeles <b>(Eastside Crew)</b></div>
+      <div class="vs-nick">eastsideMike</div>
+      <div class="vs-meta num">태권도 · RANK 41 / 1,301</div>
+    </div>
+  </div>
+
+  <div class="hero-meta">
+    <span class="chip on">무료 · F2P</span>
+    <span class="chip on">2.5D</span>
+    <span class="chip on">P2P 롤백 넷코드</span>
+    <span class="chip on">종목 2종 → 확장</span>
+    <span class="chip on">CP 포인트 경제</span>
+    <span class="chip">Steam → Android / iOS</span>
+  </div>
+
+  <div class="credit">
+    <div class="credit-mark">QUATTRO MANI <span>STUDIO</span></div>
+    <div class="credit-sub">박창현 · 정영학 — a quattro mani, 네 손으로</div>
+  </div>
+</header>
+
+<!-- 01 -->
+<section class="sec" id="s01">
+  <div class="sec-head"><div class="sec-num">01</div><div class="sec-title">
+    <h2>개요</h2><p>OVERVIEW</p></div></div>
+
+  <p>던전앤파이터식 벨트스크롤 액션의 손맛을 1:1 랭크전으로 압축하고, 승패를 <strong>국가 → 시·도 → 시·군·구</strong>라는 실제 지리 계층에 누적시켜 "내 동네의 순위"라는 소속감을 만든다.</p>
+
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>장르</td><td>2.5D 벨트스크롤 대전 격투 (1:1 온라인 랭크)</td></tr>
+      <tr><td>플랫폼</td><td>Steam(Win/Mac/Linux) → Android, iOS. 크로스플레이 &amp; 크로스 세이브</td></tr>
+      <tr><td>가격</td><td><strong>무료</strong> — 전 플랫폼. CP 인앱 결제 + 시즌 패스</td></tr>
+      <tr><td>세션</td><td>1경기 90~150초 (2선승, 라운드 60초)</td></tr>
+      <tr><td>아트</td><td>3D 로우폴리 + 셀셰이딩(툰), 측면 고정 카메라, 깊이 5레인</td></tr>
+      <tr><td>목표 사양</td><td>GTX 750Ti / 인텔 Iris Xe / Snapdragon 660급 안드로이드에서 60fps</td></tr>
+      <tr><td>목표 등급</td><td><strong>15세 이용가 이하.</strong> 비유혈·만화적 톤 유지, 유혈·사실적 부상 묘사 없음</td></tr>
+      <tr><td>서버 의존</td><td>대전은 P2P 롤백. 서버는 매칭·랭킹·상점·결제검증만 담당</td></tr>
+      <tr><td>개발</td><td>QUATTRO MANI STUDIO — 2인, 전 과정 AI 기반</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>레퍼런스 — 무엇을 가져오고 무엇을 버리는가</h3>
+  <div class="tw"><table>
+    <thead><tr><th>게임</th><th>가져올 것</th><th>버릴 것</th></tr></thead>
+    <tbody>
+      <tr><td>던전앤파이터</td><td>깊이축 이동, 과장된 타격 이펙트, 직업별 개성, 스킬 4버튼</td><td>PvE 벨트스크롤 구조, 장비 성장, 넓은 화면·무거운 HUD</td></tr>
+      <tr><td>길티기어 Xrd</td><td><strong>2.5D 구현 방식</strong> — 3D 모델 + 셀셰이딩 + 2D 판정, 프레임 단위 애니메이션 제어</td><td>높은 커맨드 난이도, 복잡한 시스템 메커닉</td></tr>
+      <tr><td>스트리트파이터 6</td><td><strong>모던 조작</strong>(원버튼 스킬 + 데미지 페널티), 프레임 데이터 공개, 랭크 구조</td><td>제작 규모, 스토리 모드</td></tr>
+      <tr><td>브롤할라</td><td>크로스플레이 운영, 낮은 진입장벽, 스킨 중심 수익 모델</td><td>플랫폼 파이터 물리</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section class="sec" id="s02">
+  <div class="sec-head"><div class="sec-num">02</div><div class="sec-title">
+    <h2>핵심 루프</h2><p>CORE LOOP</p></div></div>
+
+<pre>① 계정 생성 시 소속 지정 (국가 / 시·도 / 시·군·구)
+        ↓
+② 랭크 매칭 · 방 생성/입장 · 친구 코드
+        ↓
+③ [홈팀 결정] → 원정팀 비행 연출 → 홈 배경 스테이지에서 1:1 대전
+        ↓
+④ 승패에 따른 점수 증감 (Elo)
+        ↓
+⑤ 5개 랭킹 보드에 동시 반영 (글로벌 / 국가 / 시도 / 시군구 / 크루)
+        ↓
+⑥ CP로 스킨 구매 · 스킨/맵 제작 → 업로드 → 판매 수익 CP 수령
+        ↓
+        ①로</pre>
+
+  <div class="box rec"><span class="lb">설계 의도</span>
+    <p>이 게임의 리텐션은 여기서 나온다. "내 실력의 절대치"가 아니라 <strong>"내가 아는 사람들 사이에서의 상대적 위치"</strong>가 목표가 된다. 글로벌 12,847등은 와닿지 않지만 <strong>용인시 12등 / 기흥구 3등</strong>은 와닿는다.</p>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="sec" id="s03">
+  <div class="sec-head"><div class="sec-num">03</div><div class="sec-title">
+    <h2>소속 &amp; 크루</h2><p>TERRITORY</p></div></div>
+
+  <h3>계층 구조</h3>
+<pre>GLOBAL
+ └ 국가 (KR / US / JP …)
+    └ 1단계 행정구역 (경기도 / California / 東京都)
+       └ 2단계 행정구역 (용인시 기흥구 / Los Angeles County)   ← 필수, 여기까지
+          └ 크루 (기흥구 야근조 / 없음)                          ← 선택</pre>
+
+  <p>소속의 기준 단위는 <strong>동네(시·군·구)</strong> 하나다. 동(洞) 이하는 사용하지 않고, 실존 기관(학교·직장 등)도 소속으로 사용하지 않는다. 누구에게나 사는 동네는 있고, 그거면 충분하다.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>유형</th><th>데이터</th><th>표시</th></tr></thead>
+    <tbody>
+      <tr><td><strong>동네</strong> <span class="tag done">필수</span></td><td>행정구역 (시·도 / 시·군·구). GeoNames 또는 각국 공공데이터 기반 정적 JSON 3~6MB 초회 다운로드</td><td>항상 표시</td></tr>
+      <tr><td><strong>크루</strong> <span class="tag mid">선택</span></td><td>유저 생성</td><td>동네 뒤에 괄호로 표기. 없으면 괄호 자체가 표시되지 않음</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>크루</h3>
+  <ul>
+    <li>유저가 직접 결성하는 모임. <strong>인원 상한 30명</strong>, 동네 하나에 귀속된다</li>
+    <li>「기흥구 야근조」, 「동백동 새벽러너」처럼 자기들끼리 이름 짓는 구조</li>
+    <li>크루 랭킹은 <strong>소속원 상위 10명 평균</strong>으로 집계한다. 인원이 많다고 유리하지 않으므로 소규모 크루도 1등을 노릴 수 있다</li>
+    <li>크루명은 로케일별 금칙어 필터 적용. 크루장 30일 무활동 시 자동 이관</li>
+  </ul>
+
+  <h3>변경 정책</h3>
+  <ul>
+    <li>동네 변경은 <strong>시즌당 1회</strong>만 허용 — 약한 지역을 옮겨 다니며 1등을 수집하는 행위 차단</li>
+    <li>변경 시 해당 시즌 기록은 이전 동네에 남고, 신규 동네는 다음 시즌부터 집계</li>
+    <li>크루 가입·탈퇴는 자유. 단 탈퇴 후 7일간 재가입 불가</li>
+  </ul>
+
+  <h3>프로필 표기 체계</h3>
+<pre>우리동네짱                         ← 아이디
+경기도 용인시 기흥구 (기흥구 야근조)   ← 동네 · 크루
+검도가 · RANK 3 / 1,284           ← 종목 · 랭크</pre>
+  <ul>
+    <li>매칭 화면에서 상대 소속이 크게 표시 → 지역 라이벌 의식 형성</li>
+    <li>승리 시 "기흥구 vs 수지구 — 기흥구 +3점" 형태의 동네 대항 누적 표시</li>
+    <li>소속은 검증하지 않으며, 자칭 소속임을 이용약관에 명시</li>
+  </ul>
+</section>
+
+<!-- 04 -->
+<section class="sec" id="s04">
+  <div class="sec-head"><div class="sec-num">04</div><div class="sec-title">
+    <h2>랭킹 &amp; 시즌</h2><p>RATING</p></div></div>
+
+  <h3>레이팅 — Elo</h3>
+  <p>같은 점수대 상대를 이기면 적게, 고득점자를 이기면 많이 오른다.</p>
+<pre>기대승률 E = 1 / (1 + 10^((상대점수 - 내점수) / 400))
+점수 변동  Δ = K × (실제결과 - E)      // 승=1, 패=0</pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>구간</th><th>K값</th><th>의도</th></tr></thead>
+    <tbody>
+      <tr><td>최초 20경기</td><td class="num">60</td><td>빠른 자리 찾기</td></tr>
+      <tr><td>21~100경기</td><td class="num">32</td><td>안정화</td></tr>
+      <tr><td>100경기 이상</td><td class="num">20</td><td>정상 운영</td></tr>
+      <tr><td>상위 500위</td><td class="num">16</td><td>상단 요동 억제</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>시작 점수 <strong>1000점</strong> 기준 변동 예시 — 동점수 승리 <strong>+10</strong>, 상위(1400) 상대 승리 <strong>+18</strong>, 하위(600) 상대 승리 <strong>+2</strong> / 패배 <strong>-18</strong>.</p>
+
+  <h3>티어</h3>
+  <div class="tw"><table>
+    <thead><tr><th>티어</th><th>점수</th><th>티어</th><th>점수</th></tr></thead>
+    <tbody>
+      <tr><td>신입</td><td class="num">~999</td><td>시·도</td><td class="num">1400~1599</td></tr>
+      <tr><td>동네</td><td class="num">1000~1199</td><td>국가대표</td><td class="num">1600~1799</td></tr>
+      <tr><td>구·군</td><td class="num">1200~1399</td><td>레전드</td><td class="num">1800+ (시즌 상위 100)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>랭킹 보드 5종</h3>
+  <div class="tw"><table>
+    <thead><tr><th>보드</th><th>집계 방식</th><th>갱신</th></tr></thead>
+    <tbody>
+      <tr><td>글로벌</td><td>개인 점수</td><td>5분</td></tr>
+      <tr><td>국가</td><td>개인 점수 (국가 필터)</td><td>5분</td></tr>
+      <tr><td>시·도</td><td>개인 점수 (지역 필터)</td><td>5분</td></tr>
+      <tr><td>시·군·구</td><td>개인 점수 (지역 필터)</td><td>실시간</td></tr>
+      <tr><td>크루</td><td>소속원 <strong>상위 10명 평균</strong> × 참여 보정계수</td><td>1시간</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box note"><span class="lb">왜 총합이 아니라 상위 평균인가</span>
+    <p>크루 랭킹을 총합으로 하면 인원 많은 크루가 무조건 이긴다. 상위 N명 평균이어야 소규모 크루도 1등을 노릴 수 있고, 그래야 소속감이 실제로 작동한다.</p>
+  </div>
+
+  <h3>시즌</h3>
+  <ul>
+    <li>8주 1시즌, 종료 시 소프트 리셋: <code>신규점수 = (현재점수 + 1000) / 2</code></li>
+    <li>각 계층 1위에게 영구 칭호 부여 (예: <code>2026 S1 기흥구 챔피언</code>)</li>
+    <li>시즌마다 지역 대항 이벤트 주간 운영 (주말 48시간, 승수 합산)</li>
+  </ul>
+</section>
+
+<!-- 05 -->
+<section class="sec" id="s05">
+  <div class="sec-head"><div class="sec-num">05</div><div class="sec-title">
+    <h2>전투 시스템</h2><p>COMBAT — 2.5D</p></div></div>
+
+  <h3>기본 규격</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>시뮬레이션</td><td><strong>60Hz 고정 틱</strong> — 가변 델타타임 금지</td></tr>
+      <tr><td>이동</td><td>좌우 + 깊이 5레인 (던파식 상하 이동)</td></tr>
+      <tr><td>라운드</td><td>2선승, 라운드 60초, 시간초과 시 체력 비율 판정</td></tr>
+      <tr><td>스테이지</td><td>가로 1.5~2화면, 벽 없음(무한 백스텝 방지용 소프트 경계)</td></tr>
+      <tr><td>시점</td><td>측면 고정 카메라, 약한 원근(FOV 25~35°)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="fig">
+    <div class="fig-t">FIG.1 — 인게임 화면 구성 (16:9)</div>
+    <svg viewBox="0 0 820 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="횡스크롤 격투 게임 화면 구성도">
+      <defs>
+        <clipPath id="scr"><rect x="50" y="40" width="720" height="405"/></clipPath>
+      </defs>
+      <g clip-path="url(#scr)">
+        <rect x="50" y="40" width="720" height="405" fill="#101A23"/>
+        <!-- 배경 원경 -->
+        <rect x="70" y="150" width="70" height="105" fill="#18242F"/>
+        <rect x="150" y="175" width="55" height="80" fill="#1B2934"/>
+        <rect x="215" y="130" width="80" height="125" fill="#16222C"/>
+        <rect x="520" y="160" width="65" height="95" fill="#18242F"/>
+        <rect x="595" y="140" width="90" height="115" fill="#1B2934"/>
+        <rect x="695" y="180" width="60" height="75" fill="#16222C"/>
+        <!-- 중경 -->
+        <rect x="50" y="248" width="720" height="10" fill="#22323F"/>
+        <!-- 지면 -->
+        <rect x="50" y="258" width="720" height="187" fill="#14202A"/>
+        <!-- 깊이 레인 -->
+        <line x1="120" y1="300" x2="700" y2="300" stroke="#25333F" stroke-width="1" stroke-dasharray="5 6"/>
+        <line x1="106" y1="327" x2="714" y2="327" stroke="#25333F" stroke-width="1" stroke-dasharray="5 6"/>
+        <line x1="92" y1="356" x2="728" y2="356" stroke="#2E4150" stroke-width="1.4" stroke-dasharray="5 6"/>
+        <line x1="76" y1="388" x2="744" y2="388" stroke="#25333F" stroke-width="1" stroke-dasharray="5 6"/>
+        <line x1="60" y1="422" x2="760" y2="422" stroke="#25333F" stroke-width="1" stroke-dasharray="5 6"/>
+        <!-- 자동 줌 범위 -->
+        <rect x="255" y="262" width="300" height="118" fill="none" stroke="#FFC24B" stroke-width="1" stroke-dasharray="4 5" opacity=".55"/>
+        <!-- 캐릭터 A (홈) -->
+        <ellipse cx="303" cy="357" rx="26" ry="7" fill="#000" opacity=".45"/>
+        <circle cx="303" cy="283" r="13" fill="#5E7788"/>
+        <path d="M291 297 h24 v40 h-24 z" fill="#4BE38C" opacity=".85"/>
+        <path d="M293 337 l-3 20 h7 l3 -20 z M310 337 l3 20 h7 l-3 -20 z" fill="#3C7A5C"/>
+        <path d="M315 302 l38 -9 v8 l-38 9 z" fill="#E4EBF1" opacity=".8"/>
+        <!-- 캐릭터 B (어웨이) -->
+        <ellipse cx="510" cy="357" rx="26" ry="7" fill="#000" opacity=".45"/>
+        <circle cx="510" cy="283" r="13" fill="#5E7788"/>
+        <path d="M498 297 h24 v40 h-24 z" fill="#FF4D5E" opacity=".8"/>
+        <path d="M500 337 l-3 20 h7 l3 -20 z M517 337 l3 20 h7 l-3 -20 z" fill="#8C3742"/>
+        <!-- 히트 이펙트 -->
+        <path d="M362 296 l16 -7 -5 9 14 -2 -13 10 6 8 -18 -6 -7 8 z" fill="#FFC24B"/>
+        <!-- HUD 체력바 -->
+        <g transform="skewX(-14)">
+          <rect x="90" y="58" width="270" height="15" fill="#1A2632" stroke="#31434F"/>
+          <rect x="92" y="60" width="192" height="11" fill="#4BE38C"/>
+          <rect x="90" y="76" width="150" height="6" fill="#1A2632" stroke="#31434F" stroke-width=".8"/>
+          <rect x="91" y="77" width="96" height="4" fill="#35BDF5"/>
+          <rect x="90" y="85" width="150" height="6" fill="#1A2632" stroke="#31434F" stroke-width=".8"/>
+          <rect x="91" y="86" width="128" height="4" fill="#FFC24B"/>
+        </g>
+        <g transform="skewX(-14) translate(430,0)">
+          <rect x="90" y="58" width="270" height="15" fill="#1A2632" stroke="#31434F"/>
+          <rect x="222" y="60" width="136" height="11" fill="#FF4D5E"/>
+          <rect x="210" y="76" width="150" height="6" fill="#1A2632" stroke="#31434F" stroke-width=".8"/>
+          <rect x="285" y="77" width="74" height="4" fill="#35BDF5"/>
+        </g>
+        <!-- 라운드 pip -->
+        <circle cx="72" cy="98" r="4.5" fill="#FFC24B"/><circle cx="86" cy="98" r="4.5" fill="none" stroke="#31434F"/>
+        <circle cx="748" cy="98" r="4.5" fill="none" stroke="#31434F"/><circle cx="734" cy="98" r="4.5" fill="none" stroke="#31434F"/>
+        <!-- 타이머 -->
+        <rect x="378" y="52" width="64" height="34" fill="#0D141B" stroke="#31434F"/>
+        <text x="410" y="77" font-family="'JetBrains Mono',monospace" font-size="21" font-weight="700" fill="#E4EBF1" text-anchor="middle">38</text>
+        <!-- 소속 + 아이디 -->
+        <text x="72" y="115" font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="14" font-weight="700" fill="#E4EBF1">우리동네짱</text>
+        <text x="72" y="131" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#98A9B7">경기 기흥구 · 기흥구 야근조 · 검도가</text>
+        <text x="748" y="115" font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="14" font-weight="700" fill="#E4EBF1" text-anchor="end">eastsideMike</text>
+        <text x="748" y="131" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#98A9B7" text-anchor="end">LOS ANGELES · EASTSIDE CREW · 태권도</text>
+        <!-- 콤보 카운터 -->
+        <text x="80" y="205" font-family="'Black Han Sans',sans-serif" font-size="42" fill="#FFC24B">7</text>
+        <text x="122" y="205" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700" fill="#FFC24B">HIT</text>
+        <text x="80" y="224" font-family="'JetBrains Mono',monospace" font-size="10" fill="#98A9B7">DMG 214 · SCALE 70%</text>
+      </g>
+      <rect x="50" y="40" width="720" height="405" fill="none" stroke="#31434F" stroke-width="1.5"/>
+      <!-- 마커 -->
+      <g font-family="'JetBrains Mono',monospace" font-size="11" font-weight="700" text-anchor="middle">
+        <circle cx="200" cy="66" r="11" fill="#35BDF5"/><text x="200" y="70" fill="#08121A">1</text>
+        <circle cx="410" cy="105" r="11" fill="#35BDF5"/><text x="410" y="109" fill="#08121A">2</text>
+        <circle cx="150" cy="196" r="11" fill="#35BDF5"/><text x="150" y="200" fill="#08121A">3</text>
+        <circle cx="640" cy="196" r="11" fill="#35BDF5"/><text x="640" y="200" fill="#08121A">4</text>
+        <circle cx="410" cy="404" r="11" fill="#35BDF5"/><text x="410" y="408" fill="#08121A">5</text>
+        <circle cx="248" cy="357" r="11" fill="#35BDF5"/><text x="248" y="361" fill="#08121A">6</text>
+        <circle cx="140" cy="82" r="11" fill="#35BDF5"/><text x="140" y="86" fill="#08121A">7</text>
+        <circle cx="586" cy="268" r="11" fill="#35BDF5"/><text x="586" y="272" fill="#08121A">8</text>
+      </g>
+    </svg>
+    <div class="fig-cap">
+      <div><b>1</b>체력바 · 아이디 · 소속(동네·크루·종목)</div>
+      <div><b>2</b>라운드 타이머 60초 + 라운드 획득 표시</div>
+      <div><b>3</b>콤보 카운터 · 누적 데미지 · 현재 보정률</div>
+      <div><b>4</b>배경 3레이어 (원경 / 중경 / 지면)</div>
+      <div><b>5</b>깊이 5레인 — 화면상 Y 오프셋으로 표현</div>
+      <div><b>6</b>블롭 그림자 — 깊이 판독의 주 수단</div>
+      <div><b>7</b>MP(청) / 각성 게이지(황)</div>
+      <div><b>8</b>자동 줌 범위 — 두 캐릭터 거리에 연동</div>
+    </div>
+    <div class="fig-note">1:1 대전이므로 화면을 좁히고 HUD는 격투게임 규격(마주보는 체력바 + 중앙 타이머 + 라운드 pip)을 쓴다. 벨트스크롤에서 가져오는 것은 <strong>깊이축 이동과 타격 이펙트의 과장</strong>이다.</div>
+  </div>
+
+  <h3>카메라</h3>
+  <ul>
+    <li>측면 고정, 궤도 회전 없음. FOV 30° 내외의 약한 원근만 사용</li>
+    <li>두 캐릭터 거리에 따른 자동 줌. 줌 속도에 프레임당 상한을 둬 화면이 출렁이지 않게</li>
+    <li>연출 카메라(각성기 컷인, 마무리 히트)는 <strong>시뮬레이션과 완전 분리</strong> — 판정에 1프레임도 영향 없음</li>
+    <li><strong>롤백 중에는 연출 카메라를 재생하지 않는다.</strong> 롤백 발생 프레임은 카메라를 기본 상태로 즉시 스냅</li>
+  </ul>
+
+  <h3>깊이축 — 5레인 이산화</h3>
+  <ul>
+    <li>깊이는 연속값이 아니라 <strong>5단계 레인</strong>. 판정이 명확해지고, 고정소수점 결정론 유지가 쉬우며, 네트워크 환경에서 "미묘하게 빗나감"이 사라진다</li>
+    <li>공격 판정의 깊이 허용치는 <strong>±1레인</strong> — 인접 레인까지는 맞는다</li>
+    <li>레인 이동에 4프레임 전환 시간, 전환 중 공격 불가</li>
+    <li>종목별 차등: 체조선수 2프레임(기동형) / 씨름꾼 6프레임(둔중형)</li>
+    <li>화면상 레인 차이는 Y 오프셋 + 그림자 위치 + 미세 스케일로 표현. <strong>블롭 그림자가 깊이 정보의 주된 전달 수단</strong></li>
+    <li>콤보 진행 중에는 두 캐릭터의 레인이 <strong>락(고정)</strong>된다</li>
+  </ul>
+
+  <div class="fig">
+    <div class="fig-t">FIG.2 — 깊이 5레인 · 논리 좌표와 화면 표현</div>
+    <svg viewBox="0 0 820 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="깊이 5레인 판정 다이어그램">
+      <!-- LEFT: top-down -->
+      <text x="20" y="20" font-family="'JetBrains Mono',monospace" font-size="11" fill="#98A9B7">위에서 본 필드 — 시뮬레이션 논리</text>
+      <rect x="20" y="34" width="368" height="230" fill="#101A23" stroke="#25333F"/>
+      <!-- 공격 허용 범위 ±1레인 -->
+      <rect x="150" y="86" width="215" height="130" fill="#FF4D5E" opacity=".13"/>
+      <rect x="150" y="86" width="215" height="130" fill="none" stroke="#FF4D5E" stroke-dasharray="4 4" opacity=".7"/>
+      <g font-family="'JetBrains Mono',monospace" font-size="10" fill="#5F707D">
+        <rect x="36" y="46" width="336" height="34" fill="#16222C" stroke="#1F2C37"/><text x="46" y="67">LANE 1</text>
+        <rect x="36" y="86" width="336" height="34" fill="#1A2632" stroke="#1F2C37"/><text x="46" y="107">LANE 2</text>
+        <rect x="36" y="126" width="336" height="34" fill="#1E2C39" stroke="#2E4150"/><text x="46" y="147" fill="#98A9B7">LANE 3</text>
+        <rect x="36" y="166" width="336" height="34" fill="#1A2632" stroke="#1F2C37"/><text x="46" y="187">LANE 4</text>
+        <rect x="36" y="206" width="336" height="34" fill="#16222C" stroke="#1F2C37"/><text x="46" y="227">LANE 5</text>
+      </g>
+      <!-- 공격자 lane3 -->
+      <circle cx="130" cy="143" r="13" fill="#4BE38C"/>
+      <text x="130" y="147" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="700" fill="#08121A" text-anchor="middle">A</text>
+      <!-- 방어자 lane2 -->
+      <circle cx="300" cy="103" r="13" fill="#FF4D5E"/>
+      <text x="300" y="107" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="700" fill="#08121A" text-anchor="middle">B</text>
+      <text x="204" y="252" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#FF4D5E" text-anchor="middle">공격 판정 범위 = 자기 레인 ±1</text>
+
+      <!-- RIGHT: screen -->
+      <text x="432" y="20" font-family="'JetBrains Mono',monospace" font-size="11" fill="#98A9B7">화면에서 보이는 모습 — 렌더</text>
+      <rect x="432" y="34" width="368" height="230" fill="#101A23" stroke="#25333F"/>
+      <rect x="432" y="150" width="368" height="114" fill="#14202A"/>
+      <g stroke="#25333F" stroke-dasharray="4 5">
+        <line x1="500" y1="172" x2="740" y2="172"/>
+        <line x1="486" y1="190" x2="754" y2="190"/>
+        <line x1="470" y1="210" x2="770" y2="210"/>
+        <line x1="452" y1="232" x2="788" y2="232"/>
+        <line x1="436" y1="256" x2="800" y2="256"/>
+      </g>
+      <!-- B (lane2, 안쪽 = 위 + 작게) -->
+      <ellipse cx="672" cy="190" rx="19" ry="5" fill="#000" opacity=".5"/>
+      <circle cx="672" cy="152" r="9" fill="#5E7788"/>
+      <rect x="663" y="163" width="18" height="27" fill="#FF4D5E" opacity=".8"/>
+      <!-- A (lane3, 바깥 = 아래 + 크게) -->
+      <ellipse cx="540" cy="210" rx="24" ry="6" fill="#000" opacity=".5"/>
+      <circle cx="540" cy="163" r="11" fill="#5E7788"/>
+      <rect x="529" y="176" width="22" height="34" fill="#4BE38C" opacity=".85"/>
+      <!-- 지시선 -->
+      <path d="M540 224 L512 250" stroke="#FFC24B" stroke-width="1"/>
+      <path d="M672 200 L700 250" stroke="#FFC24B" stroke-width="1"/>
+      <text x="616" y="266" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#FFC24B" text-anchor="middle">그림자 위치 = 실제 레인</text>
+
+      <!-- 하단 정리 -->
+      <rect x="20" y="284" width="780" height="34" fill="#16222C" stroke="#25333F"/>
+      <text x="34" y="305" font-family="'JetBrains Mono',monospace" font-size="11" fill="#98A9B7">깊이는 연속값이 아니라 5단계 이산값 · 레인 전환 4F · 전환 중 공격 불가 · 콤보 중에는 레인 락(고정)</text>
+    </svg>
+    <div class="fig-note"><strong>이산화하는 이유:</strong> 깊이가 연속값이면 온라인 환경에서 "0.3레인 차이로 빗나감"이 생기고, 유저는 그 억울함을 넷코드 탓으로 인식한다. 5레인 + ±1 관대 판정은 <strong>판정 결과를 눈으로 예측 가능하게</strong> 만들기 위한 선택이다.</div>
+  </div>
+
+  <h3>조작</h3>
+  <div class="tw"><table>
+    <thead><tr><th>입력 (PC)</th><th>동작</th></tr></thead>
+    <tbody>
+      <tr><td>방향키 / 스틱</td><td>8방향 이동, 더블탭 대시</td></tr>
+      <tr><td>A</td><td>일반 공격 (5타 체인)</td></tr>
+      <tr><td>S</td><td>점프</td></tr>
+      <tr><td>D</td><td>가드 / (뒤+D) 백스텝 회피</td></tr>
+      <tr><td><strong>앞 + D</strong></td><td><strong>기본 잡기</strong> — 발생 7F, 가드 무시, 헛치면 큰 경직. 잡히는 순간 D로 풀기(테크) 가능</td></tr>
+      <tr><td>Q W E R</td><td>스킬 1~4 (MP 소모, 개별 쿨타임)</td></tr>
+      <tr><td>Space</td><td>각성기 (게이지 100%)</td></tr>
+      <tr><td>Shift + D</td><td>버스트 — 콤보 탈출 (게이지 50%, 라운드 1회)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>모바일</h4>
+  <ul>
+    <li>좌: 가상 스틱 / 우: A·S·D + 스킬 4버튼 (반투명, 위치·크기 커스터마이즈)</li>
+    <li><strong>원터치 커맨드</strong> — 커맨드 입력(↓↘→) 없이 버튼 1개 = 스킬 1개. 모바일-PC 조작 격차를 원천 제거하는 것이 크로스플레이의 전제</li>
+    <li>옵션에서 "동일 입력기기 우선 매칭" 제공</li>
+  </ul>
+
+  <h3>밸런스 원칙</h3>
+  <ol>
+    <li><strong>Pay-to-Win 금지.</strong> 유료 요소는 외형 100%. 능력치·캐릭터 판매 없음</li>
+    <li>종목은 <strong>전부 무료</strong>. 신규 종목도 출시 즉시 무료 배포</li>
+    <li>프레임 데이터 전면 공개 (연습모드 내 표시)</li>
+  </ol>
+</section>
+
+<!-- 06 -->
+<section class="sec" id="s06">
+  <div class="sec-head"><div class="sec-num">06</div><div class="sec-title">
+    <h2>콤보 시스템</h2><p>COMBO</p></div></div>
+
+  <p>콤보는 숙련도가 눈에 보이는 형태로 보상받는 장치다. 동시에 초보자가 조작 불능 상태로 죽지 않도록 탈출 수단을 반드시 함께 설계한다.</p>
+
+  <h3>프레임 규격</h3>
+  <div class="tw"><table>
+    <thead><tr><th>용어</th><th>정의</th><th>기준값</th></tr></thead>
+    <tbody>
+      <tr><td>발생 (Startup)</td><td>입력 후 판정이 나오기까지</td><td>약 5F / 중 9F / 강 14F</td></tr>
+      <tr><td>지속 (Active)</td><td>공격 판정이 살아 있는 구간</td><td>2~5F</td></tr>
+      <tr><td>경직 (Recovery)</td><td>공격 후 다시 움직일 때까지</td><td>캔슬로 단축 가능</td></tr>
+      <tr><td>히트스턴</td><td>맞은 쪽이 굳는 프레임</td><td>콤보 연결의 재료</td></tr>
+      <tr><td>블록스턴</td><td>막은 쪽이 굳는 프레임</td><td>히트스턴보다 항상 짧음</td></tr>
+      <tr><td>히트스톱</td><td>타격 순간 양쪽 정지 연출</td><td>3~8F. 타격감의 핵심</td></tr>
+      <tr><td>유리 프레임</td><td>블록스턴 − 경직</td><td>+이면 내가 먼저 움직임</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="fd">
+    <div class="fd-row">
+      <div class="fd-name">약공격 A</div>
+      <div class="fd-bar">
+        <div class="fd-seg fd-s" style="flex:5">5F</div>
+        <div class="fd-seg fd-a" style="flex:3">3F</div>
+        <div class="fd-seg fd-r" style="flex:9">9F</div>
+        <div class="fd-seg fd-x" style="flex:11"></div>
+      </div>
+    </div>
+    <div class="fd-row">
+      <div class="fd-name">↳ 체인 캔슬</div>
+      <div class="fd-bar">
+        <div class="fd-seg fd-x" style="flex:8"></div>
+        <div class="fd-seg fd-c" style="flex:6">캔슬 윈도우 6F</div>
+        <div class="fd-seg fd-x" style="flex:14"></div>
+      </div>
+    </div>
+    <div class="fd-row">
+      <div class="fd-name">중공격 A·A</div>
+      <div class="fd-bar">
+        <div class="fd-seg fd-x" style="flex:8"></div>
+        <div class="fd-seg fd-s" style="flex:9">9F</div>
+        <div class="fd-seg fd-a" style="flex:3">3F</div>
+        <div class="fd-seg fd-r" style="flex:8">8F</div>
+      </div>
+    </div>
+    <div class="fd-key">
+      <span><i class="fd-s"></i>발생 Startup</span>
+      <span><i class="fd-a"></i>지속 Active</span>
+      <span><i class="fd-r"></i>경직 Recovery</span>
+      <span><i class="fd-c"></i>캔슬 가능 구간</span>
+    </div>
+  </div>
+
+  <h3>캔슬 체계</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>캔슬</th><th>규칙</th><th>대상</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>체인 캔슬<br>(개틀링)</td><td>약 → 중 → 강 순서로만. 역방향 불가</td><td>전 종목. A 연타만으로 5타가 나감 → 초보 진입로</td></tr>
+      <tr><td class="num">2</td><td>스페셜 캔슬</td><td>일반공격 → 스킬(Q/W/E/R). 캔슬 가능 시점에 히트 이펙트가 흰색으로 반짝임</td><td>전 종목. 중급 표현의 핵심</td></tr>
+      <tr><td class="num">3</td><td>슈퍼 캔슬</td><td>스킬 → 각성기. 게이지 100% 소모</td><td>전 종목. 마무리 연출</td></tr>
+      <tr><td class="num">4</td><td>대시 캔슬</td><td>일부 종목 한정. 게이지 25% 소모</td><td>태권도 · 체조선수 등 기동형</td></tr>
+      <tr><td class="num">5</td><td>점프 캔슬</td><td>지상 콤보 → 공중 콤보. 띄우기 이후에만</td><td>공중전 종목</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="fig">
+    <div class="fig-t">FIG.3 — 콤보 루트 &amp; 캔슬 체계</div>
+    <svg viewBox="0 0 820 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="콤보 캔슬 루트 다이어그램">
+      <defs>
+        <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#35BDF5"/>
+        </marker>
+        <marker id="arR" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#FF4D5E"/>
+        </marker>
+        <marker id="arG" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#4BE38C"/>
+        </marker>
+      </defs>
+
+      <!-- 지상 체인 -->
+      <g font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="13" fill="#E4EBF1" text-anchor="middle">
+        <rect x="14" y="44" width="92" height="40" fill="#1A2632" stroke="#35BDF5"/><text x="60" y="69">약 A</text>
+        <rect x="150" y="44" width="92" height="40" fill="#1A2632" stroke="#35BDF5"/><text x="196" y="69">중 AA</text>
+        <rect x="286" y="44" width="92" height="40" fill="#1A2632" stroke="#35BDF5"/><text x="332" y="69">강 AAA</text>
+        <rect x="452" y="44" width="112" height="40" fill="#1A2632" stroke="#FFC24B"/><text x="508" y="69">스킬 Q·W·E·R</text>
+        <rect x="628" y="44" width="100" height="40" fill="#1A2632" stroke="#FF4D5E"/><text x="678" y="69">각성기</text>
+      </g>
+      <g stroke="#35BDF5" stroke-width="1.4" marker-end="url(#ar)" fill="none">
+        <line x1="108" y1="64" x2="146" y2="64"/>
+        <line x1="244" y1="64" x2="282" y2="64"/>
+        <line x1="380" y1="64" x2="448" y2="64"/>
+        <line x1="566" y1="64" x2="624" y2="64"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D" text-anchor="middle">
+        <text x="127" y="36">체인 6F</text>
+        <text x="263" y="36">체인 6F</text>
+        <text x="414" y="36">스페셜 캔슬</text>
+        <text x="595" y="36">슈퍼 캔슬</text>
+      </g>
+      <text x="14" y="106" font-family="'JetBrains Mono',monospace" font-size="10" fill="#4BE38C">▲ A 연타만으로 여기까지 자동 진행 (오토 콤보, 데미지 −20%)</text>
+
+      <!-- 공중 루트 -->
+      <g font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="13" fill="#E4EBF1" text-anchor="middle">
+        <rect x="286" y="160" width="92" height="40" fill="#1A2632" stroke="#35BDF5"/><text x="332" y="185">띄우기</text>
+        <rect x="440" y="160" width="124" height="40" fill="#1A2632" stroke="#35BDF5"/><text x="502" y="185">공중 콤보 ×N</text>
+        <rect x="628" y="160" width="100" height="40" fill="#1A2632" stroke="#FFC24B"/><text x="678" y="185">바운드 1회</text>
+      </g>
+      <path d="M332 88 L332 156" stroke="#35BDF5" stroke-width="1.4" marker-end="url(#ar)" fill="none"/>
+      <text x="342" y="126" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D">점프 캔슬</text>
+      <g stroke="#35BDF5" stroke-width="1.4" marker-end="url(#ar)" fill="none">
+        <line x1="380" y1="180" x2="436" y2="180"/>
+        <line x1="566" y1="180" x2="624" y2="180"/>
+      </g>
+      <text x="502" y="216" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D" text-anchor="middle">저글 상한 8 · 히트마다 중력 가속</text>
+
+      <!-- 버스트 -->
+      <rect x="14" y="160" width="120" height="40" fill="#1A2632" stroke="#FF4D5E"/>
+      <text x="74" y="185" font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="13" fill="#FF4D5E" text-anchor="middle">버스트</text>
+      <path d="M134 172 L200 172 L200 92" stroke="#FF4D5E" stroke-width="1.4" marker-end="url(#arR)" fill="none" stroke-dasharray="5 4"/>
+      <text x="14" y="220" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#FF4D5E">게이지 50% · 라운드 1회</text>
+      <text x="14" y="234" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D">콤보 강제 종료 · 무적</text>
+
+      <!-- 데미지 보정 차트 -->
+      <text x="14" y="278" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#98A9B7">데미지 보정 (Damage Scaling)</text>
+      <g>
+        <line x1="14" y1="390" x2="480" y2="390" stroke="#25333F"/>
+        <rect x="20" y="296" width="38" height="94" fill="#4BE38C" opacity=".85"/>
+        <rect x="72" y="305" width="38" height="85" fill="#4BE38C" opacity=".72"/>
+        <rect x="124" y="315" width="38" height="75" fill="#7FCF9A" opacity=".68"/>
+        <rect x="176" y="324" width="38" height="66" fill="#B5C97F" opacity=".7"/>
+        <rect x="228" y="334" width="38" height="56" fill="#FFC24B" opacity=".72"/>
+        <rect x="280" y="343" width="38" height="47" fill="#FFC24B" opacity=".6"/>
+        <rect x="332" y="352" width="38" height="38" fill="#FF9A5B" opacity=".7"/>
+        <rect x="384" y="371" width="38" height="19" fill="#FF4D5E" opacity=".8"/>
+        <rect x="436" y="371" width="38" height="19" fill="#FF4D5E" opacity=".55"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9" fill="#5F707D" text-anchor="middle">
+        <text x="39" y="404">1</text><text x="91" y="404">2</text><text x="143" y="404">3</text>
+        <text x="195" y="404">4</text><text x="247" y="404">5</text><text x="299" y="404">6</text>
+        <text x="351" y="404">7</text><text x="403" y="404">8</text><text x="455" y="404">9+</text>
+        <text x="245" y="420" fill="#98A9B7">히트 수</text>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#98A9B7">
+        <text x="20" y="290">100%</text>
+        <text x="384" y="365">20% 하한</text>
+      </g>
+
+      <!-- 우측 안전장치 -->
+      <rect x="520" y="286" width="286" height="120" fill="#16222C" stroke="#25333F"/>
+      <text x="536" y="308" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#FF4D5E">무한 콤보 방지 4중 안전장치</text>
+      <g font-family="'Pretendard Variable',Pretendard,sans-serif" font-size="12" fill="#98A9B7">
+        <text x="536" y="331">① 데미지 보정 (좌측 그래프)</text>
+        <text x="536" y="351">② 히트스턴 −1F씩 감쇠, 하한 8F</text>
+        <text x="536" y="371">③ 동일기 3회째부터 데미지 50%</text>
+        <text x="536" y="391">④ 15히트 초과 시 강제 다운</text>
+      </g>
+    </svg>
+    <div class="fig-note"><strong>읽는 법:</strong> 파란 화살표가 캔슬 루트, 숫자는 캔슬 윈도우 폭이다. <strong>모든 윈도우가 5프레임 이상</strong>인 것이 핵심 — 롤백 넷코드의 입력 지연 2~3프레임을 흡수하기 위한 하한선이다.</div>
+  </div>
+
+  <h3>공중 콤보 (저글)</h3>
+<pre>띄우기(Launcher) → 공중 히트 ×N → 바운드(1회) → 마무리기
+                      │
+                      └ 저글 카운트 상한 8회 · 히트마다 중력 가속</pre>
+  <ul>
+    <li>공중 히트마다 낙하 가속도가 증가 → 콤보가 자연스럽게 끝난다</li>
+    <li>바운드(벽·바닥 튕김)는 <strong>콤보당 1회</strong>만 발동</li>
+    <li>공중 콤보 중 상대는 깊이 레인이 <strong>락(고정)</strong>된다</li>
+  </ul>
+
+  <h3>무한 콤보 방지 — 4중 안전장치</h3>
+  <div class="tw"><table>
+    <thead><tr><th>장치</th><th>동작</th></tr></thead>
+    <tbody>
+      <tr><td>데미지 보정</td><td>1히트 100% → 2히트 90% → 3히트 80% → … → <strong>8히트 이후 20% 하한.</strong> 긴 콤보의 기대 수익을 낮춰 "길게 넣는 것"보다 "확실히 넣는 것"이 유리하게</td></tr>
+      <tr><td>히트스턴 감쇠</td><td>콤보 진행에 따라 히트스턴 −1F씩 감소, 하한 8F</td></tr>
+      <tr><td>동일기 반복 보정</td><td>같은 기술 3회째부터 데미지 50%</td></tr>
+      <tr><td>강제 다운</td><td>15히트 초과 시 상대 강제 다운</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>탈출 수단</h3>
+  <div class="box warn"><span class="lb">필수 설계</span>
+    <p>무료 게임에서 15초간 조작 못 하고 죽는 경험을 하면 유저는 그냥 지운다. <strong>탈출 수단은 밸런스 옵션이 아니라 상품 요건이다.</strong></p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>수단</th><th>조건</th><th>효과</th></tr></thead>
+    <tbody>
+      <tr><td>버스트</td><td>게이지 50%, <strong>라운드당 1회</strong></td><td>콤보 중 발동. 무적 판정 + 광역 넉백으로 콤보 강제 종료. 빗나가면 큰 경직</td></tr>
+      <tr><td>기상 선택</td><td>다운 시</td><td>즉시 기상 / 지연 기상 / 굴러 기상 3택 — 기상 심리전 형성</td></tr>
+      <tr><td>가드 캔슬</td><td>게이지 25%</td><td>가드 중 밀어내기. 압박 탈출용</td></tr>
+      <tr><td>잡기 테크</td><td>잡히는 순간 D</td><td>기본 잡기 풀기. 초보가 일방적으로 당하지 않게</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>오토 콤보</h3>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>오토 콤보</th><th>수동 콤보</th></tr></thead>
+    <tbody>
+      <tr><td>입력</td><td>A 연타 = 5타 자동 콤보 + 자동 스킬 마무리</td><td>캔슬 타이밍 직접 입력</td></tr>
+      <tr><td>데미지</td><td><strong>−20% 페널티</strong></td><td>100%</td></tr>
+      <tr><td>길이</td><td>고정 5~7히트</td><td>이론상 15히트까지</td></tr>
+      <tr><td>대상</td><td>모바일·입문자</td><td>PC·숙련자</td></tr>
+    </tbody>
+  </table></div>
+  <p>조작 방식으로 매칭 큐를 분리하지 않는다. 분리하면 두 풀 모두 인구가 절반이 되고, 이 게임은 인구가 곧 생명이다.</p>
+
+  <h3>롤백 넷코드가 거는 제약</h3>
+  <div class="box warn"><span class="lb">타협 불가</span>
+    <ul>
+      <li><strong>1프레임 캔슬·1프레임 링크 전면 금지</strong></li>
+      <li>모든 캔슬 윈도우는 <strong>최소 5프레임</strong> 이상 확보</li>
+      <li><strong>링크(link) 중심이 아닌 캔슬(cancel) 중심</strong>으로 콤보 루트를 설계</li>
+      <li>저스트 프레임 기술 도입하지 않음</li>
+      <li>콤보 난이도는 "타이밍의 좁음"이 아니라 <strong>"루트 선택과 상황 판단의 복잡도"</strong>로 만든다</li>
+    </ul>
+  </div>
+
+  <h3>연습 &amp; 공유</h3>
+  <div class="grid2">
+    <div class="card"><span class="k">TRAINING</span><h5>콤보 트라이얼</h5><p>종목당 10단계 (기초 3 / 실전 4 / 상급 3). 입력 히스토리·히트박스·프레임 실시간 표시</p></div>
+    <div class="card"><span class="k">REPLAY</span><h5>콤보 클립</h5><p>리플레이에서 콤보 구간만 잘라 6초 GIF로 내보내기 — SNS 확산의 주 경로</p></div>
+    <div class="card"><span class="k">COMMUNITY</span><h5>레시피 게시판</h5><p>유저 콤보 레시피 공유, 데미지·난이도·게이지 소모 자동 계산 표시</p></div>
+    <div class="card"><span class="k">UI</span><h5>콤보 카운터</h5><p>히트 수 확대 연출, 누적 데미지 + 현재 보정률 표시(연습모드), 5·10·15히트 마일스톤 연출</p></div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="sec" id="s07">
+  <div class="sec-head"><div class="sec-num">07</div><div class="sec-title">
+    <h2>종목 (캐릭터)</h2><p>CLASSES</p></div></div>
+
+  <p>던전앤파이터의 "직업"에 해당하는 개념을 이 게임에서는 <strong>종목(Class)</strong>이라 부른다. 캐릭터 선택 화면은 "종목 선택"이 된다. 얼굴 아바타는 계정 단위이므로(8장), 같은 사람이 오늘은 검도가, 내일은 씨름꾼으로 나간다.</p>
+
+  <h3>출시 로스터 — 2종</h3>
+  <div class="tw"><table>
+    <thead><tr><th>종목</th><th>축</th><th>역할</th></tr></thead>
+    <tbody>
+      <tr><td><strong>검도가</strong></td><td>리치<br>(기준점)</td><td>리치가 길고 일반공격이 정직해 <strong>콤보를 배우기 가장 좋은 종목.</strong> 튜토리얼과 콤보 트라이얼의 기본 종목. 미러전이 거리 재기 싸움이 되어 정적이지 않다. 가드 성공 시 반격 강화. 각성기 = 발도 일섬</td></tr>
+      <tr><td><strong>태권도</strong></td><td>속공<br>(러시)</td><td>대시 캔슬 보유. 붙어서 몰아치는 재미를 담당한다. 검도가와 <strong>정반대 거리 감각</strong>이라 2종만으로도 두 개의 다른 게임처럼 느껴진다. 미러전은 선공 다툼. 각성기 = 회오리 연격</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box note"><span class="lb">2종 구성의 전제 — 기본 잡기</span>
+    <p>그래플러 종목이 없는 동안에도 <strong>타격 → 가드 → 잡기</strong> 삼각 구조가 성립해야 한다. 잡기는 가드를 뚫는 유일한 수단이므로, <strong>기본 잡기를 전 종목 공통 시스템</strong>으로 둔다(5장 조작표). 씨름꾼은 나중에 이 공통 잡기를 특화한 종목으로 들어온다.</p>
+  </div>
+
+  <h3>확장 로드맵</h3>
+  <div class="tw"><table>
+    <thead><tr><th>시점</th><th>추가</th><th>전제 조건</th></tr></thead>
+    <tbody>
+      <tr><td><strong>출시</strong></td><td><strong>검도가 · 태권도</strong></td><td>기본 잡기 공통 시스템 탑재</td></tr>
+      <tr><td>시즌 1 (+8주)</td><td>씨름꾼 · 책벌레</td><td>잡기 심리전 정착, 근접 기준선 확립 → <strong>4분면 완성</strong></td></tr>
+      <tr><td>시즌 2 (+16주)</td><td>4번타자 · 체조선수</td><td>저글·바운드 시스템 실전 데이터 확보</td></tr>
+      <tr><td>시즌 3 (+24주)</td><td>밴드 보컬 · 조리사</td><td>밸런스 안정화, 승률 표 수렴</td></tr>
+      <tr><td>시즌 4 (+32주)</td><td>화가 · 공학도</td><td>롤백 상태 직렬화 최적화 완료</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>전체 구상 (10종)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>종목</th><th>역할</th><th>특징</th><th>각성기</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>검도가</td><td>카운터</td><td>리치 긴 죽도, 가드 성공 시 반격 강화</td><td>발도 일섬</td></tr>
+      <tr><td class="num">2</td><td>태권도</td><td>러시</td><td>연속 발차기, 최고 기동력, 대시 캔슬</td><td>회오리 연격</td></tr>
+      <tr><td class="num">3</td><td>씨름꾼</td><td>그래플러</td><td>잡기 특화, 가드 무시. 레인 이동 6F</td><td>들배지기 → 충격파</td></tr>
+      <tr><td class="num">4</td><td>책벌레</td><td>캐스터</td><td>저속 원거리 탄, 최저 체력</td><td>금서 개방</td></tr>
+      <tr><td class="num">5</td><td>4번타자</td><td>브루저</td><td>배트 풀스윙, 느리지만 한 방이 큼</td><td>만루 홈런</td></tr>
+      <tr><td class="num">6</td><td>체조선수</td><td>공중전</td><td>2단 점프·공중 대시, 점프 캔슬</td><td>공중 연무</td></tr>
+      <tr><td class="num">7</td><td>밴드 보컬</td><td>원거리·서포트</td><td>기타 음파 탄, 자가 버프</td><td>앙코르</td></tr>
+      <tr><td class="num">8</td><td>조리사</td><td>유지력</td><td>프라이팬 반사(투사체 되돌리기), 소량 회복</td><td>풀코스</td></tr>
+      <tr><td class="num">9</td><td>화가</td><td>설치형</td><td>물감 트랩, 슬로우 필드</td><td>대작 완성</td></tr>
+      <tr><td class="num">10</td><td>공학도</td><td>소환형</td><td>드론 2기 자동 공격</td><td>시제품 폭주</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>추가 원칙</h4>
+  <ul>
+    <li><strong>신규 종목은 출시 즉시 무료.</strong> 종목을 팔지 않는다(5장 P2W 금지). 무료 게임에서 종목까지 무료라는 점이 신규 유입의 문턱을 완전히 없앤다</li>
+    <li>매출은 <strong>신규 종목 = 신규 스킨 슬롯 + 시즌 패스 소재</strong>로 회수한다. 종목이 늘수록 스킨 판매 면적과 UGC 캔버스가 늘어난다</li>
+    <li><strong>숫자 채우기 금지.</strong> 기존 아키타입과 겹치는 종목은 추가하지 않는다. 10종을 채우는 것보다 8종이 전부 다른 편이 낫다</li>
+    <li>신규 종목은 출시 즉시 랭크 투입하되, 리플레이 자동 분석(16장)으로 <strong>2주 내 1차 밸런스 패치</strong>를 전제로 한다</li>
+    <li>종목 1종 추가 공수는 리그 재사용 기준 <strong>2~3주</strong>. 8주 시즌에 2종은 빠듯하므로 <strong>시즌당 1~2종</strong>으로 잡는다</li>
+  </ul>
+</section>
+
+<!-- 08 -->
+<section class="sec" id="s08">
+  <div class="sec-head"><div class="sec-num">08</div><div class="sec-title">
+    <h2>캐릭터 생성</h2><p>CHARACTER CREATOR</p></div></div>
+
+  <h3>온보딩</h3>
+  <p>계정 생성 직후 반드시 거치는 단계. <strong>3분 안에 끝나도록</strong> 설계한다.</p>
+<pre>최초 실행 → 언어 선택 → 소속 지정(국가/시도/시군구) → <strong>캐릭터 생성</strong> → 튜토리얼 → 첫 매치</pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>단계</th><th>선택 항목</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>1. 베이스</td><td>체형 2종</td><td>골격만 다름. 판정·능력치는 완전 동일</td></tr>
+      <tr><td>2. 피부톤</td><td>8종</td><td>전 세계 대상이므로 톤 범위를 넓게, 한쪽에 치우치지 않게 배분</td></tr>
+      <tr><td>3. 얼굴형</td><td>모프 슬라이더 4개</td><td>턱선·광대·눈 크기·눈매 각도</td></tr>
+      <tr><td>4. 이목구비</td><td>눈 20 / 눈썹 12 / 코 10 / 입 10</td><td>텍스처 UV 교체 방식</td></tr>
+      <tr><td>5. 헤어</td><td>24종 × 컬러 16</td><td>유일한 추가 메시</td></tr>
+      <tr><td>6. 액세서리</td><td>10종</td><td>안경·마스크·헤어밴드 등</td></tr>
+      <tr><td>7. 기본 의상</td><td><strong>민무늬 티셔츠 + 바지</strong> 1벌 × 컬러 12색</td><td>무늬·로고·장식 없음. 소속 동네의 기본색을 자동 제안</td></tr>
+    </tbody>
+  </table></div>
+
+  <ul>
+    <li><strong>랜덤 버튼 필수.</strong> 커스터마이징에 관심 없는 유저가 한 번에 넘길 수 있어야 한다</li>
+    <li><strong>얼굴은 계정 단위 아바타</strong>다. 전 종목에 동일하게 적용된다. "기흥구의 나"라는 한 사람이 검도가도 하고 씨름꾼도 하는 개념 — 지역 소속 게임의 정체성과 맞고, 제작 비용도 얼굴 세트 1개로 끝난다</li>
+    <li>얼굴·헤어 <strong>재변경은 언제든 무료</strong></li>
+    <li>스킨(의상)만 종목별로 따로 장착한다</li>
+  </ul>
+
+  <h3>2.5D 구현 방식</h3>
+  <ul>
+    <li><strong>얼굴 메시를 바꾸지 않는다.</strong> 단일 헤드 메시 + 모프 타겟(블렌드셰이프)으로 얼굴형·눈 크기·눈매 각도를 조절하고, 눈·눈썹·입은 텍스처 아틀라스에서 <strong>UV 오프셋만 교체</strong></li>
+    <li>셀셰이딩 툰이므로 눈·눈썹이 평면 텍스처여도 어색하지 않다</li>
+    <li>결과: 파츠가 수백 개여도 <strong>메시 1개, 드로우콜 1개</strong></li>
+    <li>헤어만 별도 메시(로우폴리 400~800tri), 컬러는 셰이더 팔레트 파라미터</li>
+    <li>부수 효과로 <strong>표정 애니메이션</strong>(피격 찡그림, 승리 미소)이 따라온다</li>
+  </ul>
+
+  <h3>기본 의상</h3>
+  <ul>
+    <li><strong>메시 1벌 + 컬러 팔레트</strong>가 전부. 무늬도 장식도 없으므로 텍스처 작업이 거의 들지 않는다</li>
+    <li>이 한 벌이 <strong>전 종목에 공통</strong>으로 쓰인다</li>
+    <li>스킨을 하나도 갖지 않은 상태의 기본 외형이며, 학생·성인 어느 쪽에도 어색하지 않다</li>
+  </ul>
+</section>
+
+<!-- 09 -->
+<section class="sec" id="s09">
+  <div class="sec-head"><div class="sec-num">09</div><div class="sec-title">
+    <h2>홈 / 어웨이</h2><p>STAGE &amp; PRESENTATION</p></div></div>
+
+  <h3>홈팀 규칙</h3>
+  <ul>
+    <li><strong>방을 만든 사람 = 홈팀.</strong> 홈팀이 스테이지 선택권 (자국 배경 중 택1 또는 랜덤)</li>
+    <li>랭크 매치는 먼저 큐에 들어온 쪽이 홈. 라운드마다 배경 전환 옵션</li>
+    <li><strong>홈 어드밴티지는 시각 연출뿐, 게임플레이에 일절 영향 없음</strong> (관중 함성·응원 배너)</li>
+  </ul>
+
+  <h3>입장 연출</h3>
+<pre>[매칭 성사]
+   ↓ (0.0s) 3D 지구본 등장
+   ↓ (0.8s) 원정팀 국가에 핀 → 홈팀 국가에 핀
+   ↓ (1.5s) 비행기가 두 핀 사이 곡선 궤적 + 점선 트레일
+   ↓ (3.0s) 홈 스테이지로 컷 없이 하강·줌인
+   ↓ (4.0s) "USA vs KOREA — MYEONGDONG" 배너
+   ↓ (5.0s) FIGHT</pre>
+
+  <div class="fig">
+    <div class="fig-t">FIG.4 — 입장 연출 스토리보드 (5초, 원테이크)</div>
+    <svg viewBox="0 0 820 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="렌더 계층과 시뮬레이션 계층 대비도">
+      <!-- 상단: 렌더 -->
+      <text x="16" y="18" font-family="'JetBrains Mono',monospace" font-size="11" fill="#35BDF5">보이는 것 — 렌더 계층 (3D · 부동소수점 자유)</text>
+      <rect x="16" y="28" width="788" height="158" fill="#101A23" stroke="#25333F"/>
+      <rect x="16" y="140" width="788" height="46" fill="#14202A"/>
+      <rect x="60" y="70" width="46" height="70" fill="#18242F"/>
+      <rect x="700" y="82" width="52" height="58" fill="#18242F"/>
+      <!-- 캐릭터 A -->
+      <ellipse cx="300" cy="142" rx="26" ry="6" fill="#000" opacity=".5"/>
+      <circle cx="300" cy="72" r="12" fill="#5E7788"/>
+      <path d="M288 86 h24 v40 h-24 z" fill="#4BE38C" opacity=".85"/>
+      <path d="M290 126 l-3 16 h7 l3 -16 z M307 126 l3 16 h7 l-3 -16 z" fill="#3C7A5C"/>
+      <path d="M312 92 l44 -10 v9 l-44 10 z" fill="#E4EBF1" opacity=".8"/>
+      <!-- 캐릭터 B -->
+      <ellipse cx="470" cy="142" rx="26" ry="6" fill="#000" opacity=".5"/>
+      <circle cx="470" cy="72" r="12" fill="#5E7788"/>
+      <path d="M458 86 h24 v40 h-24 z" fill="#FF4D5E" opacity=".8"/>
+      <path d="M460 126 l-3 16 h7 l3 -16 z M477 126 l3 16 h7 l-3 -16 z" fill="#8C3742"/>
+      <path d="M366 86 l14 -6 -4 8 12 -2 -11 9 5 7 -16 -6 -6 7 z" fill="#FFC24B"/>
+      <text x="792" y="178" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D" text-anchor="end">셀셰이딩 · 스켈레톤 · 이펙트 · 카메라 · 보간</text>
+
+      <!-- 화살표 -->
+      <path d="M410 300 L410 194" stroke="#4BE38C" stroke-width="2" marker-end="url(#arG)" fill="none"/>
+      <rect x="440" y="228" width="196" height="26" fill="#16222C" stroke="#25333F"/>
+      <text x="452" y="246" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#4BE38C">단방향 참조 · 읽기 전용</text>
+      <rect x="184" y="228" width="196" height="26" fill="#16222C" stroke="#25333F"/>
+      <text x="196" y="246" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#FF4D5E">역방향 절대 금지</text>
+      <path d="M368 236 L344 246" stroke="#FF4D5E" stroke-width="1.6"/>
+      <path d="M344 236 L368 246" stroke="#FF4D5E" stroke-width="1.6"/>
+
+      <!-- 하단: 시뮬 -->
+      <text x="16" y="290" font-family="'JetBrains Mono',monospace" font-size="11" fill="#FF4D5E">계산되는 것 — 시뮬 계층 (2D · 고정소수점 · 롤백 대상)</text>
+      <rect x="16" y="300" width="788" height="118" fill="#0F171F" stroke="#25333F"/>
+      <g stroke="#1F2C37"><line x1="16" y1="330" x2="804" y2="330"/><line x1="16" y1="360" x2="804" y2="360"/><line x1="16" y1="390" x2="804" y2="390"/></g>
+      <!-- A boxes -->
+      <rect x="284" y="318" width="34" height="76" fill="none" stroke="#35BDF5" stroke-width="1.6"/>
+      <rect x="290" y="386" width="22" height="10" fill="none" stroke="#4BE38C" stroke-width="1.4"/>
+      <rect x="318" y="330" width="56" height="20" fill="#FF4D5E" opacity=".28" stroke="#FF4D5E" stroke-width="1.4"/>
+      <!-- B boxes -->
+      <rect x="454" y="318" width="34" height="76" fill="none" stroke="#35BDF5" stroke-width="1.6"/>
+      <rect x="460" y="386" width="22" height="10" fill="none" stroke="#4BE38C" stroke-width="1.4"/>
+      <g font-family="'JetBrains Mono',monospace" font-size="9" fill="#5F707D">
+        <text x="284" y="312">HURT</text>
+        <text x="322" y="326" fill="#FF4D5E">HIT</text>
+        <text x="290" y="408" fill="#4BE38C">PUSH</text>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="10" fill="#98A9B7">
+        <text x="530" y="322">FRAME  0142</text>
+        <text x="530" y="340">A  x=+12.4531  lane=3  state=ATK_C3</text>
+        <text x="530" y="358">B  x=+21.8203  lane=3  state=HITSTUN 14F</text>
+        <text x="530" y="376">COMBO 7  SCALE 70%  HASH 4f9a21c8</text>
+        <text x="530" y="398" fill="#4BE38C">동일 입력 → 동일 해시 (결정론 보증)</text>
+      </g>
+    </svg>
+    <div class="fig-note"><strong>이 5초의 두 가지 역할:</strong> 게임의 첫인상을 만드는 연출인 동시에, <strong>P2P 연결 수립·에셋 로딩·언어팩 및 UGC 맵 다운로드를 덮는 로딩 마스크</strong>다. 컷 없이 지구본에서 스테이지까지 이어지므로 로딩 지연이 눈에 띄지 않는다.</div>
+  </div>
+
+  <ul>
+    <li>재대결 시 2초 단축판</li>
+    <li>국내전은 비행기 대신 KTX / 버스 / 자전거로 차등. <strong>같은 구(區)면 걸어서 등장</strong></li>
+  </ul>
+
+  <h3>스테이지 제작 — 모듈러 키트</h3>
+<pre>[국가 키트] 예: 한국
+ ├ 건축 모듈 (벽·창·간판·기와·셔터)        … 40~60개 프롭
+ ├ 스트리트 프롭 (가로등·자판기·전봇대·화분) … 30개
+ ├ 라이팅 프리셋 (낮/노을/야간/비)          … 4종
+ └ 스카이박스 + 컬러그레이딩 LUT           … 3종
+      ↓ 조합
+ 스테이지 15종 (명동 / 한강 / 옥상 / 시장 / 감천마을 …)</pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>작업</th><th>공수</th></tr></thead>
+    <tbody>
+      <tr><td>국가 키트 최초 구축</td><td>1~2주 (AI 프롭 생성 적용, 15장)</td></tr>
+      <tr><td>같은 키트 내 스테이지 1종 추가</td><td><strong>2~3일</strong></td></tr>
+      <tr><td>라이팅·시간대 변형</td><td>반나절 (같은 스테이지가 낮/야간 2종으로)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tw"><table>
+    <thead><tr><th>단계</th><th>범위</th></tr></thead>
+    <tbody>
+      <tr><td>출시</td><td>1개국 × 6종 = <strong>6종</strong> (한국)</td></tr>
+      <tr><td>+6개월</td><td>4개국 × 8종 = <strong>32종</strong></td></tr>
+      <tr><td>장기</td><td>국가당 15~20종 + UGC 스테이지</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>국가를 늘리는 비용과 그 안에서 스테이지를 늘리는 비용이 10배 이상 차이 난다. <strong>국가는 유저 유입 데이터를 보고 신중하게, 스테이지는 공격적으로</strong> 늘린다.</p>
+
+  <p>실존 랜드마크는 <strong>양식화된 아트 + 가상 명칭</strong>("명동 스타일 거리")으로 처리하고 실명 표기를 피한다.</p>
+</section>
+
+<!-- 10 -->
+<section class="sec" id="s10">
+  <div class="sec-head"><div class="sec-num">10</div><div class="sec-title">
+    <h2>매칭 &amp; 방</h2><p>MATCHMAKING</p></div></div>
+
+  <div class="tw"><table>
+    <thead><tr><th>모드</th><th>설명</th><th>서버 부담</th></tr></thead>
+    <tbody>
+      <tr><td>랭크 매치</td><td>점수 기반 자동 매칭. 대기 10초마다 허용 점수차 ±50씩 확대(최대 ±400), 30초 초과 시 지역 필터 해제</td><td>매칭 서버(경량)</td></tr>
+      <tr><td>방 목록</td><td>공개방 생성/입장. 지역·핑·티어 필터</td><td>로비 서버(메타데이터만)</td></tr>
+      <tr><td>친구 코드</td><td>방 생성 시 6자리 코드 자동 발급(예: <code>K7X2M9</code>) → 상대가 코드 검색 + 비밀번호 입력 후 입장</td><td>시그널링만</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>서버 부담 최소화 구조</h3>
+<pre>[클라이언트 A] ←── P2P UDP (실제 대전 트래픽) ──→ [클라이언트 B]
+       │                                              │
+       └──────→ [시그널링 / 매칭 서버] ←──────────────┘
+                        │
+                 [REST API + DB]  ← 랭킹, 프로필, 상점, 결제검증
+                        │
+                 [Relay 서버]     ← NAT 통과 실패 시에만 (10~20%)</pre>
+
+  <ul>
+    <li><strong>대전 자체가 서버를 거치지 않는다.</strong> 1:1이므로 P2P가 성립하며, 이것이 비용의 90%를 없앤다</li>
+    <li>시그널링 서버는 연결 수립까지만 관여 (연결당 수 KB). 단일 소형 인스턴스로 동시 수천 매칭 처리</li>
+    <li>방 목록은 폴링 금지 → <strong>WebSocket 델타 푸시</strong>, 지역별 샤딩</li>
+    <li>랭킹 조회는 <strong>Redis 정렬셋(ZSET) + 5분 캐시</strong>. DB 직조회 금지</li>
+  </ul>
+
+  <h3>부정행위 대응</h3>
+  <div class="tw"><table>
+    <thead><tr><th>대책</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>입력 로그 서명</td><td>양측이 종료 시 입력 해시를 제출, 불일치 시 무효</td></tr>
+      <tr><td>결과 이중 보고</td><td>보고가 다르면 점수 미반영 + 자동 신고</td></tr>
+      <tr><td>리플레이 재검증</td><td>상위 1,000위 경기는 서버가 백그라운드 재현·검증</td></tr>
+      <tr><td>서버 권위 모드</td><td>레전드 티어 이상은 전용 서버 경유 (인원 극소수라 비용 미미)</td></tr>
+      <tr><td>이상 패턴 탐지</td><td>승률 98%+, 반응속도 &lt;80ms 자동 플래그</td></tr>
+      <tr><td>계정 요건</td><td>스토어 계정 연동 필수. 신규 계정은 <strong>배치 20판 후</strong> 랭크 반영</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 11 -->
+<section class="sec" id="s11">
+  <div class="sec-head"><div class="sec-num">11</div><div class="sec-title">
+    <h2>넷코드 &amp; 기술</h2><p>TECHNICAL</p></div></div>
+
+  <h3>제1원칙 — 시뮬레이션과 렌더링의 완전 분리</h3>
+
+<pre>┌─ 시뮬레이션 계층 (게임의 진실) ───────────────┐
+│  · 60Hz 고정 틱, 고정소수점(Q16.16) 연산       │
+│  · 위치 = (X, 레인, Y높이) — 논리 좌표          │
+│  · 판정 = 손으로 작성한 AABB 박스 배열          │
+│  · 프레임 번호로 인덱싱 (애니메이션 시간 아님)   │
+│  · 3D 요소 없음. 롤백 대상은 오직 이 계층        │
+└──────────────────────────────────────────────┘
+                    ↓ (읽기 전용, 단방향)
+┌─ 렌더 계층 (보이는 것) ──────────────────────┐
+│  · 3D 모델·스켈레톤·셀셰이딩·카메라·이펙트      │
+│  · 부동소수점 자유 (판정에 영향 없음)           │
+│  · 프레임 간 보간, 가변 프레임레이트 허용        │
+│  · 롤백 시 즉시 스냅 (보간 버림)                │
+└──────────────────────────────────────────────┘</pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>❌ 금지</th><th>✅ 대신</th></tr></thead>
+    <tbody>
+      <tr><td>본(Bone) 위치에서 히트박스 추출</td><td>프레임별 히트박스를 <strong>에디터에서 손으로 작성</strong>해 데이터로 저장</td></tr>
+      <tr><td>물리 엔진(Rigidbody, Collider)으로 판정</td><td>자체 AABB 겹침 검사</td></tr>
+      <tr><td><code>Time.deltaTime</code> 기반 상태 전이</td><td><strong>프레임 카운터</strong> 기반 상태 전이</td></tr>
+      <tr><td>애니메이션 재생 위치로 공격 발동 판정</td><td>프레임 인덱스 테이블 참조</td></tr>
+      <tr><td>판정 계산에 float 사용</td><td>고정소수점 정수 연산</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="fig">
+    <div class="fig-t">FIG.5 — 같은 순간, 두 개의 표현</div>
+    <svg viewBox="0 0 820 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="홈 어웨이 입장 연출 스토리보드">
+      <!-- F1 지구본 -->
+      <rect x="8" y="26" width="150" height="106" fill="#101A23" stroke="#25333F"/>
+      <circle cx="83" cy="79" r="36" fill="#14202A" stroke="#2E4150"/>
+      <ellipse cx="83" cy="79" rx="36" ry="13" fill="none" stroke="#25333F"/>
+      <ellipse cx="83" cy="79" rx="14" ry="36" fill="none" stroke="#25333F"/>
+      <circle cx="63" cy="66" r="4" fill="#FF4D5E"/>
+      <circle cx="102" cy="88" r="4" fill="#4BE38C"/>
+      <!-- F2 비행 -->
+      <rect x="170" y="26" width="150" height="106" fill="#101A23" stroke="#25333F"/>
+      <circle cx="245" cy="79" r="36" fill="#14202A" stroke="#2E4150"/>
+      <path d="M225 66 Q245 40 264 88" fill="none" stroke="#FFC24B" stroke-width="1.4" stroke-dasharray="3 3"/>
+      <circle cx="225" cy="66" r="4" fill="#FF4D5E"/>
+      <circle cx="264" cy="88" r="4" fill="#4BE38C"/>
+      <path d="M247 49 l11 4 -11 4 3 -4 z" fill="#FFC24B"/>
+      <!-- F3 하강 -->
+      <rect x="332" y="26" width="150" height="106" fill="#101A23" stroke="#25333F"/>
+      <path d="M332 132 L332 96 Q407 76 482 96 L482 132 z" fill="#16222C"/>
+      <rect x="352" y="86" width="20" height="46" fill="#1B2934"/>
+      <rect x="380" y="76" width="26" height="56" fill="#1F2E3A"/>
+      <rect x="418" y="90" width="18" height="42" fill="#1B2934"/>
+      <path d="M400 42 l14 5 -14 5 4 -5 z" fill="#FFC24B"/>
+      <path d="M370 36 Q400 30 430 52" fill="none" stroke="#FFC24B" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <!-- F4 배너 -->
+      <rect x="494" y="26" width="150" height="106" fill="#101A23" stroke="#25333F"/>
+      <rect x="494" y="96" width="150" height="36" fill="#14202A"/>
+      <rect x="506" y="56" width="126" height="26" fill="#0D141B" stroke="#31434F"/>
+      <text x="569" y="73" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#E4EBF1" text-anchor="middle">USA vs KOREA</text>
+      <text x="569" y="94" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#FFC24B" text-anchor="middle">MYEONGDONG</text>
+      <!-- F5 FIGHT -->
+      <rect x="656" y="26" width="150" height="106" fill="#101A23" stroke="#25333F"/>
+      <rect x="656" y="96" width="150" height="36" fill="#14202A"/>
+      <ellipse cx="700" cy="112" rx="15" ry="4" fill="#000" opacity=".5"/>
+      <circle cx="700" cy="82" r="8" fill="#5E7788"/><rect x="692" y="92" width="16" height="20" fill="#4BE38C" opacity=".85"/>
+      <ellipse cx="762" cy="112" rx="15" ry="4" fill="#000" opacity=".5"/>
+      <circle cx="762" cy="82" r="8" fill="#5E7788"/><rect x="754" y="92" width="16" height="20" fill="#FF4D5E" opacity=".8"/>
+      <text x="731" y="56" font-family="'Black Han Sans',sans-serif" font-size="20" fill="#FFC24B" text-anchor="middle">FIGHT</text>
+
+      <!-- 타임라인 -->
+      <line x1="8" y1="152" x2="806" y2="152" stroke="#25333F"/>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5F707D" text-anchor="middle">
+        <text x="83" y="148">▼</text><text x="83" y="168">0.0s</text><text x="83" y="184" fill="#98A9B7">3D 지구본</text>
+        <text x="245" y="148">▼</text><text x="245" y="168">1.5s</text><text x="245" y="184" fill="#98A9B7">비행 궤적</text>
+        <text x="407" y="148">▼</text><text x="407" y="168">3.0s</text><text x="407" y="184" fill="#98A9B7">스테이지 하강</text>
+        <text x="569" y="148">▼</text><text x="569" y="168">4.0s</text><text x="569" y="184" fill="#98A9B7">대전 배너</text>
+        <text x="731" y="148">▼</text><text x="731" y="168">5.0s</text><text x="731" y="184" fill="#98A9B7">전투 개시</text>
+      </g>
+      <rect x="8" y="196" width="798" height="1" fill="#25333F"/>
+    </svg>
+    <div class="fig-note">위아래는 같은 순간을 그린 것이지만, 게임의 진실은 <strong>아래쪽</strong>이다. 위쪽은 아래쪽을 읽어서 그릴 뿐 아무것도 결정하지 않는다. 이 구조 덕분에 히트박스 시각화 툴, 리플레이, 서버 재검증, 훈련모드 프레임 표시가 전부 따라온다.</div>
+  </div>
+
+  <h3>넷코드</h3>
+  <ul>
+    <li><strong>롤백 넷코드.</strong> 입력 지연 2~3프레임 고정, 최대 롤백 8프레임</li>
+    <li>결정론적 시뮬레이션 필요 → <strong>고정소수점 연산</strong>, 부동소수점 금지</li>
+    <li>한국↔미국(RTT 150~200ms)도 롤백이면 플레이 가능. 홈/어웨이 컨셉의 전제 조건</li>
+    <li>결정론 검증: 같은 입력 → 같은 상태 해시. CI에 골든 테스트로 상시 실행(15장)</li>
+  </ul>
+
+  <h3>엔진</h3>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Unity 6 <span class="tag done">권장</span></th><th>Godot 4.x</th></tr></thead>
+    <tbody>
+      <tr><td>3D 모바일 렌더러</td><td>◎ URP, 실전 검증 다수</td><td>○ 개선 중이나 사례 적음</td></tr>
+      <tr><td>스켈레탈 애니메이션</td><td>◎ GPU 스키닝, 압축</td><td>△ 다수 캐릭터 시 약점</td></tr>
+      <tr><td>툰 셰이더 생태계</td><td>◎ 즉시 사용 가능</td><td>△ 직접 작성 (+4~6주)</td></tr>
+      <tr><td>애니메이션 리타게팅</td><td>◎ FBX/humanoid 강력</td><td>○ glTF 중심, 수동</td></tr>
+      <tr><td>비용</td><td>매출 20만$ 초과 시 유료</td><td>완전 무료</td></tr>
+      <tr><td>빌드 용량</td><td>150~300MB</td><td>100~200MB</td></tr>
+    </tbody>
+  </table></div>
+  <p>어느 쪽이든 <strong>시뮬레이션 계층은 엔진 비의존 모듈</strong>(순수 C#/C++)로 분리한다. 엔진을 갈아타야 해도 게임의 핵심은 살아남는다.</p>
+
+  <h3>저사양 최적화</h3>
+  <h4>캐릭터</h4>
+  <ul>
+    <li>폴리곤 예산 <strong>캐릭터당 8,000~12,000 tri</strong>, 본 45~60개</li>
+    <li>머티리얼 1~2개 통합 (툰 셰이더 + 아웃라인)</li>
+    <li>얼굴 커스터마이징은 모프타겟 + UV 오프셋 → 드로우콜 증가 없음</li>
+    <li>LOD 2단계, 모바일 저사양 모드에서 강제 LOD1</li>
+  </ul>
+  <h4>스테이지·라이팅</h4>
+  <ul>
+    <li><strong>라이트맵 전면 베이크.</strong> 실시간 라이트는 캐릭터용 디렉셔널 1개만</li>
+    <li>실시간 그림자 없음 → <strong>블롭 그림자</strong>로 대체 (깊이 판독에도 유리)</li>
+    <li>GPU 인스턴싱 + 스태틱 배칭, 드로우콜 <strong>80 이하</strong></li>
+    <li>스테이지 폴리곤 <strong>50,000 tri 이하</strong>, 텍스처 아틀라스 2048² × 3장 이내</li>
+  </ul>
+  <h4>렌더 · 공통</h4>
+  <ul>
+    <li>모바일 내부 렌더 해상도 <strong>1280×720 고정</strong> → 업스케일 출력</li>
+    <li>포스트 프로세싱은 컬러그레이딩(LUT) 1패스만. 블룸·모션블러·SSAO·AA는 저사양에서 off</li>
+    <li>파티클 상한 저사양 128 / 고사양 512, GPU 파티클</li>
+    <li><strong>시뮬 60Hz / 렌더 가변</strong> 분리 → 렌더가 30fps로 떨어져도 판정은 완전 동일</li>
+    <li>텍스처 압축: Android ASTC 6×6 (ETC2 폴백) / iOS ASTC</li>
+    <li><strong>발열 관리:</strong> 모바일은 3경기 연속 후 해상도 스케일 90% 자동 하향(해제 가능)</li>
+  </ul>
+
+  <h3>용량 예산</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>크기</th></tr></thead>
+    <tbody>
+      <tr><td>엔진 런타임</td><td class="num">40~60MB</td></tr>
+      <tr><td>캐릭터 2종 + 기본 의상</td><td class="num">30~40MB</td></tr>
+      <tr><td>스테이지 6종 (한국 키트)</td><td class="num">40~60MB</td></tr>
+      <tr><td>오디오·UI·폰트</td><td class="num">30MB</td></tr>
+      <tr><td><strong>초기 다운로드</strong></td><td class="num"><strong>150MB 내외</strong></td></tr>
+      <tr><td>확장 후 전체 (에셋 번들)</td><td class="num">300~400MB</td></tr>
+    </tbody>
+  </table></div>
+  <p>iOS 셀룰러 다운로드 한도(200MB)를 넘지 않도록 초기 빌드를 200MB 이하로 묶고, 나머지는 에셋 번들로 내려받는다.</p>
+
+  <h3>백엔드</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>API</td><td>Node.js 또는 Go + REST</td></tr>
+      <tr><td>DB</td><td>PostgreSQL (프로필·거래·소속·CP 원장)</td></tr>
+      <tr><td>캐시·랭킹</td><td>Redis ZSET</td></tr>
+      <tr><td>시그널링</td><td>WebSocket 단일 서비스</td></tr>
+      <tr><td>Relay</td><td>지역별 소형 UDP 릴레이 (서울·오리건·프랑크푸르트)</td></tr>
+      <tr><td>스토리지</td><td>S3 호환 + CDN (UGC 텍스처·맵)</td></tr>
+      <tr><td>결제검증</td><td>Steam Web API / Google Play Billing / Apple StoreKit 서버 검증</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 12 -->
+<section class="sec" id="s12">
+  <div class="sec-head"><div class="sec-num">12</div><div class="sec-title">
+    <h2>경제 &amp; 과금</h2><p>ECONOMY</p></div></div>
+
+  <h3>무료 / 결제 경계</h3>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>무료 유저</th><th>결제 유저</th></tr></thead>
+    <tbody>
+      <tr><td>기본 의상</td><td><strong>민무늬 티셔츠 + 바지</strong> × 12색</td><td>동일</td></tr>
+      <tr><td>얼굴 커스터마이징</td><td>전부 무료 (8장)</td><td>동일</td></tr>
+      <tr><td>종목</td><td><strong>전부 무료</strong></td><td>동일 — P2W 금지</td></tr>
+      <tr><td>랭킹·소속·시즌</td><td><strong>전면 참여</strong></td><td>동일</td></tr>
+      <tr><td><strong>스킨 구매·장착</strong></td><td><span class="tag crit">불가</span></td><td><span class="tag done">가능</span></td></tr>
+      <tr><td>UGC 제작</td><td>제작 가능, <strong>판매 등록은 결제 이력 필요</strong></td><td>가능</td></tr>
+      <tr><td>시즌 패스</td><td>무료 트랙만</td><td>유료 트랙 포함</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>무료 유저는 무늬 없는 티셔츠와 바지 차림이다. 옷을 입고 있되 아무 개성이 없는 상태이므로, 스킨을 장착한 결제 유저와 나란히 서면 차이가 한눈에 보인다.</p>
+
+  <h3>CP (Clash Point)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>획득</td><td>① 현금 충전 ② UGC 판매 수익 ③ 시즌·랭킹 보상(소량) ④ 일일 미션(소량)</td></tr>
+      <tr><td>사용</td><td>스킨 구매 전용</td></tr>
+      <tr><td>환금</td><td><strong>불가.</strong> 이용약관에 명시. 환전 창구를 두지 않는다</td></tr>
+      <tr><td>귀속</td><td>계정 단위. 크로스 플랫폼 공유</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>충전 패키지</h4>
+  <div class="tw"><table>
+    <thead><tr><th>가격</th><th>CP</th><th>보너스</th></tr></thead>
+    <tbody>
+      <tr><td class="num">₩1,200</td><td class="num">100 CP</td><td>—</td></tr>
+      <tr><td class="num">₩3,900</td><td class="num">350 CP</td><td class="num">+7%</td></tr>
+      <tr><td class="num">₩9,900</td><td class="num">950 CP</td><td class="num">+15%</td></tr>
+      <tr><td class="num">₩19,900</td><td class="num">2,000 CP</td><td class="num">+21%</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>구매 플로우</h4>
+<pre>스킨 선택 → [CP 부족] → 충전 시트 자동 노출
+                          └ 필요한 최소 패키지 자동 하이라이트
+                             → 결제 → 즉시 구매 완료 → 장착</pre>
+
+  <h3>스킨 가격</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>기본 스킨</td><td class="num">100 CP</td><td>단색 계열, 소품 1점</td></tr>
+      <tr><td>테마 스킨</td><td class="num">250 CP</td><td>의상 전체 교체</td></tr>
+      <tr><td>프리미엄 스킨</td><td class="num">450 CP</td><td>실루엣 변형 + 전용 이펙트</td></tr>
+    </tbody>
+  </table></div>
+  <p>스킨은 <strong>외형 전용. 히트박스·프레임 데이터 절대 불변.</strong></p>
+
+  <h3>시즌 패스</h3>
+  <ul>
+    <li>8주 시즌 단위. 스킨·이모트·칭호·배경 프레임 중심</li>
+    <li><strong>능력치·종목은 절대 포함하지 않는다</strong></li>
+    <li>무료 트랙 / 유료 트랙 2단 구성</li>
+  </ul>
+
+  <h3>운영 규칙</h3>
+  <ul>
+    <li><strong>확률형 아이템(랜덤박스) 없음.</strong> 전 품목 직접 구매</li>
+    <li>미성년자 결제 보호: 월 한도 설정, 보호자 동의, 환불 정책 명시</li>
+    <li>CP 충전은 <strong>각 플랫폼의 결제 수단으로만</strong>. 앱 내에서 외부 결제를 안내하지 않는다</li>
+    <li>충전된 CP는 계정 귀속이므로 Steam에서 충전한 CP를 iOS에서 사용 가능</li>
+    <li>스토어 수수료 30% (구글·애플 연 100만$ 이하 15%)가 CP 충전·시즌 패스 결제에 적용</li>
+  </ul>
+</section>
+
+<!-- 13 -->
+<section class="sec" id="s13">
+  <div class="sec-head"><div class="sec-num">13</div><div class="sec-title">
+    <h2>UGC 마켓</h2><p>CREATOR ECONOMY</p></div></div>
+
+<pre>① 공식 에디터로 제작 (스킨 = UV 텍스처 페인팅 / 맵 = 키트 조립)
+        ↓
+② 워크샵 업로드
+        ↓
+③ 커뮤니티 반응 수집 → 임계치 통과
+        ↓
+④ 자동 필터 + 운영 검수 통과
+        ↓
+⑤ 정식 스토어 등재 → 판매
+        ↓
+⑥ 판매 CP의 50%를 제작자에게 CP로 지급</pre>
+
+  <h3>UGC 스킨 — 텍스처 페인팅</h3>
+  <div class="tw"><table>
+    <thead><tr><th>유저가 할 수 있는 것</th><th>할 수 없는 것</th></tr></thead>
+    <tbody>
+      <tr><td>펼쳐진 UV 텍스처(1024×1024) 위에 페인팅. 에디터에서 3D 프리뷰 실시간 회전</td><td>3D 모델(.fbx/.glb) 업로드</td></tr>
+      <tr><td>데칼 스티커 레이어 배치 — 그림을 못 그려도 참여 가능</td><td>메시·리그·본 변경</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>메시가 고정이므로 <strong>스킨이 히트박스·실루엣에 영향을 줄 수 없다.</strong> "판정 불변" 원칙이 설계 차원에서 강제된다</li>
+    <li>셀셰이딩이라 텍스처가 대부분 평면 색면 → 그림 실력이 없어도 결과물이 그럴듯하게 나온다</li>
+    <li>텍스처 파일 하나(≈500KB, 압축 후 ~150KB)만 오가므로 CDN 비용·검수 부담 최소</li>
+    <li>실루엣 자체를 바꾸는 스킨은 <strong>공식 프리미엄 스킨의 영역</strong>으로 남긴다</li>
+  </ul>
+
+  <h3>UGC 스테이지 — "우리 동네 만들기"</h3>
+  <p>1:1 격투 스테이지는 평평한 바닥 + 5레인이 전부이고 지형이 승패에 개입하지 않는다. 따라서 <strong>유저가 만드는 것은 레벨 디자인이 아니라 배경 장식</strong>이며, 밸런스 검수가 필요 없다.</p>
+
+  <div class="box note"><span class="lb">맵 파일 규격</span>
+    <p>맵 파일은 <strong>선언적 데이터만</strong> 담는다. 프롭 배치, 라이팅 프리셋, 스카이박스, 데칼 텍스처, 카메라 경계가 전부이며 <strong>실행 가능한 코드는 포함하지 않는다.</strong> 유저 코드가 시뮬레이션에 개입하면 결정론이 깨져 롤백 넷코드가 성립하지 않기 때문이다(11장).</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>유저가 할 수 있는 것</th><th>할 수 없는 것</th></tr></thead>
+    <tbody>
+      <tr><td>키트 프롭 배치·회전·크기 조절 (그리드 스냅)</td><td>3D 모델 업로드</td></tr>
+      <tr><td>간판·현수막·벽면에 <strong>직접 그린 데칼</strong> 부착 — 우리 동네나 크루 이름을 벽에 쓸 수 있다</td><td>스크립트·트리거·이벤트</td></tr>
+      <tr><td>라이팅 프리셋·시간대·날씨 선택</td><td>바닥 지형 변경, 레인 구조 수정</td></tr>
+      <tr><td>스카이박스·컬러그레이딩 선택</td><td>카메라 거동·판정 관련 값 수정</td></tr>
+      <tr><td>배경 관중·소품 애니메이션 on/off</td><td>임의 에셋 참조</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box rec"><span class="lb">개발 순서</span>
+    <p>맵 에디터를 나중에 따로 만들지 않는다. 공식 스테이지도 어차피 무언가로 만들어야 하므로, <strong>그 내부 제작 툴을 처음부터 유저용 에디터로 설계</strong>한다. 포맷·직렬화·프롭 ID 체계는 <strong>STAGE 1부터 UGC를 전제로</strong> 잡아둔다.</p>
+  </div>
+
+  <h4>배포 방식</h4>
+  <div class="tw"><table>
+    <thead><tr><th>구성</th><th>크기</th></tr></thead>
+    <tbody>
+      <tr><td>프롭 배치 데이터 (500개 상한 × 약 40B)</td><td class="num">약 20 KB</td></tr>
+      <tr><td>커스텀 데칼 텍스처 (512² × 4장 상한)</td><td class="num">200~600 KB</td></tr>
+      <tr><td>메타데이터·썸네일</td><td class="num">약 50 KB</td></tr>
+      <tr><td><strong>맵 1개 합계 (압축 후)</strong></td><td class="num"><strong>300 KB ~ 1.5 MB</strong></td></tr>
+    </tbody>
+  </table></div>
+
+<pre>① 방 목록·친구방에서 맵 ID + 해시가 먼저 보인다
+        ↓
+② 입장 시 <strong>백그라운드 다운로드</strong> (CDN 우선, P2P 폴백)
+        ↓
+③ 로컬 캐시에 저장 — 한 번 받은 맵은 다시 안 받는다
+        ↓
+④ 매치 시작 시 <strong>양측 맵 해시 대조</strong> — 불일치면 매치 취소
+        ↓
+⑤ 5초 입장 연출이 남은 로딩을 덮는다 (9장)</pre>
+
+  <h4>제작 상한</h4>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>상한</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr><td>프롭 개수</td><td class="num">500개</td><td rowspan="3">에디터에서 <strong>강제.</strong> 실시간으로 "모바일 60fps 가능/불가" 표시, 초과 시 업로드 차단. 저사양 상대의 프레임을 떨구는 어뷰징 방지</td></tr>
+      <tr><td>폴리곤</td><td class="num">50,000 tri</td></tr>
+      <tr><td>커스텀 텍스처</td><td class="num">512² × 4장</td></tr>
+      <tr><td>배경 대비</td><td>자동 검사</td><td>캐릭터 실루엣이 항상 배경보다 앞 레이어에 렌더되도록 셰이더에서 보장</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>파서·검증</h4>
+  <ul>
+    <li>화이트리스트 파서 — 모르는 필드는 거부. 프롭 ID는 게임이 보유한 것만 참조 가능</li>
+    <li>매치 시작 전 해시 대조, 불일치 시 취소 및 자동 신고</li>
+  </ul>
+
+  <h3>사용 범위</h3>
+  <div class="tw"><table>
+    <thead><tr><th>모드</th><th>UGC 맵</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr><td>랭크 매치</td><td><span class="tag crit">공식만</span></td><td>매칭마다 다운로드가 붙으면 대기가 길어지고, 시각 환경이 제각각이면 경쟁 공정성이 깨진다</td></tr>
+      <tr><td>캐주얼 방·친구방</td><td><span class="tag done">허용</span></td><td>UGC 맵의 주 무대</td></tr>
+      <tr><td>지역 대항 이벤트</td><td><span class="tag done">허용</span></td><td>"우리 동네 맵에서 붙자"</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>제작자 인센티브:</strong> 인기 UGC 맵은 큐레이션을 거쳐 <strong>공식 스테이지로 승격</strong>시키고 제작자에게 CP를 지급한다. 랭크전에 자기 동네가 올라가는 것이 강한 동기가 된다.</p>
+
+  <h3>등재 기준</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>기준</th></tr></thead>
+    <tbody>
+      <tr><td>등재 임계치</td><td><strong>동적 기준</strong> — 「주간 업로드 상위 1%」 또는 「좋아요 300개」 중 먼저 도달. DAU 성장에 따라 자동 상향</td></tr>
+      <tr><td>투표 자격</td><td><strong>가중 좋아요</strong> — 계정당 1표, 누적 플레이 10시간 이상만 투표 가능, 랭크 가중치</td></tr>
+      <tr><td>저작권</td><td>자동 이미지 유사도 필터 + 신고 즉시 내림 + <strong>등재 전 사람 검수 필수</strong> + DMCA 절차 문서화</td></tr>
+      <tr><td>제작자 배분</td><td>판매 CP의 <strong>50%</strong>. 크리에이터 등급(브론즈~다이아)에 따라 55/60% 상향</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box dec"><span class="lb">공개 시점</span>
+    <p>UGC 워크샵은 <strong>STAGE 3</strong>에 연다. 2인 체제에서 검수 인력 없이 열 수 없다. 초기에는 <strong>주 1회 배치 큐레이션(주당 10개 승인)</strong>으로 축소 운영하고, DAU 5,000 + 검수 파트타임 확보 후 상시 운영으로 전환한다.</p>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="sec" id="s14">
+  <div class="sec-head"><div class="sec-num">14</div><div class="sec-title">
+    <h2>다국어</h2><p>LOCALIZATION</p></div></div>
+
+  <p>격투게임은 번역할 텍스트가 적다. 스토리도 대사도 없어 UI·튜토리얼·스킬명·상점·약관을 다 합쳐도 <strong>3,000~6,000 단어</strong> 수준이다.</p>
+
+  <h3>언어 티어</h3>
+  <div class="tw"><table>
+    <thead><tr><th>단계</th><th>언어</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>STAGE 1</td><td>한국어 · 영어</td><td>개발 언어 + 글로벌 기본</td></tr>
+      <tr><td>STAGE 2</td><td>+ 일본어 · 중국어 간체 · 스페인어(중남미) · 포르투갈어(브라질)</td><td>격투게임 인구가 많은 시장. 브라질·중남미는 커뮤니티가 매우 활발</td></tr>
+      <tr><td>STAGE 3</td><td>+ 러시아어 · 독일어 · 프랑스어 · 인도네시아어 · 태국어 · 베트남어</td><td>유저 유입 데이터를 보고 순차</td></tr>
+      <tr><td>보류</td><td>아랍어 · 히브리어</td><td>RTL 레이아웃 미러링이 필요해 UI를 다시 짜야 한다. 별도 과제</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>지역 이름은 번역하지 않는다</h3>
+  <div class="box rec"><span class="lb">원칙 — 원어 표기 + 로마자 병기</span>
+<pre>표시 예 (미국 유저의 화면에서)
+
+    경기도 용인시 기흥구
+    Giheung-gu, Yongin, Gyeonggi-do
+    KR</pre>
+    <p>전 세계 2단계 행정구역만 수만 개이고 크루명까지 더하면 계속 늘어나므로 번역은 불가능하다. 그리고 미국 유저가 화면에서 한글로 된 "용인시 기흥구"를 보는 것 자체가 이 게임의 핵심 경험이다. <strong>진짜 외국 동네와 싸우고 있다</strong>는 감각은 원어 표기에서 나온다.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>계층</th><th>표시 방식</th><th>데이터 출처</th></tr></thead>
+    <tbody>
+      <tr><td>국가</td><td>보는 사람의 언어로 번역 + ISO 코드 + 국기</td><td>표준 목록 (250개 미만)</td></tr>
+      <tr><td>1단계 행정구역</td><td>다국어 명칭 있으면 사용, 없으면 원어 + 로마자</td><td>GeoNames alternate names</td></tr>
+      <tr><td>2단계 행정구역</td><td><strong>원어 + 로마자</strong></td><td>각국 공공데이터</td></tr>
+      <tr><td>크루명</td><td><strong>유저가 입력한 그대로</strong> 표시. 번역하지 않음</td><td>유저 생성</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>폰트</h3>
+  <p>위 결정의 대가로 <strong>내 언어의 폰트만으로는 부족하다.</strong> 한국 유저가 일본 유저와 매칭되면 일본어 글리프가, 러시아 유저와 붙으면 키릴 문자가 필요하다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>문제</th><th>해법</th></tr></thead>
+    <tbody>
+      <tr><td>CJK 폰트는 각 10~20MB. 한·중·일 전부 넣으면 40MB+</td><td><strong>언어팩 온디맨드</strong> — 기본 빌드에는 라틴 + 사용자 언어만. 매칭 시 상대 스크립트 팩을 자동 다운로드(수 MB, 5초 입장 연출 뒤에 숨는다)</td></tr>
+      <tr><td>글리프 수가 많아 아틀라스가 터짐</td><td><strong>SDF 동적 폰트 아틀라스</strong> — 런타임에 필요한 글리프만 생성. 한 경기에 뜨는 지역명은 몇 개뿐</td></tr>
+      <tr><td>스크립트마다 폰트가 달라 디자인이 깨짐</td><td><strong>Noto Sans 계열로 통일</strong></td></tr>
+      <tr><td>텍스처에 구워진 글자는 번역 불가</td><td><strong>UI 텍스트를 텍스처에 굽지 않는다.</strong> 전부 런타임 렌더</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>텍스트 확장</h3>
+  <ul>
+    <li>독일어·러시아어는 영어 대비 <strong>30~40% 길어진다.</strong> CJK는 짧아진다</li>
+    <li>UI는 <strong>영어 기준 +40% 여백</strong>으로 설계. 격투게임 HUD는 공간이 빡빡해 나중에 늘릴 수 없다</li>
+    <li>버튼 라벨은 자동 축소(auto-shrink) + 잘리면 툴팁</li>
+    <li>순위 표기가 언어마다 다르다 — <code>3rd</code> / <code>3位</code> / <code>3위</code> / <code>3.º</code> → ICU 포맷</li>
+  </ul>
+
+  <h3>음성 — 비언어</h3>
+  <ul>
+    <li><strong>기합·신음·호흡 등 비언어 보이스만</strong> 사용 → 로컬라이제이션 비용 0</li>
+    <li>각성기 이름은 <strong>화면 자막 연출</strong>로 처리, 음성 없음</li>
+    <li>승리 대사도 텍스트 말풍선 또는 이모트로</li>
+    <li>자유 채팅 미탑재 → 실시간 다국어 모더레이션 부담 없음. 대신 <strong>프리셋 이모트·스티커</strong>로 소통</li>
+    <li>닉네임·크루명은 <strong>로케일별 금칙어 필터</strong> 적용</li>
+  </ul>
+
+  <h3>AI 번역 방침</h3>
+  <div class="tw"><table>
+    <thead><tr><th>대상</th><th>방식</th></tr></thead>
+    <tbody>
+      <tr><td>UI 문자열·메뉴</td><td>AI 1차 번역 + 네이티브 검수 (Tier 1~2) / 커뮤니티 번역 + 검수 (Tier 3)</td></tr>
+      <tr><td>종목명·스킬명·각성기명</td><td><span class="tag high">네이티브 필수</span> 직역하면 우스워진다</td></tr>
+      <tr><td>튜토리얼·콤보 트라이얼</td><td>AI + 검수</td></tr>
+      <tr><td><strong>이용약관·개인정보처리방침</strong></td><td><span class="tag crit">AI 단독 금지</span> 법적 효력 문서. 관할별 요구사항이 다르므로 전문 번역 또는 현지 검토</td></tr>
+      <tr><td>스토어 페이지</td><td>AI + 검수. 전환율에 직결되므로 카피 감각 필요</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>일관성 확보:</strong> 종목명·시스템 용어(버스트, 각성기, 소속, CP 등)를 <strong>용어집(termbase)</strong>으로 고정하고 매 번역 세션에 함께 주입한다.</p>
+
+  <h3>기술 구현</h3>
+  <ul>
+    <li><strong>키 기반 문자열 테이블.</strong> 영어 문장을 키로 쓰지 않는다</li>
+    <li><strong>ICU MessageFormat</strong> — 복수형, 순서수, 성별 변화</li>
+    <li>로케일별 숫자·날짜·시간 포맷</li>
+    <li><strong>언어와 지역 소속은 완전히 독립.</strong> 한국 거주 유저가 영어 UI를, 재외 한국인이 한국어 UI로 미국 소속을 쓸 수 있어야 한다</li>
+    <li>폴백 체인: 요청 로케일 → 기본 로케일 → 영어</li>
+    <li>CI에서 <strong>미번역 키 자동 검출</strong></li>
+  </ul>
+
+  <h3>추가 공수</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>AI 적용</th></tr></thead>
+    <tbody>
+      <tr><td>i18n 프레임워크·문자열 파이프라인</td><td class="num">0.5 인월</td></tr>
+      <tr><td>폰트·언어팩 온디맨드 시스템</td><td class="num">0.5 인월</td></tr>
+      <tr><td>Tier 1 (한국어·영어)</td><td class="num">0.3 인월</td></tr>
+      <tr><td>Tier 2 (4개 언어)</td><td class="num">0.6 인월</td></tr>
+      <tr><td>Tier 3 (6개 언어)</td><td class="num">0.5 인월</td></tr>
+      <tr><td><strong>소계</strong></td><td class="num"><strong>2.4 인월</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p style="font-size:13.4px;color:var(--fg-3)">STAGE 2까지는 Tier 1·2만 포함하므로 선행 공수는 약 1.9인월이다.</p>
+</section>
+
+<!-- 15 -->
+<section class="sec" id="s15">
+  <div class="sec-head"><div class="sec-num">15</div><div class="sec-title">
+    <h2>AI 개발</h2><p>AI-DRIVEN DEVELOPMENT</p></div></div>
+
+  <p>개발·코딩은 전 과정을 AI로 진행한다. 결정론 시뮬레이션과 롤백 넷코드를 품고 있으므로 모델 선택보다 <strong>검증 체계</strong>가 중요하다.</p>
+
+  <h3>모델별 역할</h3>
+  <div class="tw"><table>
+    <thead><tr><th>모델</th><th>주 담당</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>Claude<br><span style="font-weight:400;color:var(--fg-3);font-size:12px">Claude Code</span></td><td><strong>메인 구현</strong> — 결정론 시뮬 코어, 롤백 넷코드, 대규모 리팩터링, 판정 로직</td><td>정확성이 중요한 장기 코드 세션. 에이전틱 코딩으로 저장소 전반 작업</td></tr>
+      <tr><td>GPT<br><span style="font-weight:400;color:var(--fg-3);font-size:12px">Codex</span></td><td><strong>교차 검증</strong> — 동일 명세를 독립 구현해 결과 대조</td><td>결정론 검증에는 "같은 명세, 다른 구현, 같은 해시"가 가장 강력한 증거</td></tr>
+      <tr><td>Gemini</td><td><strong>에셋·문서 파이프라인</strong> — 빌드 스크립트, 에셋 변환, 스크린샷 기반 UI 피드백</td><td>초장문 컨텍스트와 멀티모달. 렌더 결과를 보고 판단하는 작업에 적합</td></tr>
+      <tr><td>Kimi K3</td><td><strong>프론트엔드·UI</strong> — 로비, 상점, 랭킹 UI, 대형 저장소 스캔</td><td>프론트엔드 코드 벤치마크 상위. 1M 토큰 컨텍스트로 저장소 전체를 한 번에 읽는다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>6가지 규칙</h3>
+  <div class="grid2">
+    <div class="card"><span class="k">RULE 01</span><h5>명세를 먼저 잠근다</h5><p>고정소수점 타입, 상태 구조체, 직렬화 포맷, 프레임 규격을 문서로 먼저 확정하고 그 문서를 모든 모델에 컨텍스트로 준다.</p></div>
+    <div class="card"><span class="k">RULE 02</span><h5>골든 테스트 우선</h5><p>「같은 입력 → 같은 상태 해시」 리플레이 결정론 테스트를 CI에 넣는다. AI 코드 품질은 <strong>리뷰가 아니라 테스트로</strong> 판정한다.</p></div>
+    <div class="card"><span class="k">RULE 03</span><h5>모델 교차 검증</h5><p>판정·물리처럼 미묘한 부분은 두 모델에 독립 구현시키고 1만 프레임 시뮬 결과를 대조한다. 불일치가 곧 버그 위치다.</p></div>
+    <div class="card"><span class="k">RULE 04</span><h5>SSOT 문서 관리</h5><p><code>/docs/spec/</code>에 시스템별 단일 진실 원천 문서를 두고 세션마다 주입. 모델이 바뀌어도 일관성이 유지된다.</p></div>
+    <div class="card"><span class="k">RULE 05</span><h5>위임 불가 영역</h5><p>공격 모션의 타격감 설계, 아트 디렉션 판단, 밸런스 감각. 여기는 사람이 한다.</p></div>
+    <div class="card"><span class="k">RULE 06</span><h5>라이선스 확인</h5><p>AI 툴의 무료 티어는 출처 표기 의무나 비상업 제한이 붙는 경우가 많다. <strong>상용 출시물이므로 유료 플랜의 상업 라이선스를 확인하고 쓴다.</strong></p></div>
+  </div>
+
+  <h3>모듈별 배치</h3>
+  <div class="tw"><table>
+    <thead><tr><th>모듈</th><th>담당</th><th>검증</th></tr></thead>
+    <tbody>
+      <tr><td>고정소수점 수학 라이브러리</td><td>Claude</td><td>단위 테스트 + GPT 독립 구현 대조</td></tr>
+      <tr><td>시뮬 코어 (상태·전이·판정)</td><td>Claude</td><td>결정론 해시 테스트 1만 회</td></tr>
+      <tr><td>롤백 넷코드</td><td>Claude</td><td>인위적 지연·패킷로스 주입 테스트</td></tr>
+      <tr><td>히트박스 저작 툴</td><td>Claude / Gemini</td><td>수동 검수 (에디터 UX)</td></tr>
+      <tr><td>콤보 시스템</td><td>Claude</td><td>트라이얼 자동 재생 테스트</td></tr>
+      <tr><td>로비·상점·랭킹 UI</td><td>Kimi K3</td><td>시각 회귀 테스트 + Gemini 스크린샷 리뷰</td></tr>
+      <tr><td>백엔드 API·랭킹 집계</td><td>Claude / GPT</td><td>부하 테스트</td></tr>
+      <tr><td>빌드·에셋 파이프라인</td><td>Gemini</td><td>CI 통과 여부</td></tr>
+      <tr><td>UGC 에디터</td><td>Kimi K3 / Claude</td><td>실사용자 테스트</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>AI 아트 파이프라인</h3>
+  <div class="tw"><table>
+    <thead><tr><th>구간</th><th>AI 대체율</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>배경 프롭 · 스테이지 키트</td><td><span class="tag done">80~90%</span></td><td>리깅 불필요, 원거리·셀셰이딩이라 품질 요구가 낮다. 국가 키트가 3~4주에서 1주 내외로 줄어든다</td></tr>
+      <tr><td>캐릭터 베이스 메시</td><td><span class="tag done">60~70%</span></td><td>레퍼런스 이미지 → 메시 생성 후 쿼드 리토폴로지. 격투게임은 관절이 극단적으로 꺾이므로 <strong>에지 플로우 손보기는 남는다</strong></td></tr>
+      <tr><td>리깅</td><td><span class="tag done">85%</span></td><td>휴머노이드 오토리깅은 사실상 해결. 가중치 미세조정만 수동</td></tr>
+      <tr><td>텍스처</td><td><span class="tag done">80%</span></td><td>PBR 자동 생성 + 셀셰이딩이라 평면 색면이 많아 유리. UGC 스킨과 UV 파이프라인이 겹친다</td></tr>
+      <tr><td>이동 · 피격 · 기본 모션</td><td><span class="tag done">70%</span></td><td>웹캠 기반 AI 모캡 + 기성 라이브러리 리타게팅</td></tr>
+      <tr><td><strong>공격 모션 · 각성기</strong></td><td><span class="tag crit">20~30%</span></td><td><strong>여기가 병목이다.</strong> AI 모캡은 "자연스러운 움직임"을 만들지 "12프레임에 판정이 나가는 과장된 타격"을 만들지 못한다. 타격감은 anticipation·과장·프레임 단위 타이밍의 설계 행위다</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box rec"><span class="lb">아트 워크플로</span>
+<pre>① 컨셉 이미지 생성 (이미지 AI)
+        ↓
+② 이미지 → 3D 베이스 메시
+        ↓
+③ 쿼드 리메시 + 에지 플로우 손보기          ← 사람, 종목당 2~3일
+        ↓
+④ 오토리깅 + 가중치 조정
+        ↓
+⑤ 이동·피격·기본 모션 = 웹캠 모캡 or 기성 라이브러리
+        ↓
+⑥ <strong>공격 모션·각성기 = 직접 촬영 후 과장·타이밍 재설계</strong>  ← 사람, 핵심
+        ↓
+⑦ 프레임별 히트박스 저작 (11장 툴)          ← 사람, 위임 불가</pre>
+    <p>⑥과 ⑦에 사람의 시간을 몰아주고 나머지는 자동화한다. <strong>두 사람이 직접 죽도를 휘두르고 발차기를 하는 영상을 찍는 것</strong>이 가장 현실적인 모캡 방법이다.</p>
+  </div>
+
+  <h3>공수 산정</h3>
+  <p>기준은 <strong>STAGE 2(Steam 얼리 액세스) 도달</strong>. 종목 2종, 스테이지 6종, 콤보·랭크·소속·CP 상점 전체 포함. 단위는 <strong>인월</strong>.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>영역</th><th>AI 미사용</th><th>AI 100%</th><th>배수</th></tr></thead>
+    <tbody>
+      <tr><td colspan="4" style="background:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--hurt);padding:9px 14px">A. 게임 코어</td></tr>
+      <tr><td>고정소수점 수학 라이브러리</td><td class="num">0.5</td><td class="num">0.2</td><td class="num">2.5×</td></tr>
+      <tr><td>결정론 시뮬 코어</td><td class="num">3.0</td><td class="num">1.5</td><td class="num">2.0×</td></tr>
+      <tr><td>롤백 넷코드</td><td class="num">4.0</td><td class="num">2.5</td><td class="num">1.6×</td></tr>
+      <tr><td>콤보 시스템</td><td class="num">1.5</td><td class="num">0.7</td><td class="num">2.1×</td></tr>
+      <tr><td>렌더·카메라·이펙트</td><td class="num">2.5</td><td class="num">1.2</td><td class="num">2.1×</td></tr>
+      <tr><td>커스터마이징 (모프·UV)</td><td class="num">1.0</td><td class="num">0.4</td><td class="num">2.5×</td></tr>
+      <tr><td>입력·오토콤보</td><td class="num">1.0</td><td class="num">0.3</td><td class="num">3.3×</td></tr>
+      <tr><td>히트박스 저작 툴</td><td class="num">2.0</td><td class="num">0.5</td><td class="num">4.0×</td></tr>
+      <tr><td>리플레이·훈련모드</td><td class="num">1.5</td><td class="num">0.5</td><td class="num">3.0×</td></tr>
+      <tr><td>UI 전체</td><td class="num">3.0</td><td class="num">0.6</td><td class="num"><span class="tag done">5.0×</span></td></tr>
+      <tr><td><strong>소계</strong></td><td class="num"><strong>20.0</strong></td><td class="num"><strong>8.4</strong></td><td class="num"><strong>2.4×</strong></td></tr>
+
+      <tr><td colspan="4" style="background:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--hurt);padding:9px 14px">B. 백엔드 · 인프라</td></tr>
+      <tr><td>계정·소속·행정구역 데이터</td><td class="num">1.5</td><td class="num">0.4</td><td class="num">3.8×</td></tr>
+      <tr><td>매칭·시그널링·방 시스템</td><td class="num">2.0</td><td class="num">0.7</td><td class="num">2.9×</td></tr>
+      <tr><td>릴레이 서버</td><td class="num">1.0</td><td class="num">0.4</td><td class="num">2.5×</td></tr>
+      <tr><td>랭킹 집계·시즌</td><td class="num">1.5</td><td class="num">0.4</td><td class="num">3.8×</td></tr>
+      <tr><td>CP·상점·시즌패스·결제검증</td><td class="num">2.0</td><td class="num">0.9</td><td class="num">2.2×</td></tr>
+      <tr><td>부정행위 대응·재검증</td><td class="num">1.5</td><td class="num">0.6</td><td class="num">2.5×</td></tr>
+      <tr><td>CI·모니터링·배포</td><td class="num">2.0</td><td class="num">0.7</td><td class="num">2.9×</td></tr>
+      <tr><td><strong>소계</strong></td><td class="num"><strong>11.5</strong></td><td class="num"><strong>4.1</strong></td><td class="num"><strong>2.8×</strong></td></tr>
+
+      <tr><td colspan="4" style="background:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--inv);padding:9px 14px">C. 검증 — AI가 늘리는 영역</td></tr>
+      <tr><td>결정론 골든 테스트 하네스</td><td class="num">1.0</td><td class="num">0.5</td><td class="num">2.0×</td></tr>
+      <tr><td><strong>AI 산출물 검토·교차검증·재작업</strong></td><td class="num">—</td><td class="num"><strong>2.5</strong></td><td class="num"><span class="tag crit">신규</span></td></tr>
+      <tr><td>QA·크로스플랫폼 실기 테스트</td><td class="num">2.0</td><td class="num">1.6</td><td class="num">1.3×</td></tr>
+      <tr><td><strong>소계</strong></td><td class="num"><strong>3.0</strong></td><td class="num"><strong>4.6</strong></td><td class="num"><span class="tag crit">0.65×</span></td></tr>
+
+      <tr><td colspan="4" style="background:var(--ink-3);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--fg-3);padding:9px 14px">D. 아트</td></tr>
+      <tr><td>3D 캐릭터 2종 (모델·리그·애니)</td><td class="num">5.0</td><td class="num">3.0</td><td class="num">1.7×</td></tr>
+      <tr><td>스테이지 키트 1개국 + 6종</td><td class="num">1.8</td><td class="num">0.9</td><td class="num">2.0×</td></tr>
+      <tr><td>VFX·사운드·BGM</td><td class="num">1.5</td><td class="num">0.7</td><td class="num">2.1×</td></tr>
+      <tr><td>밸런스 튜닝 (2종)</td><td class="num">1.2</td><td class="num">0.8</td><td class="num">1.5×</td></tr>
+      <tr><td>기획 판단·아트 디렉션·스토어 대응</td><td class="num">2.0</td><td class="num">1.6</td><td class="num">1.3×</td></tr>
+      <tr><td><strong>소계</strong></td><td class="num"><strong>11.5</strong></td><td class="num"><strong>7.0</strong></td><td class="num"><strong>1.6×</strong></td></tr>
+
+      <tr><td><strong>총계</strong></td><td class="num"><strong>46.0 인월</strong></td><td class="num"><strong>24.1 인월</strong></td><td class="num"><strong>1.9×</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>다국어 2.4인월(14장)과 UGC 맵 파이프라인 2.5인월(13장, 실질 신규 1.0)이 별도로 붙는다.</p>
+
+  <h4>일정 환산</h4>
+  <div class="tw"><table>
+    <thead><tr><th>시나리오</th><th>팀 내부 잔여</th><th>STAGE 2 도달</th></tr></thead>
+    <tbody>
+      <tr><td><strong>AI 아트 자체 처리 + 2인 전업</strong><br><span style="font-weight:400;color:var(--fg-3);font-size:12.5px">외주비 0원</span></td><td class="num">약 26 인월</td><td class="num"><strong>13개월</strong> + 버퍼 2개월</td></tr>
+      <tr><td><strong>공격 모션만 외주 + 2인 전업</strong></td><td class="num">약 23 인월</td><td class="num"><strong>11~12개월</strong> <span class="tag done">권장</span></td></tr>
+      <tr><td>겸업 (가동률 35%)</td><td class="num">동일</td><td class="num"><span class="tag crit">2~2.5배</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>인월은 <strong>전업 100% 기준</strong>이다. 다른 일과 병행하면 실가동률이 30~40%로 떨어지고 같은 26인월이 13개월에서 26개월 이상으로 늘어난다. 엔진 선택이나 모델 조합보다 이 변수가 일정에 크게 작용한다.</p>
+
+  <h3>구독 스택</h3>
+  <div class="tw"><table>
+    <thead><tr><th>용도</th><th>도구</th></tr></thead>
+    <tbody>
+      <tr><td>메인 구현·리팩터링</td><td>Claude (Claude Code)</td></tr>
+      <tr><td>교차 검증</td><td>GPT (Codex)</td></tr>
+      <tr><td>멀티모달·에셋 파이프라인</td><td>Gemini</td></tr>
+      <tr><td>프론트엔드·저장소 스캔</td><td>Kimi K3</td></tr>
+      <tr><td><strong>배치 자동화</strong></td><td>각 사 API 크레딧</td></tr>
+      <tr><td>아트 보조</td><td>이미지 생성(컨셉·텍스처), 3D 생성, 사운드·BGM 생성</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box rec"><span class="lb">야간 배치</span>
+    <p>보유 서버 44코어(16장)에 API 크레딧을 붙여 사람이 자는 동안 다음을 자동으로 돌린다.</p>
+    <ul>
+      <li>매 커밋마다 결정론 골든 테스트 수백 케이스 병렬 실행</li>
+      <li>실패 케이스를 AI에게 자동 전달 → 수정 PR 초안 생성 → 아침에 사람이 판단만</li>
+      <li>두 모델의 독립 구현을 동시 시뮬레이션해 불일치 프레임 자동 리포트</li>
+      <li>하루치 리플레이 재생 → 밸런스 지표 자동 집계(16장)</li>
+    </ul>
+    <p>위 표에서 가장 비싼 신규 비용이 「AI 산출물 검토·재작업 2.5인월」인데, 이 배치 체계가 그 항목을 직접 깎는다. <strong>검토를 사람이 읽어서 하는 대신 테스트가 통과 여부로 판정</strong>하게 만드는 것이 핵심이다.</p>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="sec" id="s16">
+  <div class="sec-head"><div class="sec-num">16</div><div class="sec-title">
+    <h2>인프라</h2><p>INFRASTRUCTURE</p></div></div>
+
+  <h3>보유 자산</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>사양</th><th>평가</th></tr></thead>
+    <tbody>
+      <tr><td>CPU</td><td>Xeon E5-2696 v4 ×2<br><span style="font-weight:400;color:var(--fg-3);font-size:12.5px">22C/44T ×2 = 총 44코어 88스레드</span></td><td>게임 백엔드에는 과잉. <strong>빌드·테스트 팜으로 최적</strong></td></tr>
+      <tr><td>RAM</td><td>128GB</td><td>충분. Redis 랭킹은 10만 유저여도 수십 MB</td></tr>
+      <tr><td>스토리지</td><td>SSD 4TB</td><td>넉넉. 배분안은 아래</td></tr>
+      <tr><td>위치</td><td>국내 IDC</td><td>한국·일본·중국 대상 최적. <strong>미주·유럽 릴레이로는 부적합</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <p>이 서버 한 대로 <strong>STAGE 1 전 구간과 STAGE 2 초기까지 커버된다.</strong> 추가로 필요한 것은 해외 릴레이용 소형 VPS 2~3대와 iOS 빌드용 맥이다.</p>
+
+  <h3>부하 특성</h3>
+  <p>대전 트래픽이 P2P로 흐르므로 CPU도 메모리도 병목이 아니다. 변수는 <strong>지연시간과 지리적 위치</strong>다.</p>
+<pre>롤백 입력 패킷 ≈ 100 bytes (페이로드 + UDP/IP 오버헤드)
+60 packets/s × 2방향 × 2플레이어 ≈ 12 KB/s per 릴레이 매치
+
+동시 릴레이   200경기  →  약  2.4 MB/s  ≈  20 Mbps
+동시 릴레이 1,000경기  →  약   12 MB/s  ≈ 100 Mbps
+
+* NAT 통과 실패율 10~20% 가정</pre>
+  <p>대역폭은 한동안 문제가 되지 않는다. 실질 트래픽 비용은 클라이언트 다운로드와 UGC 배포에서 나오며 그건 CDN이 담당한다.</p>
+
+  <h3>단계별 계획</h3>
+  <div class="tw"><table>
+    <thead><tr><th>단계</th><th>구성</th><th>추가 비용</th></tr></thead>
+    <tbody>
+      <tr><td><strong>STAGE 1</strong></td><td>보유 서버 1대에 전부 수용. 국내/아시아 대상만 운영</td><td>사실상 0 + 도메인</td></tr>
+      <tr><td><strong>STAGE 2</strong></td><td>보유 서버 = 코어(DB·API·랭킹·시그널링·빌드)<br>+ <strong>해외 릴레이 VPS</strong> 도쿄·오리건·프랑크푸르트 소형 3대<br>+ <strong>Cloudflare</strong> 앞단 (DDoS·CDN)<br>+ <strong>결제 검증 API는 클라우드로 분리</strong></td><td>월 10만 원 안팎</td></tr>
+      <tr><td><strong>STAGE 3</strong></td><td>리전 확장, DB 이중화, UGC용 오브젝트 스토리지 + CDN, 로그·모니터링 분리</td><td>매출 연동 증설</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>역할 배치안</h3>
+  <div class="tw"><table>
+    <thead><tr><th>역할</th><th>vCPU</th><th>RAM</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>PostgreSQL</td><td class="num">8</td><td class="num">16GB</td><td>프로필·소속·거래·CP 원장</td></tr>
+      <tr><td>Redis</td><td class="num">4</td><td class="num">8GB</td><td>랭킹 ZSET 5종, 세션</td></tr>
+      <tr><td>API 서버</td><td class="num">8</td><td class="num">8GB</td><td>2인스턴스 로드밸런싱</td></tr>
+      <tr><td>시그널링(WebSocket)</td><td class="num">4</td><td class="num">4GB</td><td>매칭·방 목록 델타 푸시</td></tr>
+      <tr><td>릴레이 (KR/아시아)</td><td class="num">4</td><td class="num">4GB</td><td>UDP</td></tr>
+      <tr><td>모니터링·로그</td><td class="num">4</td><td class="num">8GB</td><td>Grafana + Loki</td></tr>
+      <tr><td><strong>CI · 빌드 · 테스트 팜</strong></td><td class="num"><strong>40+</strong></td><td class="num"><strong>48GB</strong></td><td>아래 참조</td></tr>
+      <tr><td>여유</td><td class="num">16</td><td class="num">32GB</td><td>피크 대응·스테이징</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box rec"><span class="lb">이 서버의 주 용도는 빌드·검증 팜이다</span>
+    <ul>
+      <li><strong>1만 프레임 리플레이 × 수백 케이스를 매 커밋마다 병렬 실행.</strong> 44코어면 수십 개 케이스를 동시에 돌려 몇 분 안에 끝난다</li>
+      <li>AI가 짠 코드를 리뷰가 아니라 테스트로 검증하는 체제의 물리적 기반</li>
+      <li>인위적 지연·패킷로스 주입 넷코드 테스트를 컨테이너 수십 개로 동시 시뮬레이션</li>
+      <li>Unity 빌드 캐시 + Windows/Android 빌드 러너</li>
+      <li>모델 교차 검증 — 두 모델의 독립 구현을 동시에 돌려 상태 해시 대조</li>
+    </ul>
+    <p><strong>iOS 빌드는 macOS가 필수다.</strong> Mac mini 1대(중고 M1도 충분) 또는 클라우드 맥을 STAGE 3 착수 전에 확보한다.</p>
+  </div>
+
+  <h3>스토리지 4TB 배분</h3>
+  <div class="box note"><span class="lb">리플레이가 가볍다</span>
+    <p>결정론 시뮬레이션이므로 리플레이를 영상이 아니라 <strong>입력 로그</strong>로 저장한다.</p>
+<pre>패킹된 입력  ≈ 4 bytes/frame/player
+60fps × 2인 × 180초  ≈ 86 KB (원본)
+반복 구간 압축 후    ≈ <strong>10~20 KB / 경기</strong>
+
+하루 5만 경기 = 약 750 MB/day = 약 270 GB/year</pre>
+    <p>같은 경기를 영상으로 녹화하면 경기당 30~80MB다. 3천 배 차이 덕분에 전 경기 리플레이 보관이 가능하다.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>용도</th><th>할당</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>PostgreSQL + WAL</td><td class="num">300 GB</td><td>실사용은 연 수십 GB 수준</td></tr>
+      <tr><td>Redis 영속화</td><td class="num">50 GB</td><td>스냅샷용</td></tr>
+      <tr><td><strong>리플레이 저장소</strong></td><td class="num">800 GB</td><td>일반 경기 30일 / 랭커·신고 경기 영구</td></tr>
+      <tr><td>UGC 오리진</td><td class="num">300 GB</td><td>원본 아카이브만. <strong>배포는 CDN</strong></td></tr>
+      <tr><td><strong>CI · 빌드 캐시</strong></td><td class="num">1 TB</td><td>Unity 라이브러리 캐시만 프로젝트당 20~50GB</td></tr>
+      <tr><td>로그 · 모니터링</td><td class="num">200 GB</td><td>30일 롤링</td></tr>
+      <tr><td>DB 백업 로컬 사본</td><td class="num">300 GB</td><td>오프사이트 백업이 원본</td></tr>
+      <tr><td>OS · 컨테이너 이미지</td><td class="num">100 GB</td><td></td></tr>
+      <tr><td><strong>여유</strong></td><td class="num"><strong>950 GB</strong></td><td>SSD는 70~80% 이상 채우면 쓰기 성능·수명이 떨어진다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>디스크 구성</h4>
+  <ul>
+    <li>4TB가 단일 드라이브면 최소 <strong>RAID 1 미러</strong>. 단 RAID는 가용성 장치이지 백업이 아니다</li>
+    <li>Unity 빌드와 CI는 쓰기량이 많다. <strong>CI 캐시만이라도 별도 디스크</strong>로 빼고 소모품으로 취급</li>
+    <li>DB와 CI를 물리 분리. 불가능하면 cgroup으로 CI의 IO 제한</li>
+    <li><strong>DB 오프사이트 백업 필수.</strong> 일 1회 클라우드 스토리지로, 복구 절차를 한 번 리허설</li>
+  </ul>
+
+  <div class="box note"><span class="lb">리플레이 + 44코어 = 밸런스 분석</span>
+    <p>2명이서는 종목 10종의 밸런스를 플레이테스트만으로 잡을 수 없다. 리플레이가 입력 로그이고 시뮬이 결정론적이므로 <strong>저장된 경기를 서버에서 대량으로 재생</strong>해 자동 집계한다.</p>
+    <ul>
+      <li>종목별·티어별 승률, 매치업 표</li>
+      <li>기술별 사용 빈도와 히트율 — 아무도 안 쓰는 스킬 색출</li>
+      <li>콤보 루트 실제 사용 분포 — 설계한 루트와 유저가 쓰는 루트의 차이</li>
+      <li>평균 콤보 길이, 버스트 사용 시점 분포</li>
+      <li>롤백 발생 빈도·지역별 체감 지연</li>
+    </ul>
+  </div>
+
+  <h3>운영 요건</h3>
+  <ul>
+    <li><strong>결제 검증·계정 API는 클라우드로 분리.</strong> 자동 재시작·헬스체크·알림 필수</li>
+    <li>Cloudflare 등 앞단 배치. 릴레이 IP는 노출되므로 <strong>매치마다 엔드포인트 로테이션</strong></li>
+    <li>거주 지역·연령을 수집하므로 저장 시 암호화, 접근 통제, 보관 기간·파기 정책 명시</li>
+    <li><strong>결제 정보는 저장하지 않는다.</strong> 스토어 영수증 검증만 수행</li>
+    <li>관리자 접근은 VPN + 키 기반 인증만</li>
+  </ul>
+
+  <h3>고정 비용</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>대략</th><th>시점</th></tr></thead>
+    <tbody>
+      <tr><td>Steam 등록비</td><td class="num">작품당 $100</td><td>출시 준비 시</td></tr>
+      <tr><td>Apple Developer</td><td class="num">연 $99</td><td>모바일 착수 시</td></tr>
+      <tr><td>Google Play</td><td class="num">1회 $25</td><td>모바일 착수 시</td></tr>
+      <tr><td>해외 릴레이 VPS ×3</td><td class="num">월 수만 원</td><td>STAGE 2</td></tr>
+      <tr><td>CDN·오브젝트 스토리지</td><td class="num">초기 무료 티어</td><td>STAGE 2</td></tr>
+      <tr><td>도메인·인증서</td><td class="num">연 수만 원</td><td>즉시</td></tr>
+      <tr><td>Mac (iOS 빌드)</td><td class="num">1회</td><td>STAGE 3 이전</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 17 -->
+<section class="sec" id="s17">
+  <div class="sec-head"><div class="sec-num">17</div><div class="sec-title">
+    <h2>팀 &amp; 로드맵</h2><p>TEAM &amp; ROADMAP</p></div></div>
+
+  <h3>QUATTRO MANI STUDIO</h3>
+  <div class="box note"><span class="lb">이름의 뜻</span>
+    <p><strong>Quattro mani</strong>는 이탈리아어로 "네 손"이다. 음악에서 실제로 쓰는 용어로, <strong>「a quattro mani」는 두 사람이 피아노 한 대를 함께 연주하는 것</strong>을 말한다. 오른쪽에 앉은 사람이 맡는 고음부를 primo, 왼쪽의 저음부를 secondo라 부른다.</p>
+    <p>중요한 건 <strong>피아노가 두 대가 아니라 한 대</strong>라는 점이다. 각자 자기 악기를 따로 치는 게 아니라 하나의 건반을 나눠 쓴다. 서로의 손이 닿을 만큼 가까이 앉아야 하고, 연주 내내 상대가 무엇을 치고 있는지 듣고 있어야 한다. 파트는 둘로 나뉘지만 <strong>나오는 곡은 하나</strong>다.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><span class="k">1 · 두 사람</span><h5>네 손</h5><p>2인이 하나의 작품을 만든다</p></div>
+    <div class="card"><span class="k">2 · 네 살</span><h5>궁합도 안 보는 사이</h5><p>박창현·정영학의 나이 차 4살. 한국 속담에서 4살 차이는 궁합을 볼 필요가 없다</p></div>
+    <div class="card"><span class="k">3 · 이 게임</span><h5>네 주먹</h5><p>1:1 격투 게임. 화면 안에 늘 주먹이 넷이다</p></div>
+  </div>
+
+  <h3>역할 분담</h3>
+  <div class="grid2">
+    <div class="card"><span class="k">SECONDO · 박창현</span><h5>시뮬 코어 &amp; 인프라</h5><p>결정론 시뮬레이션, 롤백 넷코드, 백엔드·랭킹, AI 코딩 오케스트레이션, 빌드·배포. 표면에 드러나지 않지만 전체를 지탱하는 토대</p></div>
+    <div class="card"><span class="k">PRIMO · 정영학</span><h5>게임 디자인 &amp; 아트</h5><p>아트 파이프라인·외주 관리, 히트박스·프레임 데이터 저작, 콤보 루트 설계, 밸런스 튜닝, 스테이지 조립, 커뮤니티. 유저가 실제로 듣고 보는 멜로디</p></div>
+  </div>
+
+  <h4>표기 규칙</h4>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>정식 명칭</td><td><strong>QUATTRO MANI STUDIO</strong></td></tr>
+      <tr><td>한글 표기</td><td>콰트로 마니 스튜디오</td></tr>
+      <tr><td>약칭 · 로고</td><td><code>QM</code> 또는 <code>4 MANI</code></td></tr>
+      <tr><td>도메인</td><td>quattromanistudio.com / .games / .gg</td></tr>
+      <tr><td>Steam 퍼블리셔명</td><td>Quattro Mani Studio</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>수익 배분 — 5:5</h3>
+  <p>두 사람이 균등 배분한다. 다만 <strong>수익은 5:5여도 의사결정까지 5:5면 의견이 갈렸을 때 결정할 방법이 없다.</strong> 영역별 최종 결정권은 나눠서 명시한다.</p>
+  <ul>
+    <li>기술 구조·인프라·일정 → <strong>박창현</strong> 최종 결정</li>
+    <li>게임 디자인·밸런스·아트 방향 → <strong>정영학</strong> 최종 결정</li>
+    <li>가격·출시 시점·계약 → 합의 필수, 합의 불가 시 <strong>보류(현상 유지)</strong>가 기본값</li>
+  </ul>
+
+  <h4>착수 전 문서화</h4>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>수익 배분 5:5</td><td>분배 방식·주기·정산 계좌</td></tr>
+      <tr><td>비용 부담 비율</td><td>아트 외주·서버·스토어 등록비도 5:5인가. 한쪽이 더 냈다면 회수 순서는</td></tr>
+      <tr><td>지식재산권 귀속</td><td>코드·아트·게임명·상표가 누구 것인지</td></tr>
+      <tr><td>영역별 결정권</td><td>위 항목</td></tr>
+      <tr><td><strong>중도 이탈 처리</strong></td><td>한 명이 그만두면 지분과 소스는 어떻게 되는가</td></tr>
+      <tr><td>사업자 형태</td><td>공동 개인사업자 / 법인. 스토어 정산과 세금 처리 방식이 달라진다</td></tr>
+    </tbody>
+  </table></div>
+  <p style="font-size:13.4px;color:var(--fg-3)">동업 계약과 세무는 전문 영역이므로 실제 문서화는 변호사·세무사 검토를 거친다. 위 목록은 상담 전에 두 사람이 합의해 둘 항목의 체크리스트다.</p>
+
+  <h3>로드맵 — 3단계</h3>
+  <div class="tw"><table>
+    <thead><tr><th>단계</th><th>기간</th><th>범위</th><th>목적</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>STAGE 1</strong><br>수직 슬라이스</td>
+        <td>0~6개월</td>
+        <td>종목 2종 / 스테이지 2종 / 롤백 P2P 대전 / 콤보 기본형 / 홈·어웨이 연출 / 랭킹 스켈레톤<br><span style="color:var(--fg-3);font-size:12.5px">과금·상점·UGC·모바일 없음</span></td>
+        <td>① 결정론 롤백 검증<br>② 설치·리텐션 지표 측정<br>③ 아트 파이프라인 실측</td>
+      </tr>
+      <tr>
+        <td><strong>STAGE 2</strong><br>Steam 얼리 액세스</td>
+        <td>7~14개월</td>
+        <td>스테이지 6종 / 랭크·소속·시즌 / 콤보 전체 / CP 상점 + 공식 스킨 + 시즌 패스 가동</td>
+        <td>매출 발생 → 아트 재투자 루프 성립</td>
+      </tr>
+      <tr>
+        <td><strong>STAGE 3</strong><br>확장</td>
+        <td>15개월~</td>
+        <td>모바일 이식 / 국가·스테이지 확장 / 종목 6~10종 / <strong>UGC 워크샵</strong></td>
+        <td>매출과 인구가 확인된 뒤에만 착수</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h4>출시 시점에 넣지 않는 것</h4>
+  <div class="tw"><table>
+    <thead><tr><th>기능</th><th>재개 조건</th></tr></thead>
+    <tbody>
+      <tr><td>UGC 워크샵</td><td>DAU 5,000 + 검수 파트타임 1명 확보 후. 초기에는 주 1회 배치 큐레이션</td></tr>
+      <tr><td>모바일 동시 출시</td><td>PC 빌드 안정화 + 매출로 QA 외주 확보 후</td></tr>
+      <tr><td>국가 10~20종 배경</td><td>유저 유입 국가 데이터를 보고 순차</td></tr>
+      <tr><td>종목 10종</td><td>시즌마다 1~2종. 10종은 목표지 출시 요건이 아니다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>아트 조달</h3>
+  <p>AI 파이프라인(15장)이 배경·베이스 메시·리깅·텍스처·기본 모션을 커버하므로, 외주가 필요한 구간은 <strong>공격 모션과 각성기</strong>로 좁혀졌다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>방식</th><th>비용</th><th>장단</th></tr></thead>
+    <tbody>
+      <tr><td>전량 자체 (AI + 직접 촬영)</td><td>0원</td><td>일정 13개월. 타격감 튜닝에 시간이 많이 든다</td></tr>
+      <tr><td><strong>공격 모션만 외주</strong> <span class="tag done">권장</span></td><td>종목당 수백만 원대</td><td>일정 11~12개월. 종목 정체성을 만드는 부분에만 예산 집중</td></tr>
+      <tr><td>전량 외주</td><td>높음</td><td>2인 체제에서는 과잉 투자</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 18 -->
+<section class="sec" id="s18">
+  <div class="sec-head"><div class="sec-num">18</div><div class="sec-title">
+    <h2>남은 결정</h2><p>OPEN DECISIONS</p></div></div>
+
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>항목</th><th>선택지</th><th>파급</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>아트 디렉션</strong></td><td>셀셰이딩 툰(권장) / 세미리얼 / 3D 픽셀(복셀)</td><td>모델러 조달 조건 + UGC 참여율을 동시에 좌우. <strong>목표 등급과 함께 정해야</strong> 손이 두 번 가지 않는다</td></tr>
+      <tr><td class="num">2</td><td><strong>목표 등급</strong></td><td>12세 이용가 / 15세 이용가</td><td>12세를 노리면 타격 연출 수위를 더 낮춰야 한다</td></tr>
+      <tr><td class="num">3</td><td><strong>두 사람의 가동률</strong></td><td>전업 / 겸업</td><td>일정에 2~2.5배 차이. <strong>다른 모든 결정보다 파급이 크다</strong></td></tr>
+      <tr><td class="num">4</td><td>아트 조달 방식</td><td>전량 자체 / 공격 모션만 외주(권장) / 전량 외주</td><td>일정 13개월 vs 11~12개월</td></tr>
+      <tr><td class="num">5</td><td>엔진</td><td>Unity 6 (권장) / Godot 4</td><td>일정 ±1.5개월, 매출 20만$ 초과 시 라이선스 비용</td></tr>
+      <tr><td class="num">6</td><td><strong>맵 포맷을 UGC 전제로 설계할 것인가</strong></td><td>예(권장) / 내부 툴 전용</td><td><span class="tag crit">STAGE 1에 결정</span> 나중에 뒤집으면 공식 스테이지를 전부 다시 만들어야 한다 (13장)</td></tr>
+      <tr><td class="num">7</td><td>출시 언어 범위</td><td>Tier 1만(한/영) / Tier 2까지(6개 언어)</td><td>Tier 2는 +0.6인월. 브라질·중남미는 매칭 모수에 직접 기여</td></tr>
+      <tr><td class="num">8</td><td>출시 순서</td><td><strong>PC 먼저 → 모바일</strong>(권장) / 동시 출시</td><td>동시 출시는 매칭 인구에 유리하나 2인 QA 부담이 감당 범위를 넘는다</td></tr>
+      <tr><td class="num">9</td><td>닉네임 정책</td><td>중복 허용 + 내부 ID 분리(권장) / 유니크 강제</td><td>유니크 강제는 선점 문제와 CS를 부른다. 변경은 시즌당 1회 제한</td></tr>
+      <tr><td class="num">10</td><td><strong>STAGE 1 성공 기준</strong></td><td>설치 수 / 동접 / 7일 리텐션 중 무엇을 볼 것인가</td><td>이 숫자가 STAGE 2 착수 여부를 결정한다. <strong>미리 정해두지 않으면 나중에 못 접는다</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box rec"><span class="lb">우선순위</span>
+    <p>①②③⑥을 먼저 정한다. ①②는 아트 파이프라인 착수의 전제이고, ③은 일정 전체를 좌우하며, ⑥은 STAGE 1 착수 직후의 설계 방향을 결정한다.</p>
+    <p>확정 후 이 문서는 <strong>v2.0 상세 사양</strong>으로 분화한다 — 종목별 프레임 데이터 시트, 콤보 루트 표, UI 와이어프레임, DB 스키마, 네트워크 프로토콜, <code>/docs/spec/</code> SSOT 문서 세트(15장 RULE 04).</p>
+  </div>
+</section>
+
+<footer>
+  <span style="font-family:var(--display);font-size:17px;color:var(--fg)">QUATTRO MANI <span style="color:var(--hurt)">STUDIO</span></span><br>
+  HOMETOWN CLASH · 우리동네 싸움짱 — GAME DESIGN DOCUMENT v1.0<br>
+  2026.08.08 · 박창현 · 정영학 · 18개 섹션
+</footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var secs = Array.prototype.slice.call(document.querySelectorAll('.sec'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  var fill = document.getElementById('fill');
+  var pct  = document.getElementById('pct');
+  var comboEl = document.getElementById('combo');
+  var rail = document.getElementById('rail');
+  var menuBtn = document.getElementById('menuBtn');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lastCombo = -1;
+
+  if ('IntersectionObserver' in window && !reduce){
+    var revealer = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); revealer.unobserve(e.target); }
+      });
+    }, {rootMargin:'0px 0px -8% 0px', threshold:0.02});
+    secs.forEach(function(s){ revealer.observe(s); });
+  } else {
+    secs.forEach(function(s){ s.classList.add('in'); });
+  }
+
+  function setCombo(n){
+    if (n === lastCombo) return;
+    lastCombo = n;
+    comboEl.textContent = n;
+    if (reduce) return;
+    comboEl.classList.add('pop');
+    setTimeout(function(){ comboEl.classList.remove('pop'); }, 180);
+  }
+
+  var ticking = false;
+  function update(){
+    ticking = false;
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    fill.style.width = (p*100).toFixed(1) + '%';
+    pct.textContent = Math.round(p*100) + '%';
+
+    var mid = window.scrollY + window.innerHeight*0.4;
+    var hits = 0, active = -1;
+    for (var i=0;i<secs.length;i++){
+      if (secs[i].offsetTop <= mid){ hits = i+1; active = i; }
+    }
+    if (p > 0.985) { hits = secs.length; active = secs.length-1; }
+    setCombo(hits);
+    links.forEach(function(a,i){ a.classList.toggle('on', i === active); });
+  }
+  function onScroll(){
+    if (!ticking){ ticking = true; window.requestAnimationFrame(update); }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  update();
+
+  menuBtn.addEventListener('click', function(){ rail.classList.toggle('open'); });
+  links.forEach(function(a){ a.addEventListener('click', function(){ rail.classList.remove('open'); }); });
+  document.addEventListener('click', function(e){
+    if (window.innerWidth <= 1080 && rail.classList.contains('open')
+        && !rail.contains(e.target) && e.target !== menuBtn){
+      rail.classList.remove('open');
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -46,7 +46,7 @@ var colors := {
 	"shoes": Color.html("#241f2b"),
 	"outline": Color.html("#0d0b10"),
 }
-## §6.7 실루엣 구분용 특징. hair_style: "messy"|"bob"|"bald"|"slick"
+## §6.7 실루엣 구분용 특징. hair_style: "messy"|"bob"|"long_wave"|"bald"|"slick"
 var hair_style := "messy"
 var has_bag := false
 var has_coat := false
@@ -296,8 +296,20 @@ func _draw_arm(x: int, y: int, w: int, length: int, ol: Color) -> void:
 
 func _draw_hair(head_y: int, head_w: int, head_h: int, side: bool, dir: int) -> void:
 	match hair_style:
+		"long_wave":
+			# §6.7 윤세라 — 긴 갈색 웨이브. 어깨 아래까지 내려온다 (2026-08-17 목업 채택).
+			# 단발(bob)과 실루엣이 갈려야 한다 — 그게 이 자리표시자의 유일한 일이다.
+			_rect(Rect2(-head_w / 2 - 1, head_y - 2, head_w + 2, int(head_h * 0.5)), colors["hair"])
+			var fall := head_h + 4
+			_rect(Rect2(-head_w / 2 - 2, head_y, 3, fall), colors["hair"])
+			_rect(Rect2(head_w / 2 - 1, head_y, 3, fall), colors["hair"])
+			if side:
+				var back2 := (-head_w / 2 - 3) if dir > 0 else (head_w / 2 + 1)
+				_rect(Rect2(back2, head_y, 2, fall + 1), colors["hair"])
+			# 금 귀걸이 — accent 는 장신구 색이다
+			_rect(Rect2(head_w / 2 - 1, head_y + int(head_h * 0.55), 1, 2), colors["accent"])
 		"bob":
-			# §6.7 윤세라 — 적갈색 단발. 옆에서 보면 뒤통수 쪽이 더 두껍다.
+			# §6.7 옛 윤세라 규격. 다른 인물이 쓸 수 있어 남긴다.
 			_rect(Rect2(-head_w / 2 - 1, head_y - 1, head_w + 2, int(head_h * 0.55)), colors["hair"])
 			_rect(Rect2(-head_w / 2 - 1, head_y, 2, head_h), colors["hair"])
 			_rect(Rect2(head_w / 2 - 1, head_y, 2, head_h), colors["hair"])
