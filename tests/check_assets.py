@@ -6,7 +6,7 @@
 이 도구는 «눈으로 보면 놓치는 객관적인 것»만 본다 — 크기, 알파, 가장자리 잔여물.
 
     python3 tests/check_assets.py                 # assets/ 아래 PNG 전부
-    python3 tests/check_assets.py docs/art/received
+    python3 tests/check_assets.py <폴더>           # 후보 폴더 등 다른 곳
     python3 tests/check_assets.py --tone          # 톤 수치도 같이 (참고용, 판정 아님)
 
 쓰고 싶을 때만 쓰면 되는 도구다. 이걸 통과해야 그림을 쓸 수 있는 것이 아니다.
@@ -38,9 +38,20 @@ ANCHOR_DIR = ROOT / "docs" / "mockups"
 # UI 작업의 참고 자료로는 그대로 쓰되, 톤 앵커에서는 뺀다.
 NON_ANCHOR = {"04_notebook"}
 
-# 기준 캔버스가 정해지면 여기에 규격을 넣는다 (§23 «사람이 결정해야 하는 것»)
+# 규격. **기준 캔버스가 942×1674 로 정해져서 채웠다** (2026-08-17).
+#
+# UI 그림은 전부 «UI 설계 좌표 × 3» 이다 (Layout.UI_SCALE). 배경만 규칙이 다르다 —
+# 월드 밴드(942×1305)를 채운 뒤 남는 쪽을 잘라내므로 2:3 으로 넉넉히 받는다.
+#
+# 캐릭터 스프라이트시트는 여기 없다. 프레임 크기(frame_size)가 아직 미정이고
+# (D3 · 인물 크기), 시트는 프레임 × 열수라 한 값으로 못 적는다.
 SPEC: dict[str, dict] = {
-    # "assets/backgrounds/*.png": {"size": (1080, 1500)},
+    "assets/backgrounds/*.png": {"size": (1024, 1536)},
+    "assets/sprites/portraits/*.png": {"size": (189, 189)},
+    "assets/ui/items/*.png": {"size": (48, 36)},
+    "assets/ui/topbar.png": {"size": (942, 147)},
+    "assets/ui/command_panel.png": {"size": (942, 222)},
+    "assets/ui/title.png": {"size": (942, 1674)},
 }
 
 # 합격선은 상수가 아니라 «앵커끼리 떨어진 최대 거리»에서 나온다 (main 참고)
@@ -312,7 +323,9 @@ def main(argv: list[str]) -> int:
     if show_tone:
         print("※ 톤 수치는 참고용이다. 이 숫자로 그림을 버리지 않는다 — 판정은 눈으로 한다.")
     if not SPEC:
-        print("※ 기준 캔버스가 미정이라 크기 검사는 아직 비어 있다 (§23).")
+        print("※ 크기 규격이 비어 있어 크기 검사를 건너뛰었다.")
+    else:
+        print("※ 크기·알파만 본다. 화풍·톤·구도는 여전히 눈으로 판정한다.")
     return 0
 
 

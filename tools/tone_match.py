@@ -4,7 +4,7 @@
 
 받은 그림의 «채도»를 앵커에 맞춘다. 색상(hue)과 구도는 건드리지 않는다.
 
-    python3 tools/tone_match.py docs/art/received/05_subway_night.png
+    python3 tools/tone_match.py assets/backgrounds/subway_night.png
     python3 tools/tone_match.py <파일> --target 0.427 --out <저장경로>
 
 명도(밝기)는 기본적으로 건드리지 않는다 — 밤 장면이 어두운 것은 «어긋남»이 아니라
